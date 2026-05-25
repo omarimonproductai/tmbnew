@@ -1067,20 +1067,20 @@ body {
 
   .panel-toggle-mobile {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    bottom: 16px;
+    right: 16px;
     z-index: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: 2px solid #ffffff;
     background: #ffffff;
     color: #444;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
     font-family: inherit;
   }
   .panel-toggle-mobile.active { color: #c8001e; background: #fff5f6; }
@@ -1095,7 +1095,7 @@ body {
   .vehicle-visibility-toggle { width: 40px; height: 40px; }
   .refresh-control { width: 40px; height: 40px; }
 
-  .view-toggle-wrapper { top: 10px; left: 60px; }
+  .view-toggle-wrapper { top: 10px; left: 10px; }
   .view-toggle button span { display: none; }
   .view-toggle button { padding: 6px 8px; }
 
