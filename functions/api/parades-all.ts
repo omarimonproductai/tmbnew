@@ -8,26 +8,45 @@ import {
 } from '../_tmb';
 import type { LiniaResum, ParadaAmbLinies } from '../../src/types/tmb';
 
-export const onRequest: PagesFunction<Env> = async ({ env }) => {
+export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
   try {
+    const url = new URL(request.url);
+    const chunksTotal = Math.max(
+      1,
+      Math.min(20, parseInt(url.searchParams.get('chunks') ?? '1', 10) || 1),
+    );
+    const chunkIdx = Math.max(
+      0,
+      Math.min(
+        chunksTotal - 1,
+        parseInt(url.searchParams.get('chunk') ?? '0', 10) || 0,
+      ),
+    );
+
     const creds = getCreds(env);
     const allLinies = await fetchAllLinies(creds);
-    // Cloudflare Workers cap us at 50 subrequests per invocation, so the
-    // tail of a 200-line fan-out gets dropped silently. Sort the queue by
-    // importance: metro first, then Nova Xarxa families (V/H/D/M), then
-    // everything else (numeric, B, L, …), and finally night buses (N) which
-    // are the most disposable for a daytime user.
+    // Cloudflare Workers cap us at 50 subrequests per invocation. Sort by
+    // importance so each chunk slices a consistent priority window:
+    //   1. metro
+    //   2. Nova Xarxa families V / H / D / M
+    //   3. numeric & other (B, L, …)
+    //   4. night-bus N
     const familyRank = (codi: string): number => {
       const head = codi.charAt(0).toUpperCase();
       if (head === 'V' || head === 'H' || head === 'D' || head === 'M') return 1;
       if (head === 'N') return 3;
       return 2;
     };
-    const linies = [...allLinies].sort((a, b) => {
+    const sorted = [...allLinies].sort((a, b) => {
       if (a.tipus !== b.tipus) return a.tipus === 'metro' ? -1 : 1;
       if (a.tipus === 'metro') return 0;
       return familyRank(a.codi) - familyRank(b.codi);
     });
+
+    // Slice the chunk this invocation is responsible for.
+    const chunkSize = Math.ceil(sorted.length / chunksTotal);
+    const start = chunkIdx * chunkSize;
+    const linies = sorted.slice(start, start + chunkSize);
 
     const results = await mapLimit(linies, 20, async (linia) => {
       try {

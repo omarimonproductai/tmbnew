@@ -32,6 +32,15 @@ export function getParadesAll(): Promise<ParadaAmbLinies[]> {
   return jsonFetch<ParadaAmbLinies[]>(`${API_BASE}/parades-all`);
 }
 
+export function getParadesAllChunk(
+  chunk: number,
+  total: number,
+): Promise<ParadaAmbLinies[]> {
+  return jsonFetch<ParadaAmbLinies[]>(
+    `${API_BASE}/parades-all?chunks=${total}&chunk=${chunk}`,
+  );
+}
+
 export function getVehicles(
   liniaId: string,
   liniaCodi: string,
