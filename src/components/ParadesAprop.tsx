@@ -1,5 +1,6 @@
 import { useTempsReal } from '../hooks/useTempsReal';
 import { formatDistance } from '../utils/distance';
+import { getLineColor } from '../utils/lineColor';
 import type { LiniaResum, ParadaAprop, TempsRealArribada, TransportType } from '../types/tmb';
 
 const TYPE_LABEL: Record<TransportType, string> = {
@@ -90,7 +91,7 @@ function LineArrivalRow({
   const next = pickNextForLine(arribades, linia.codi);
   return (
     <div className="line-arrival">
-      <span className="line-arrival-badge" style={{ background: linia.color }}>
+      <span className="line-arrival-badge" style={{ background: getLineColor(linia) }}>
         {linia.codi}
       </span>
       <span className="line-arrival-dest" title={next?.destinacio ?? ''}>

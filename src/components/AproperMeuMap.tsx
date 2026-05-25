@@ -8,6 +8,7 @@ import {
   Tooltip,
   useMap,
 } from 'react-leaflet';
+import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
@@ -66,7 +67,8 @@ export function AproperMeuMap({ centre, radiM, parades, topN }: Props) {
       {parades.map((p, idx) => {
         const rank = idx + 1;
         const isTop = rank <= topN;
-        const color = p.liniesQueParen[0]?.color ?? '#666';
+        const rep = pickRepresentativeLine(p.liniesQueParen);
+        const color = rep ? getLineColor(rep) : '#666';
         return (
           <CircleMarker
             key={p.id}

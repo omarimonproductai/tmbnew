@@ -11,7 +11,14 @@ import type { LiniaResum, ParadaAmbLinies } from '../../src/types/tmb';
 export const onRequest: PagesFunction<Env> = async ({ env }) => {
   try {
     const creds = getCreds(env);
-    const linies = await fetchAllLinies(creds);
+    const allLinies = await fetchAllLinies(creds);
+    // Metro first: there are only a dozen metro lines, and processing them
+    // before the 200+ bus lines guarantees they're always represented in the
+    // response even if a slow tail of bus fetches eats into our budget.
+    const linies = [
+      ...allLinies.filter((l) => l.tipus === 'metro'),
+      ...allLinies.filter((l) => l.tipus !== 'metro'),
+    ];
 
     const results = await mapLimit(linies, 10, async (linia) => {
       try {
