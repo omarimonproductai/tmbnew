@@ -15,14 +15,13 @@ export const onRequest: PagesFunction<Env> = async ({ env }) => {
     // Cloudflare Workers cap us at 50 subrequests per invocation, so the
     // tail of a 200-line fan-out gets dropped silently. Sort the queue by
     // importance: metro first, then Nova Xarxa families (V/H/D/M), then
-    // night buses (N), then everything else. That way the urban backbone
-    // is always represented even when the budget runs out before reaching
-    // the long tail of numeric lines.
+    // everything else (numeric, B, L, …), and finally night buses (N) which
+    // are the most disposable for a daytime user.
     const familyRank = (codi: string): number => {
       const head = codi.charAt(0).toUpperCase();
       if (head === 'V' || head === 'H' || head === 'D' || head === 'M') return 1;
-      if (head === 'N') return 2;
-      return 3;
+      if (head === 'N') return 3;
+      return 2;
     };
     const linies = [...allLinies].sort((a, b) => {
       if (a.tipus !== b.tipus) return a.tipus === 'metro' ? -1 : 1;
