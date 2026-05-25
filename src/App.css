@@ -1046,6 +1046,11 @@ body {
   display: none;
 }
 
+/* Bottom-sheet variant of .panel (Aprop meu on mobile) — desktop falls
+   back to the normal sidebar layout below. */
+.sheet-handle { display: none; }
+.sheet-body { display: contents; }
+
 @media (max-width: 640px) {
   .app-main { flex-direction: column-reverse; }
   .panel {
@@ -1058,6 +1063,65 @@ body {
   }
   .panel.panel--open { display: flex; }
   .map-area { height: 100%; flex: 1; }
+
+  /* Aprop meu bottom sheet: peek + expandable */
+  .panel.panel--bottom-sheet {
+    display: flex;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 800;
+    height: 80px;
+    border-top: none;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.18);
+    flex-direction: column;
+    transition: height 0.28s ease;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .panel.panel--bottom-sheet.panel--open { height: 75dvh; }
+  .panel.panel--bottom-sheet .sheet-handle {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 10px;
+    background: white;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    position: relative;
+  }
+  .panel.panel--bottom-sheet .sheet-grip {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  .panel.panel--bottom-sheet .sheet-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #222;
+  }
+  .panel.panel--bottom-sheet .sheet-caret {
+    position: absolute;
+    right: 16px;
+    bottom: 8px;
+    color: #999;
+    font-size: 12px;
+  }
+  .panel.panel--bottom-sheet .sheet-body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
 
   .app-header { padding: 6px 12px; gap: 8px; }
   .app-header h1 { font-size: 14px; }
