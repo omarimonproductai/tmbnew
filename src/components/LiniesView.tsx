@@ -35,7 +35,10 @@ export function LiniesView() {
   const [seleccio, setSeleccio] = useState<Linia | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('map');
   const [showVehicles, setShowVehicles] = useState(true);
-  const [panelOpen, setPanelOpen] = useState(false);
+  // On mobile we want the line list to be the landing UI: it greets the
+  // user expanded, and the FAB only appears once they've picked a line
+  // (so they have something on the map to look at).
+  const [panelOpen, setPanelOpen] = useState(true);
 
   const handleSelect = (linia: Linia) => {
     setSeleccio(linia);
@@ -138,13 +141,14 @@ export function LiniesView() {
         />
       </aside>
       <section className="map-area" aria-label="Vista de la línia">
-        <button
-          type="button"
-          className={`panel-toggle-mobile${panelOpen ? ' active' : ''}`}
-          onClick={() => setPanelOpen((v) => !v)}
-          aria-label={panelOpen ? 'Tancar cerca de línies' : 'Obrir cerca de línies'}
-          aria-expanded={panelOpen}
-        >
+        {seleccio && (
+          <button
+            type="button"
+            className={`panel-toggle-mobile${panelOpen ? ' active' : ''}`}
+            onClick={() => setPanelOpen((v) => !v)}
+            aria-label={panelOpen ? 'Tancar cerca de línies' : 'Obrir cerca de línies'}
+            aria-expanded={panelOpen}
+          >
           {panelOpen ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
               <line x1="6" y1="6" x2="18" y2="18" />
@@ -156,7 +160,8 @@ export function LiniesView() {
               <line x1="16" y1="16" x2="21" y2="21" />
             </svg>
           )}
-        </button>
+          </button>
+        )}
         {seleccio && (
           <div className="line-header-wrapper">
             <LineHeaderBanner linia={seleccio} />
