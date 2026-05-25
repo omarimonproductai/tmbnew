@@ -1064,7 +1064,9 @@ body {
   .panel.panel--open { display: flex; }
   .map-area { height: 100%; flex: 1; }
 
-  /* Aprop meu bottom sheet: peek + expandable */
+  /* Aprop meu bottom sheet: peek + draggable. Height is driven from
+     JS (inline style) so the user can leave it at any position; we
+     just provide a soft transition for the tap-toggle snap. */
   .panel.panel--bottom-sheet {
     display: flex;
     position: absolute;
@@ -1072,15 +1074,14 @@ body {
     right: 0;
     bottom: 0;
     z-index: 800;
-    height: 80px;
     border-top: none;
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.18);
     flex-direction: column;
-    transition: height 0.28s ease;
+    transition: height 0.22s ease;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  .panel.panel--bottom-sheet.panel--open { height: 75dvh; }
+  .panel.panel--bottom-sheet .sheet-handle { touch-action: none; }
   .panel.panel--bottom-sheet .sheet-handle {
     flex-shrink: 0;
     display: flex;
