@@ -37,6 +37,17 @@ export function AproperMeuView() {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
+
+  // Expose the live sheet height to the CSS so map overlays (the zoom
+  // controls) can sit above the sheet as it grows.
+  useEffect(() => {
+    if (!isMobile) return;
+    const root = document.documentElement;
+    root.style.setProperty('--sheet-height', `${sheetHeight}px`);
+    return () => {
+      root.style.removeProperty('--sheet-height');
+    };
+  }, [sheetHeight, isMobile]);
   const dragRef = useRef<{
     startY: number;
     startHeight: number;

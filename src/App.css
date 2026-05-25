@@ -1213,6 +1213,6 @@ body {
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
   .panel--bottom-sheet ~ .map-area .leaflet-top.leaflet-left {
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--sheet-height, 96px) + 16px + env(safe-area-inset-bottom, 0px));
   }
 }
