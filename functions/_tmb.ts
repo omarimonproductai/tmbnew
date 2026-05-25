@@ -1,26 +1,35 @@
-import type { Linia, Parada, LineGeometry, TransportType } from '../../src/types/tmb';
+import type { Linia, Parada, LineGeometry, TransportType } from '../src/types/tmb';
 
 const TMB_BASE = 'https://api.tmb.cat/v1';
 
-function requireCredentials(): { app_id: string; app_key: string } {
-  const app_id = process.env.TMB_APP_ID;
-  const app_key = process.env.TMB_APP_KEY;
+export interface Env {
+  TMB_APP_ID: string;
+  TMB_APP_KEY: string;
+}
+
+export interface TmbCreds {
+  app_id: string;
+  app_key: string;
+}
+
+export function getCreds(env: Env): TmbCreds {
+  const app_id = env.TMB_APP_ID;
+  const app_key = env.TMB_APP_KEY;
   if (!app_id || !app_key) {
     throw new Error(
-      'Credencials TMB no configurades. Defineix TMB_APP_ID i TMB_APP_KEY a Netlify (o .env.local per a dev).',
+      'Credencials TMB no configurades. Defineix TMB_APP_ID i TMB_APP_KEY a Cloudflare Pages (Settings → Environment variables) o .dev.vars per a dev local.',
     );
   }
   return { app_id, app_key };
 }
 
-function withCreds(url: string): string {
-  const { app_id, app_key } = requireCredentials();
+function withCreds(url: string, creds: TmbCreds): string {
   const sep = url.includes('?') ? '&' : '?';
-  return `${url}${sep}app_id=${encodeURIComponent(app_id)}&app_key=${encodeURIComponent(app_key)}`;
+  return `${url}${sep}app_id=${encodeURIComponent(creds.app_id)}&app_key=${encodeURIComponent(creds.app_key)}`;
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(withCreds(url), {
+async function fetchJson<T>(url: string, creds: TmbCreds): Promise<T> {
+  const res = await fetch(withCreds(url, creds), {
     headers: { Accept: 'application/json' },
   });
   if (!res.ok) {
@@ -39,9 +48,8 @@ export interface RawProbe {
 
 // Performs a raw fetch and returns the parsed body (or text) without throwing,
 // so the debug endpoint can show what TMB returned even on errors.
-export async function rawFetch(url: string): Promise<RawProbe> {
-  const fullUrl = withCreds(url);
-  // Strip credentials from the URL we expose back to the client.
+export async function rawFetch(url: string, creds: TmbCreds): Promise<RawProbe> {
+  const fullUrl = withCreds(url, creds);
   const safeUrl = fullUrl
     .replace(/([?&])app_id=[^&]*/i, '$1app_id=***')
     .replace(/([?&])app_key=[^&]*/i, '$1app_key=***');
@@ -90,7 +98,6 @@ function ensureColor(raw: unknown, fallback: string): string {
   return fallback;
 }
 
-// Geometry normaliser: accepts LineString or MultiLineString GeoJSON.
 function normaliseGeometry(geom: unknown): LineGeometry | null {
   if (!geom || typeof geom !== 'object') return null;
   const g = geom as { type?: string; coordinates?: unknown };
@@ -120,10 +127,10 @@ const DEFAULT_COLORS: Record<TransportType, string> = {
   bus: '#E84E0F',
 };
 
-export async function fetchAllLinies(): Promise<Linia[]> {
+export async function fetchAllLinies(creds: TmbCreds): Promise<Linia[]> {
   const [metro, bus] = await Promise.all([
-    fetchJson<GeoJsonCollection<unknown, AnyProps>>(`${TMB_BASE}/transit/linies/metro`),
-    fetchJson<GeoJsonCollection<unknown, AnyProps>>(`${TMB_BASE}/transit/linies/bus`),
+    fetchJson<GeoJsonCollection<unknown, AnyProps>>(`${TMB_BASE}/transit/linies/metro`, creds),
+    fetchJson<GeoJsonCollection<unknown, AnyProps>>(`${TMB_BASE}/transit/linies/bus`, creds),
   ]);
 
   const result: Linia[] = [];
@@ -215,12 +222,12 @@ interface BusParadaProps {
   SENTIT?: string;
 }
 
-export async function fetchParades(liniaId: string): Promise<Parada[]> {
+export async function fetchParades(creds: TmbCreds, liniaId: string): Promise<Parada[]> {
   const { tipus, codi } = parseLiniaId(liniaId);
 
   if (tipus === 'metro') {
     const url = `${TMB_BASE}/transit/linies/metro/${encodeURIComponent(codi)}/estacions`;
-    const data = await fetchJson<GeoJsonCollection<{ type: string; coordinates: [number, number] }, MetroEstacioProps>>(url);
+    const data = await fetchJson<GeoJsonCollection<{ type: string; coordinates: [number, number] }, MetroEstacioProps>>(url, creds);
     return data.features
       .filter((f) => f.geometry && Array.isArray(f.geometry.coordinates))
       .map((f) => {
@@ -238,7 +245,7 @@ export async function fetchParades(liniaId: string): Promise<Parada[]> {
   }
 
   const url = `${TMB_BASE}/transit/linies/bus/${encodeURIComponent(codi)}/parades`;
-  const data = await fetchJson<GeoJsonCollection<{ type: string; coordinates: [number, number] }, BusParadaProps>>(url);
+  const data = await fetchJson<GeoJsonCollection<{ type: string; coordinates: [number, number] }, BusParadaProps>>(url, creds);
   return data.features
     .filter((f) => f.geometry && Array.isArray(f.geometry.coordinates))
     .map((f) => {
@@ -297,6 +304,7 @@ export interface NormalisedArrival {
 }
 
 export async function fetchIBus(
+  creds: TmbCreds,
   liniaCodi: string,
   paradaCodi: string,
   all = false,
@@ -304,23 +312,20 @@ export async function fetchIBus(
   arribades: NormalisedArrival[];
   raw: IBusResponse;
 }> {
-  // TMB exposes two iBus endpoints. The line-scoped one is more reliable,
-  // but it sometimes returns an empty payload, so we fall back to the
-  // stop-wide endpoint and tag every arrival as relevant.
   const lineScopedUrl = `${TMB_BASE}/ibus/lines/${encodeURIComponent(liniaCodi)}/stops/${encodeURIComponent(paradaCodi)}`;
   const stopWideUrl = `${TMB_BASE}/ibus/stops/${encodeURIComponent(paradaCodi)}`;
 
   let data: IBusResponse = {};
   if (!all) {
     try {
-      data = await fetchJson<IBusResponse>(lineScopedUrl);
+      data = await fetchJson<IBusResponse>(lineScopedUrl, creds);
     } catch {
       // Line-scoped endpoint may not exist for this combo; fall through to the wide one.
     }
   }
 
   if (all || rowsFromIBus(data).length === 0) {
-    data = await fetchJson<IBusResponse>(stopWideUrl);
+    data = await fetchJson<IBusResponse>(stopWideUrl, creds);
   }
 
   const rows = rowsFromIBus(data);
@@ -349,8 +354,6 @@ export async function fetchIBus(
   const arribades = all
     ? normalised
     : (() => {
-        // Prefer arrivals that match the requested line; if none match (because of
-        // naming mismatches like "H10" vs "10"), return everything sorted by minutes.
         const matching = normalised.filter(
           (a) => !liniaCodi || a.liniaCodi === liniaCodi,
         );
@@ -401,6 +404,7 @@ interface IMetroResponse {
 }
 
 export async function fetchIMetro(
+  creds: TmbCreds,
   liniaCodi: string,
   paradaCodi: string,
   all = false,
@@ -409,7 +413,7 @@ export async function fetchIMetro(
   raw: IMetroResponse;
 }> {
   const url = `${TMB_BASE}/itransit/metro/estacions?estacions=${encodeURIComponent(paradaCodi)}`;
-  const data = await fetchJson<IMetroResponse>(url);
+  const data = await fetchJson<IMetroResponse>(url, creds);
   const now = typeof data.timestamp === 'number' ? data.timestamp : Date.now();
 
   const arribades: NormalisedArrival[] = [];
@@ -445,7 +449,6 @@ export async function fetchIMetro(
     }
   }
 
-  // Show all upcoming trains sorted by arrival time.
   arribades.sort((a, b) => {
     const am = a.minutsRestants ?? Number.POSITIVE_INFINITY;
     const bm = b.minutsRestants ?? Number.POSITIVE_INFINITY;
@@ -470,12 +473,13 @@ export async function mapLimit<T, R>(
 }
 
 export async function fetchIBusBatch(
+  creds: TmbCreds,
   liniaCodi: string,
   paradaCodis: string[],
 ): Promise<NormalisedArrival[]> {
   const results = await mapLimit(paradaCodis, 10, async (codi) => {
     try {
-      const { arribades } = await fetchIBus(liniaCodi, codi, true);
+      const { arribades } = await fetchIBus(creds, liniaCodi, codi, true);
       return arribades.filter((a) => !a.liniaCodi || a.liniaCodi === liniaCodi);
     } catch {
       return [] as NormalisedArrival[];
@@ -485,22 +489,23 @@ export async function fetchIBusBatch(
 }
 
 export async function fetchIMetroBatch(
+  creds: TmbCreds,
   liniaCodi: string,
   paradaCodis: string[],
 ): Promise<NormalisedArrival[]> {
-  // TMB iMetro accepts CSV of station codes in a single call.
   if (paradaCodis.length === 0) return [];
   const csv = paradaCodis.join(',');
-  const { arribades } = await fetchIMetro(liniaCodi, csv, false);
+  const { arribades } = await fetchIMetro(creds, liniaCodi, csv, false);
   return arribades.filter((a) => a.liniaCodi === liniaCodi);
 }
 
-export function jsonResponse(status: number, body: unknown): Response {
+export function jsonResponse(status: number, body: unknown, extraHeaders?: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'cache-control': status === 200 ? 'public, max-age=60' : 'no-store',
+      ...(extraHeaders ?? {}),
     },
   });
 }

@@ -3,24 +3,24 @@ import {
   fetchIBusBatch,
   fetchIMetroBatch,
   fetchParades,
-  NormalisedArrival,
+  getCreds,
   parseLiniaId,
-} from './_tmb';
+  type Env,
+  type NormalisedArrival,
+} from '../../_tmb';
 import type {
   CuaParada,
   Parada,
   TransportType,
   VehicleRaw,
   VehiclesResposta,
-} from '../../src/types/tmb';
+} from '../../../src/types/tmb';
 
-export default async (req: Request): Promise<Response> => {
+export const onRequest: PagesFunction<Env, 'path'> = async ({ env, params }) => {
   try {
-    const url = new URL(req.url);
-    const pathParam = url.searchParams.get('path');
-    const segments = (pathParam ?? url.pathname.replace(/^.*vehicles\/?/, ''))
-      .split('/')
-      .map((s) => decodeURIComponent(s))
+    const raw = params.path;
+    const segments = (Array.isArray(raw) ? raw : raw ? [raw] : [])
+      .map((seg) => decodeURIComponent(seg))
       .filter(Boolean);
     const [liniaId, liniaCodi] = segments;
     if (!liniaId || !liniaCodi) {
@@ -34,9 +34,11 @@ export default async (req: Request): Promise<Response> => {
       return errorResponse(400, err instanceof Error ? err.message : String(err));
     }
 
+    const creds = getCreds(env);
+
     let parades: Parada[];
     try {
-      parades = await fetchParades(liniaId);
+      parades = await fetchParades(creds, liniaId);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return errorResponse(502, `No s'han pogut carregar les parades: ${message}`);
@@ -50,8 +52,8 @@ export default async (req: Request): Promise<Response> => {
     try {
       arribades =
         tipus === 'bus'
-          ? await fetchIBusBatch(liniaCodi, parades.map((p) => p.codi))
-          : await fetchIMetroBatch(liniaCodi, parades.map((p) => p.codi));
+          ? await fetchIBusBatch(creds, liniaCodi, parades.map((p) => p.codi))
+          : await fetchIMetroBatch(creds, liniaCodi, parades.map((p) => p.codi));
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return jsonVehiclesResponse({
@@ -75,7 +77,7 @@ function jsonVehiclesResponse(body: VehiclesResposta): Response {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'cache-control': 'public, max-age=30',
-      'netlify-cdn-cache-control': 'public, max-age=30, durable',
+      'cdn-cache-control': 'public, max-age=30',
     },
   });
 }
@@ -117,7 +119,6 @@ function aggregateVehicles(
 
   const vehicles: VehicleRaw[] = [];
 
-  // Path 1: metro — group by codi_servei (real train id).
   const byVehicleId = new Map<string, NormalisedArrival[]>();
   for (const a of withId) {
     const list = byVehicleId.get(a.vehicleId!) ?? [];
@@ -138,7 +139,6 @@ function aggregateVehicles(
     });
   }
 
-  // Path 2: bus (or metro without ids) — trajectory walk per direction.
   const stepMin = tipus === 'metro' ? 1.2 : 1.5;
   const byDest = new Map<string, NormalisedArrival[]>();
   for (const a of withoutId) {
@@ -178,7 +178,6 @@ function aggregateVehicles(
       if (trajectory.length > 1) {
         cua = buildQueueFromList(trajectory, stopByCodi);
       } else {
-        // Synthesise queue from line order in the head's sentit.
         const list2 = stopsBySentit.get(headStop.sentit ?? 'default') ?? [];
         const idx = list2.findIndex((p) => p.codi === headStop.codi);
         cua = [{ codi: headStop.codi, nom: headStop.nom, minuts: headMin }];
@@ -223,5 +222,3 @@ function buildQueueFromList(
     };
   });
 }
-
-export const config = { path: '/api/vehicles/*' };

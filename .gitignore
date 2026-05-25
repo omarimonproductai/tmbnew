@@ -3,7 +3,8 @@
 node_modules/
 dist/
 leaflet/
-.netlify/
+.dev.vars
+.wrangler/
 coverage/
 *.log
 *.tsbuildinfo
