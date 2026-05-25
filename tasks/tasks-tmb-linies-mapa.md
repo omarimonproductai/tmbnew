@@ -54,18 +54,18 @@ Actualitza l'arxiu després de cada sub-tasca, no només al final de la tasca pa
 - [x] 1.0 Configuració inicial del projecte (React + Vite + Netlify)
   - [x] 1.1 Inicialitzar el projecte amb `npm create vite@latest` seleccionant React + TypeScript
   - [x] 1.2 Instal·lar dependències: `leaflet`, `react-leaflet`, `@types/leaflet`
-  - [ ] 1.3 Instal·lar Netlify CLI (`npm install -g netlify-cli`) per poder desenvolupar les functions en local
+  - [ ] 1.3 Instal·lar Netlify CLI (`npm install -g netlify-cli`) per poder desenvolupar les functions en local _(opcional: la verificació es fa directament a la URL de Netlify)_
   - [x] 1.4 Crear l'arxiu `.env.example` amb les variables `TMB_APP_ID` i `TMB_APP_KEY` buides (sense prefix `VITE_`, ja que les usaran les functions serverless, no el client)
   - [x] 1.5 Afegir `.env.local` al `.gitignore`
   - [x] 1.6 Crear l'estructura de carpetes: `src/components/`, `src/hooks/`, `src/services/`, `src/types/`, `netlify/functions/`
   - [x] 1.7 Crear `netlify.toml` amb la configuració de build i els redirects `/api/*` cap a les functions
-  - [ ] 1.8 Verificar que `netlify dev` arrenca correctament (substitueix `npm run dev` en local)
+  - [ ] 1.8 Verificar que `netlify dev` arrenca correctament (substitueix `npm run dev` en local) _(opcional: depèn de 1.3)_
 
 - [x] 2.0 Proxy Netlify Functions + Integració amb l'API de TMB
   - [x] 2.1 Registrar-se a developer.tmb.cat i obtenir `app_id` i `app_key` gratuïts; afegir-los a `.env.local`
   - [x] 2.2 Crear `netlify/functions/linies.ts`: rep la petició del frontend, crida `api.tmb.cat/v1/transit/linies` amb les credencials des de variables d'entorn, retorna el JSON
   - [x] 2.3 Crear `netlify/functions/parades.ts`: rep `liniaId` com a paràmetre, crida `api.tmb.cat/v1/transit/linies/{id}/parades`, retorna el JSON
-  - [ ] 2.4 Verificar les functions en local amb `netlify dev` i comprovar que `/api/linies` retorna dades correctes
+  - [ ] 2.4 Verificar les functions en local amb `netlify dev` i comprovar que `/api/linies` retorna dades correctes _(opcional: substituït per verificació directa a la URL de Netlify)_
   - [x] 2.5 Definir els tipus TypeScript a `src/types/tmb.ts` (Linia, Parada, TempsReal) a partir de la resposta real de l'API
   - [x] 2.6 Crear `src/services/tmb.ts` amb `getLinies()` i `getParades(liniaId)` que criden `/api/linies` i `/api/parades/:id` (les functions del proxy)
   - [x] 2.7 Crear el hook `src/hooks/useLinies.ts` que crida `getLinies()` i gestiona loading/error
@@ -103,9 +103,9 @@ Actualitza l'arxiu després de cada sub-tasca, no només al final de la tasca pa
   - [x] 6.3 Verificar que el mapa crida `invalidateSize()` quan el layout canvia per evitar renderitzats incorrectes
   - [ ] 6.4 Testar en Chrome i Firefox a escriptori i mòbil (mínim 390px d'amplada)
 
-- [ ] 7.0 Desplegament a Netlify
+- [x] 7.0 Desplegament a Netlify
   - [x] 7.1 Connectar el repositori de GitHub a Netlify des del panell de Netlify
-  - [ ] 7.2 Configurar el build command (`npm run build`) i el publish directory (`dist`) a Netlify
+  - [x] 7.2 Configurar el build command (`npm run build`) i el publish directory (`dist`) a Netlify
   - [x] 7.3 Afegir `TMB_APP_ID` i `TMB_APP_KEY` com a variables d'entorn al panell de Netlify (Site Settings → Environment Variables)
-  - [ ] 7.4 Fer el primer desplegament i verificar que les Netlify Functions responen correctament
-  - [ ] 7.5 Verificar que l'app funciona correctament a l'URL de Netlify (`.netlify.app`)
+  - [x] 7.4 Fer el primer desplegament i verificar que les Netlify Functions responen correctament
+  - [x] 7.5 Verificar que l'app funciona correctament a l'URL de Netlify (`.netlify.app`)
