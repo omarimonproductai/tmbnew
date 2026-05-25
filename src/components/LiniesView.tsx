@@ -153,7 +153,9 @@ export function LiniesView() {
           <LineListView
             linia={seleccio}
             parades={parades}
-            vehicles={showVehicles ? vehiclesAmbPos : []}
+            vehicles={
+              showVehicles && vehiclesData ? vehiclesData.vehicles : []
+            }
             correspondencesPerParada={correspondencesPerParada}
           />
         )}

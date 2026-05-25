@@ -61,7 +61,12 @@ export function StopMarker({ linia, parada, terminal = false, correspondences }:
           <span className="tooltip-name">{parada.nom}</span>
         </Tooltip>
         <Popup>
-          <StopPopup linia={linia} parada={parada} enabled={open} />
+          <StopPopup
+            linia={linia}
+            parada={parada}
+            enabled={open}
+            correspondences={correspondences}
+          />
         </Popup>
       </CircleMarker>
       {icon && (

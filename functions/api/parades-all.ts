@@ -32,7 +32,12 @@ export const onRequest: PagesFunction<Env> = async ({ env }) => {
       };
       for (const p of parades) {
         if (!p.codi || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;
-        const key = `${linia.tipus}|${p.codi}`;
+        // For metro we key on the group station id (CODI_GRUP_ESTACIO) so that
+        // L1 and L5 at La Sagrera collapse into one entry with both lines in
+        // `liniesQueParen`. For bus we keep the platform `codi`, which already
+        // is shared by every bus passing through that physical stop.
+        const groupKey = linia.tipus === 'metro' ? p.id : p.codi;
+        const key = `${linia.tipus}|${groupKey}`;
         const existing = map.get(key);
         if (existing) {
           if (!existing.liniesQueParen.some((l) => l.id === liniaResum.id)) {
@@ -40,7 +45,7 @@ export const onRequest: PagesFunction<Env> = async ({ env }) => {
           }
         } else {
           map.set(key, {
-            id: `${linia.tipus}-${p.codi}`,
+            id: `${linia.tipus}-${groupKey}`,
             codi: p.codi,
             nom: p.nom,
             lat: p.lat,

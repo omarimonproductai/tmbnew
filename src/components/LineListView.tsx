@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { StopRow } from './StopRow';
-import type { Linia, LiniaResum, Parada, VehiclePos } from '../types/tmb';
+import type { Linia, LiniaResum, Parada, VehicleRaw } from '../types/tmb';
 
 interface Props {
   linia: Linia;
   parades: Parada[];
-  vehicles: VehiclePos[];
+  vehicles: VehicleRaw[];
   correspondencesPerParada: Map<string, LiniaResum[]>;
 }
 
@@ -75,9 +75,9 @@ export function LineListView({
     }));
   }, [parades, linia]);
 
-  const vehiclesPerColumn = useMemo<Map<string, VehiclePos[]>[]>(() => {
+  const vehiclesPerColumn = useMemo<Map<string, VehicleRaw[]>[]>(() => {
     return columns.map((col) => {
-      const map = new Map<string, VehiclePos[]>();
+      const map = new Map<string, VehicleRaw[]>();
       if (col.synthetic) {
         for (const v of vehicles) {
           if (!matchesDestination(v.destinacio, col.destinacio)) continue;

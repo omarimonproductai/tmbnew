@@ -1,14 +1,15 @@
 import { useTempsReal } from '../hooks/useTempsReal';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
-import type { Linia, Parada } from '../types/tmb';
+import type { Linia, LiniaResum, Parada } from '../types/tmb';
 
 interface Props {
   linia: Linia;
   parada: Parada;
   enabled: boolean;
+  correspondences?: LiniaResum[];
 }
 
-export function StopPopup({ linia, parada, enabled }: Props) {
+export function StopPopup({ linia, parada, enabled, correspondences }: Props) {
   const { data, loading, error } = useTempsReal(
     linia.tipus,
     linia.codi,
@@ -18,12 +19,29 @@ export function StopPopup({ linia, parada, enabled }: Props) {
 
   return (
     <div className="stop-popup-content">
-      <div className="popup-title">{parada.nom}</div>
-      <div>
+      <div className="popup-head">
         <span className="popup-badge" style={{ background: linia.color }}>
           {linia.codi}
         </span>
+        <span className="popup-title">{parada.nom}</span>
       </div>
+      {correspondences && correspondences.length > 0 && (
+        <div className="popup-interchanges" aria-label="Correspondències">
+          <span className="popup-interchanges-label">Correspondència</span>
+          <span className="popup-interchanges-list">
+            {correspondences.map((l) => (
+              <span
+                key={l.id}
+                className="popup-mini-badge"
+                style={{ background: l.color }}
+                title={`${l.tipus === 'metro' ? 'Metro' : 'Bus'} ${l.codi}`}
+              >
+                {l.codi}
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
       <TempsRealBlock
         loading={loading}
         error={error}
@@ -61,6 +79,7 @@ function TempsRealBlock({
           <ul>
             {g.arribades.map((a, idx) => {
               const isOtherLine = a.liniaCodi && a.liniaCodi !== liniaCodi;
+              const imminent = isImminent(a.text);
               return (
                 <li key={idx}>
                   <span className="popup-dest">
@@ -68,7 +87,11 @@ function TempsRealBlock({
                       <span className="popup-otherline">{a.liniaCodi}</span>
                     )}
                   </span>
-                  <span className="popup-time">{a.text}</span>
+                  <span
+                    className={`popup-time${imminent ? ' popup-time--imminent' : ''}`}
+                  >
+                    {a.text}
+                  </span>
                 </li>
               );
             })}
@@ -77,4 +100,9 @@ function TempsRealBlock({
       ))}
     </div>
   );
+}
+
+function isImminent(text: string): boolean {
+  const t = text.toLowerCase();
+  return t.includes('arribant') || t.includes('arriving');
 }

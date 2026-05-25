@@ -5,14 +5,14 @@ import type {
   LiniaResum,
   Parada,
   TransportType,
-  VehiclePos,
+  VehicleRaw,
 } from '../types/tmb';
 
 interface Props {
   parada: Parada;
   ordre: number;
   correspondencies: LiniaResum[];
-  vehiclesNext: VehiclePos[];
+  vehiclesNext: VehicleRaw[];
   expanded: boolean;
   onToggle: () => void;
   linia: Linia;
@@ -132,7 +132,7 @@ function VehicleIndicator({
   color,
   tipus,
 }: {
-  vehicle: VehiclePos;
+  vehicle: VehicleRaw;
   color: string;
   tipus: TransportType;
 }) {
