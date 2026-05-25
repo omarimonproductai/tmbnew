@@ -61,7 +61,7 @@ Actualitza l'arxiu després de cada sub-tasca, no només al final de la tasca pa
   - [ ] 1.8 Verificar que `netlify dev` arrenca correctament (substitueix `npm run dev` en local)
 
 - [ ] 2.0 Proxy Netlify Functions + Integració amb l'API de TMB
-  - [ ] 2.1 Registrar-se a developer.tmb.cat i obtenir `app_id` i `app_key` gratuïts; afegir-los a `.env.local`
+  - [x] 2.1 Registrar-se a developer.tmb.cat i obtenir `app_id` i `app_key` gratuïts; afegir-los a `.env.local`
   - [ ] 2.2 Crear `netlify/functions/linies.ts`: rep la petició del frontend, crida `api.tmb.cat/v1/transit/linies` amb les credencials des de variables d'entorn, retorna el JSON
   - [ ] 2.3 Crear `netlify/functions/parades.ts`: rep `liniaId` com a paràmetre, crida `api.tmb.cat/v1/transit/linies/{id}/parades`, retorna el JSON
   - [ ] 2.4 Verificar les functions en local amb `netlify dev` i comprovar que `/api/linies` retorna dades correctes
@@ -103,8 +103,8 @@ Actualitza l'arxiu després de cada sub-tasca, no només al final de la tasca pa
   - [ ] 6.4 Testar en Chrome i Firefox a escriptori i mòbil (mínim 390px d'amplada)
 
 - [ ] 7.0 Desplegament a Netlify
-  - [ ] 7.1 Connectar el repositori de GitHub a Netlify des del panell de Netlify
+  - [x] 7.1 Connectar el repositori de GitHub a Netlify des del panell de Netlify
   - [ ] 7.2 Configurar el build command (`npm run build`) i el publish directory (`dist`) a Netlify
-  - [ ] 7.3 Afegir `TMB_APP_ID` i `TMB_APP_KEY` com a variables d'entorn al panell de Netlify (Site Settings → Environment Variables)
+  - [x] 7.3 Afegir `TMB_APP_ID` i `TMB_APP_KEY` com a variables d'entorn al panell de Netlify (Site Settings → Environment Variables)
   - [ ] 7.4 Fer el primer desplegament i verificar que les Netlify Functions responen correctament
   - [ ] 7.5 Verificar que l'app funciona correctament a l'URL de Netlify (`.netlify.app`)
