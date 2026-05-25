@@ -1173,4 +1173,15 @@ body {
   .line-list-view { padding: 100px 8px 8px; }
   .list-sentit-selector { display: flex; }
   .list-columns.multi .list-column:not(.active) { display: none; }
+
+  /* Move Leaflet's zoom buttons to the bottom-left on mobile. When the
+     'Aprop meu' bottom sheet is around, lift them above its peek so the
+     buttons stay tappable while the sheet is collapsed. */
+  .leaflet-top.leaflet-left {
+    top: auto;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .panel--bottom-sheet ~ .map-area .leaflet-top.leaflet-left {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
 }
