@@ -12,15 +12,25 @@ export const onRequest: PagesFunction<Env> = async ({ env }) => {
   try {
     const creds = getCreds(env);
     const allLinies = await fetchAllLinies(creds);
-    // Metro first: there are only a dozen metro lines, and processing them
-    // before the 200+ bus lines guarantees they're always represented in the
-    // response even if a slow tail of bus fetches eats into our budget.
-    const linies = [
-      ...allLinies.filter((l) => l.tipus === 'metro'),
-      ...allLinies.filter((l) => l.tipus !== 'metro'),
-    ];
+    // Cloudflare Workers cap us at 50 subrequests per invocation, so the
+    // tail of a 200-line fan-out gets dropped silently. Sort the queue by
+    // importance: metro first, then Nova Xarxa families (V/H/D/M), then
+    // night buses (N), then everything else. That way the urban backbone
+    // is always represented even when the budget runs out before reaching
+    // the long tail of numeric lines.
+    const familyRank = (codi: string): number => {
+      const head = codi.charAt(0).toUpperCase();
+      if (head === 'V' || head === 'H' || head === 'D' || head === 'M') return 1;
+      if (head === 'N') return 2;
+      return 3;
+    };
+    const linies = [...allLinies].sort((a, b) => {
+      if (a.tipus !== b.tipus) return a.tipus === 'metro' ? -1 : 1;
+      if (a.tipus === 'metro') return 0;
+      return familyRank(a.codi) - familyRank(b.codi);
+    });
 
-    const results = await mapLimit(linies, 10, async (linia) => {
+    const results = await mapLimit(linies, 20, async (linia) => {
       try {
         const parades = await fetchParades(creds, linia.id);
         return { linia, parades };
