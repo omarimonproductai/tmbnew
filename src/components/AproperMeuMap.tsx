@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   Circle,
   CircleMarker,
@@ -18,9 +18,10 @@ interface Props {
   radiM: number;
   parades: ParadaAprop[];
   topN: number;
+  bottomInset?: number;
 }
 
-export function AproperMeuMap({ centre, radiM, parades, topN }: Props) {
+export function AproperMeuMap({ centre, radiM, parades, topN, bottomInset = 0 }: Props) {
   return (
     <MapContainer
       center={centre ? [centre.lat, centre.lng] : FALLBACK_CENTER}
@@ -61,7 +62,7 @@ export function AproperMeuMap({ centre, radiM, parades, topN }: Props) {
               Tu
             </Tooltip>
           </CircleMarker>
-          <FitToCircle centre={centre} radiM={radiM} />
+          <MapFollowsUser centre={centre} radiM={radiM} bottomInset={bottomInset} />
         </>
       )}
       {parades.map((p, idx) => {
@@ -93,12 +94,43 @@ export function AproperMeuMap({ centre, radiM, parades, topN }: Props) {
   );
 }
 
-function FitToCircle({ centre, radiM }: { centre: Coordinate; radiM: number }) {
+// When the user or radius change, refit the bounds inside the visible area
+// (the strip above the bottom sheet). When only the sheet moves, keep zoom
+// stable and just slide the centre so the 'Tu' dot stays in the visible
+// vertical middle.
+function MapFollowsUser({
+  centre,
+  radiM,
+  bottomInset,
+}: {
+  centre: Coordinate;
+  radiM: number;
+  bottomInset: number;
+}) {
   const map = useMap();
+  const lastFitRef = useRef<{ lat: number; lng: number; radiM: number } | null>(null);
   useEffect(() => {
-    const bounds = L.latLng(centre.lat, centre.lng).toBounds(radiM * 2);
-    map.fitBounds(bounds, { padding: [40, 40] });
-  }, [centre.lat, centre.lng, radiM, map]);
+    const needsFit =
+      !lastFitRef.current ||
+      lastFitRef.current.lat !== centre.lat ||
+      lastFitRef.current.lng !== centre.lng ||
+      lastFitRef.current.radiM !== radiM;
+
+    if (needsFit) {
+      const bounds = L.latLng(centre.lat, centre.lng).toBounds(radiM * 2);
+      map.fitBounds(bounds, {
+        paddingTopLeft: [40, 40],
+        paddingBottomRight: [40, 40 + bottomInset],
+      });
+      lastFitRef.current = { lat: centre.lat, lng: centre.lng, radiM };
+    } else {
+      const zoom = map.getZoom();
+      const userPx = map.project([centre.lat, centre.lng], zoom);
+      const newCenterPx = userPx.add([0, bottomInset / 2]);
+      const newCenter = map.unproject(newCenterPx, zoom);
+      map.setView(newCenter, zoom, { animate: false });
+    }
+  }, [centre.lat, centre.lng, radiM, bottomInset, map]);
   return null;
 }
 

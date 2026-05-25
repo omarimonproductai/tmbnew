@@ -18,10 +18,10 @@ function getViewportHeight(): number {
 }
 
 function getIsMobile(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 640px)').matches
-  );
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+  return window.matchMedia('(max-width: 640px)').matches;
 }
 
 export function AproperMeuView() {
@@ -31,6 +31,7 @@ export function AproperMeuView() {
   const [isMobile, setIsMobile] = useState(getIsMobile);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
     const mq = window.matchMedia('(max-width: 640px)');
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener('change', handler);
@@ -163,6 +164,7 @@ export function AproperMeuView() {
           radiM={radius}
           parades={paradesDins}
           topN={TOP_N}
+          bottomInset={isMobile ? sheetHeight : 0}
         />
         {!position && status !== 'requesting' && (
           <div className="map-hint">

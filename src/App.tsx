@@ -5,7 +5,7 @@ import { ModeToggle, type AppMode } from './components/ModeToggle';
 import './App.css';
 
 export default function App() {
-  const [appMode, setAppMode] = useState<AppMode>('linies');
+  const [appMode, setAppMode] = useState<AppMode>('aprop-meu');
 
   return (
     <div className="app">
