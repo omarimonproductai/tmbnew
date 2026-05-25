@@ -1,6 +1,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #root { height: 100%; }
+html, body, #root { height: 100%; height: 100dvh; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -1067,23 +1067,24 @@ body {
 
   .panel-toggle-mobile {
     position: absolute;
-    bottom: 16px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     right: 16px;
     z-index: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     border: 2px solid #ffffff;
-    background: #ffffff;
-    color: #444;
+    background: #c8001e;
+    color: #ffffff;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
     font-family: inherit;
   }
-  .panel-toggle-mobile.active { color: #c8001e; background: #fff5f6; }
+  .panel-toggle-mobile:hover { transform: scale(1.05); }
+  .panel-toggle-mobile.active { background: #ffffff; color: #c8001e; }
 
   .map-controls-stack {
     top: 10px;
