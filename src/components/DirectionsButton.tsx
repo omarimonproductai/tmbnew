@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   isAppleDevice,
   openInAppleMaps,
@@ -9,83 +10,130 @@ interface Props {
   lat: number;
   lng: number;
   nom?: string;
-  variant?: 'inline' | 'block';
+  variant?: 'icon' | 'block';
 }
 
-export function DirectionsButton({ lat, lng, nom, variant = 'inline' }: Props) {
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const appleDevice = isAppleDevice();
+function NavIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M22 2L2 9.27l8.18 2.55L12.73 22 22 2z" />
+    </svg>
+  );
+}
 
-  useEffect(() => {
-    if (!open) return;
-    const onDocClick = (e: MouseEvent | TouchEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', onDocClick);
-    document.addEventListener('touchstart', onDocClick);
-    return () => {
-      document.removeEventListener('mousedown', onDocClick);
-      document.removeEventListener('touchstart', onDocClick);
-    };
-  }, [open]);
+export function DirectionsButton({ lat, lng, nom, variant = 'icon' }: Props) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const appleDevice = isAppleDevice();
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (appleDevice) {
-      setOpen((v) => !v);
+      setSheetOpen(true);
     } else {
       openInGoogleMaps(lat, lng, nom);
     }
   };
 
-  const pick = (app: 'apple' | 'google') => (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setOpen(false);
+  const pick = (app: 'apple' | 'google') => () => {
+    setSheetOpen(false);
     if (app === 'apple') openInAppleMaps(lat, lng, nom);
     else openInGoogleMaps(lat, lng, nom);
   };
 
   return (
-    <div
-      ref={wrapRef}
-      className={`directions-wrap directions-wrap--${variant}${open ? ' open' : ''}`}
-    >
+    <>
       <button
         type="button"
-        className={`directions-btn directions-btn--${variant}`}
+        className={`dir-btn dir-btn--${variant}`}
         onClick={handleClick}
-        aria-haspopup={appleDevice ? 'menu' : undefined}
-        aria-expanded={appleDevice ? open : undefined}
+        aria-haspopup={appleDevice ? 'dialog' : undefined}
         aria-label={nom ? `Indicacions cap a ${nom}` : 'Indicacions'}
+        title="Indicacions"
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <polygon points="3 11 22 2 13 21 11 13 3 11" />
-        </svg>
-        <span>Indicacions</span>
+        <NavIcon size={variant === 'block' ? 16 : 18} />
+        {variant === 'block' && <span>Com arribar-hi</span>}
       </button>
-      {appleDevice && open && (
-        <div className="directions-menu" role="menu">
+      {sheetOpen && (
+        <DirectionsSheet
+          nom={nom}
+          onPick={pick}
+          onCancel={() => setSheetOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+function DirectionsSheet({
+  nom,
+  onPick,
+  onCancel,
+}: {
+  nom?: string;
+  onPick: (app: 'apple' | 'google') => () => void;
+  onCancel: () => void;
+}) {
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onCancel]);
+
+  return createPortal(
+    <div className="dir-backdrop" onClick={onCancel} role="presentation">
+      <div
+        ref={sheetRef}
+        className="dir-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Tria d'app de mapes"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="dir-sheet-head">
+          <div className="dir-sheet-title">Com arribar-hi</div>
+          {nom && <div className="dir-sheet-sub">{nom}</div>}
+        </div>
+        <div className="dir-sheet-group">
           <button
             type="button"
-            role="menuitem"
-            className="directions-menu-item"
-            onClick={pick('apple')}
+            className="dir-sheet-item"
+            onClick={onPick('apple')}
           >
             Apple Maps
           </button>
+          <div className="dir-sheet-sep" />
           <button
             type="button"
-            role="menuitem"
-            className="directions-menu-item"
-            onClick={pick('google')}
+            className="dir-sheet-item"
+            onClick={onPick('google')}
           >
             Google Maps
           </button>
         </div>
-      )}
-    </div>
+        <button
+          type="button"
+          className="dir-sheet-cancel"
+          onClick={onCancel}
+        >
+          Cancel·la
+        </button>
+      </div>
+    </div>,
+    document.body,
   );
 }

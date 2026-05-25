@@ -494,61 +494,127 @@ body {
   text-overflow: ellipsis;
 }
 
-/* "Indicacions" button — used inside list items, map popups and stop popups. */
-.directions-wrap { position: relative; display: inline-flex; }
-.directions-wrap--block { display: block; width: 100%; margin-top: 6px; }
-.directions-btn {
+/* "Com arribar-hi" trigger — icon-only inline, full-width in popups. */
+.dir-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid #1d7df2;
-  background: white;
-  color: #1d7df2;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.directions-btn:hover { background: #1d7df2; color: white; }
-.directions-btn--block {
-  display: flex;
-  width: 100%;
   justify-content: center;
-  padding: 6px 10px;
-  font-size: 12px;
+  color: #1d7df2;
+  padding: 0;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
-.directions-menu {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 4px);
-  min-width: 140px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 4px;
-  z-index: 1000;
+.dir-btn--icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dir-btn--icon:hover { background: rgba(29, 125, 242, 0.1); }
+.dir-btn--icon:active { transform: scale(0.92); }
+.dir-btn--block {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 12px;
+  background: #1d7df2;
+  color: white;
+  border-radius: 10px;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.dir-btn--block:hover { background: #176adf; }
+.dir-btn--block:active { transform: scale(0.98); }
+
+/* iOS-style action sheet shown when both Apple Maps and Google Maps are
+   plausibly installed. */
+.dir-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  animation: dir-backdrop-in 0.18s ease;
+}
+@keyframes dir-backdrop-in {
+  from { background: rgba(0, 0, 0, 0); }
+  to { background: rgba(0, 0, 0, 0.35); }
+}
+.dir-sheet {
+  width: 100%;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  animation: dir-sheet-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
-.directions-wrap--block .directions-menu { right: 50%; transform: translateX(50%); }
-.directions-menu-item {
+@keyframes dir-sheet-in {
+  from { transform: translateY(20px); opacity: 0.4; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.dir-sheet-head {
+  background: rgba(248, 248, 248, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 14px 16px 10px;
+  border-radius: 14px 14px 0 0;
+  text-align: center;
+}
+.dir-sheet-title { font-size: 12px; font-weight: 600; color: #777; }
+.dir-sheet-sub {
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  margin-top: 2px;
+}
+.dir-sheet-group {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+  margin-top: -8px;
+}
+.dir-sheet-head + .dir-sheet-group {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.dir-sheet-item {
+  display: block;
+  width: 100%;
   background: transparent;
   border: none;
+  padding: 14px 16px;
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  color: #222;
-  padding: 8px 12px;
-  text-align: left;
-  border-radius: 6px;
+  font-size: 16px;
+  color: #1d7df2;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+}
+.dir-sheet-item:active { background: rgba(0, 0, 0, 0.06); }
+.dir-sheet-sep { height: 1px; background: rgba(0, 0, 0, 0.08); }
+.dir-sheet-cancel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: #1d7df2;
+  font-weight: 700;
   cursor: pointer;
 }
-.directions-menu-item:hover { background: #f4f6fa; color: #1d7df2; }
+.dir-sheet-cancel:active { background: rgba(0, 0, 0, 0.06); }
 
 /* Map popup for stops in the 'Aprop meu' view. */
 .aprop-popup { font-size: 12px; min-width: 160px; }
