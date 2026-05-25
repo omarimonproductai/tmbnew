@@ -122,10 +122,10 @@ body {
 .line-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 9px 14px;
+  gap: 10px;
+  padding: 6px 12px;
   cursor: pointer;
-  border-bottom: 1px solid #f6f6f6;
+  border-bottom: 1px solid #fafafa;
   background: white;
   border-left: 2px solid transparent;
   width: 100%;
@@ -133,26 +133,26 @@ body {
   font-family: inherit;
 }
 .line-item:last-child { border-bottom: none; }
-.line-item:hover { background: #fafafa; }
-.line-item.active { background: #fafafa; border-left-color: #d8d8d8; }
+.line-item:hover { background: #fbfbfb; }
+.line-item.active { background: #fbfbfb; border-left-color: #e4e4e4; }
 
 .line-badge {
-  width: 40px;
-  height: 28px;
-  border-radius: 6px;
+  width: 32px;
+  height: 22px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 700;
   color: white;
   flex-shrink: 0;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 .line-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.line-name { font-size: 13px; font-weight: 600; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.line-type { font-size: 11px; color: #888; margin-top: 1px; }
-.line-count { font-size: 11px; color: #aaa; flex-shrink: 0; }
+.line-name { font-size: 12px; font-weight: 500; color: #4a4a4a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line-type { font-size: 10px; color: #a5a5a5; margin-top: 1px; }
+.line-count { font-size: 10px; color: #bbb; flex-shrink: 0; }
 
 .state-msg { padding: 24px 16px; color: #777; font-size: 13px; text-align: center; }
 .state-msg--error { color: #c8001e; }
