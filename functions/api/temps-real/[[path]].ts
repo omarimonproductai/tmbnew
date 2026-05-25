@@ -2,28 +2,32 @@ import {
   errorResponse,
   fetchIBus,
   fetchIMetro,
+  getCreds,
   jsonResponse,
   rawFetch,
-} from './_tmb';
-import type { TempsRealResposta } from '../../src/types/tmb';
+  type Env,
+} from '../../_tmb';
+import type { TempsRealResposta } from '../../../src/types/tmb';
 
 const TMB_BASE = 'https://api.tmb.cat/v1';
 
-export default async (req: Request): Promise<Response> => {
+export const onRequest: PagesFunction<Env, 'path'> = async ({ request, env, params }) => {
   try {
-    const url = new URL(req.url);
+    const url = new URL(request.url);
     const debug = url.searchParams.get('debug') === '1';
     const all = url.searchParams.get('all') === '1';
-    // Path: /api/temps-real/{tipus}/{liniaCodi}/{paradaCodi}
-    const path = url.searchParams.get('path');
-    const segments = (path ?? url.pathname.replace(/^.*temps-real\/?/, ''))
-      .split('/')
-      .map((s) => decodeURIComponent(s))
+
+    // params.path arrives as string[] from the [[path]] catch-all.
+    const raw = params.path;
+    const segments = (Array.isArray(raw) ? raw : raw ? [raw] : [])
+      .map((seg) => decodeURIComponent(seg))
       .filter(Boolean);
     const [tipus, liniaCodi, paradaCodi] = segments;
     if (!tipus || !liniaCodi || !paradaCodi) {
       return errorResponse(400, 'Falten paràmetres tipus/liniaCodi/paradaCodi');
     }
+
+    const creds = getCreds(env);
 
     if (debug) {
       const attempts: Array<{ label: string } & Awaited<ReturnType<typeof rawFetch>>> = [];
@@ -32,6 +36,7 @@ export default async (req: Request): Promise<Response> => {
           label: 'metro-estacions',
           ...(await rawFetch(
             `${TMB_BASE}/itransit/metro/estacions?estacions=${encodeURIComponent(paradaCodi)}`,
+            creds,
           )),
         });
       } else if (tipus === 'bus') {
@@ -39,12 +44,14 @@ export default async (req: Request): Promise<Response> => {
           label: 'line-scoped',
           ...(await rawFetch(
             `${TMB_BASE}/ibus/lines/${encodeURIComponent(liniaCodi)}/stops/${encodeURIComponent(paradaCodi)}`,
+            creds,
           )),
         });
         attempts.push({
           label: 'stop-wide',
           ...(await rawFetch(
             `${TMB_BASE}/ibus/stops/${encodeURIComponent(paradaCodi)}`,
+            creds,
           )),
         });
       }
@@ -69,8 +76,8 @@ export default async (req: Request): Promise<Response> => {
     try {
       const { arribades } =
         tipus === 'bus'
-          ? await fetchIBus(liniaCodi, paradaCodi, all)
-          : await fetchIMetro(liniaCodi, paradaCodi, all);
+          ? await fetchIBus(creds, liniaCodi, paradaCodi, all)
+          : await fetchIMetro(creds, liniaCodi, paradaCodi, all);
       const resposta: TempsRealResposta = {
         parada: paradaCodi,
         arribades,
@@ -98,5 +105,3 @@ export default async (req: Request): Promise<Response> => {
     return errorResponse(500, message);
   }
 };
-
-export const config = { path: '/api/temps-real/*' };

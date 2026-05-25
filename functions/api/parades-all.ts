@@ -1,38 +1,27 @@
-import { errorResponse, fetchAllLinies, fetchParades } from './_tmb';
-import type {
-  LiniaResum,
-  ParadaAmbLinies,
-} from '../../src/types/tmb';
+import {
+  errorResponse,
+  fetchAllLinies,
+  fetchParades,
+  getCreds,
+  mapLimit,
+  type Env,
+} from '../_tmb';
+import type { LiniaResum, ParadaAmbLinies } from '../../src/types/tmb';
 
-async function mapLimit<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const out: R[] = [];
-  for (let i = 0; i < items.length; i += limit) {
-    const batch = items.slice(i, i + limit);
-    const res = await Promise.all(batch.map(fn));
-    out.push(...res);
-  }
-  return out;
-}
-
-export default async (): Promise<Response> => {
+export const onRequest: PagesFunction<Env> = async ({ env }) => {
   try {
-    const linies = await fetchAllLinies();
+    const creds = getCreds(env);
+    const linies = await fetchAllLinies(creds);
 
     const results = await mapLimit(linies, 10, async (linia) => {
       try {
-        const parades = await fetchParades(linia.id);
+        const parades = await fetchParades(creds, linia.id);
         return { linia, parades };
       } catch {
         return { linia, parades: [] };
       }
     });
 
-    // Aggregate by (tipus, codi) so each physical stop appears once with the
-    // lines that pass through it.
     const map = new Map<string, ParadaAmbLinies>();
     for (const { linia, parades } of results) {
       const liniaResum: LiniaResum = {
@@ -68,9 +57,8 @@ export default async (): Promise<Response> => {
       status: 200,
       headers: {
         'content-type': 'application/json; charset=utf-8',
-        // Long edge cache: the stop list barely changes day-to-day.
         'cache-control': 'public, max-age=300',
-        'netlify-cdn-cache-control': 'public, max-age=300, durable',
+        'cdn-cache-control': 'public, max-age=300',
       },
     });
   } catch (err) {
@@ -78,5 +66,3 @@ export default async (): Promise<Response> => {
     return errorResponse(502, message);
   }
 };
-
-export const config = { path: '/api/parades-all' };
