@@ -1,0 +1,27 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/linies"
+  to = "/.netlify/functions/linies"
+  status = 200
+
+[[redirects]]
+  from = "/api/parades/*"
+  to = "/.netlify/functions/parades?liniaId=:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/temps-real/*"
+  to = "/.netlify/functions/temps-real?path=:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

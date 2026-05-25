@@ -1,4 +1,10 @@
 .env.local
+.env
 node_modules/
 dist/
 leaflet/
+.netlify/
+coverage/
+*.log
+*.tsbuildinfo
+.DS_Store
