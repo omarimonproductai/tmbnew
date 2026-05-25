@@ -123,18 +123,24 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px;
+  padding: 7px 12px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.035);
-  background: white;
+  border: 0;
   border-left: 1.5px solid transparent;
+  background: white;
   width: 100%;
   text-align: left;
   font-family: inherit;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+  outline: none;
 }
-.line-item:last-child { border-bottom: none; }
-.line-item:hover { background: rgba(0, 0, 0, 0.015); }
-.line-item.active { background: rgba(0, 0, 0, 0.025); border-left-color: rgba(0, 0, 0, 0.08); }
+.line-item:last-child { box-shadow: none; }
+.line-item:hover { background: rgba(0, 0, 0, 0.012); }
+.line-item.active {
+  background: rgba(0, 0, 0, 0.02);
+  border-left-color: rgba(0, 0, 0, 0.08);
+}
+.line-item:focus-visible { outline: 2px solid rgba(200, 0, 30, 0.35); outline-offset: -2px; }
 
 .line-badge {
   width: 32px;
