@@ -8,7 +8,7 @@ import {
 } from 'react-leaflet';
 import { StopMarker } from './StopMarker';
 import { VehicleMarker } from './VehicleMarker';
-import type { Linia, Parada, VehiclePos } from '../types/tmb';
+import type { Linia, LiniaResum, Parada, VehiclePos } from '../types/tmb';
 
 const BARCELONA_CENTER: [number, number] = [41.3874, 2.1686];
 const DEFAULT_ZOOM = 13;
@@ -17,9 +17,10 @@ interface Props {
   linia: Linia | null;
   parades: Parada[];
   vehicles?: VehiclePos[];
+  correspondencesPerParada?: Map<string, LiniaResum[]>;
 }
 
-export function MapView({ linia, parades, vehicles }: Props) {
+export function MapView({ linia, parades, vehicles, correspondencesPerParada }: Props) {
   const polylinePoints = useMemo<[number, number][][]>(() => {
     if (linia?.geometry) {
       if (linia.geometry.type === 'LineString') {
@@ -62,6 +63,7 @@ export function MapView({ linia, parades, vehicles }: Props) {
             linia={linia}
             parada={p}
             terminal={idx === 0 || idx === parades.length - 1}
+            correspondences={correspondencesPerParada?.get(p.codi)}
           />
         ))}
       {linia && vehicles &&

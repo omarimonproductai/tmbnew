@@ -261,6 +261,30 @@ body {
 }
 .tooltip-name { font-weight: 600; color: #222; }
 
+.stop-corr-icon { background: transparent; border: none; pointer-events: none; }
+.stop-corr-icon .corr-badges {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  white-space: nowrap;
+}
+.stop-corr-icon .corr-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.2px;
+  border: 1.5px solid white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  line-height: 1;
+}
+
 /* --- Aprop meu --- */
 
 .location-block {

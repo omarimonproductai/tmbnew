@@ -49,14 +49,16 @@ export function LiniesView() {
     enabled: !!seleccio,
   });
 
-  // Heavy fetch — only load it when we're actually showing the list view.
+  // Heavy fetch — load it for the list view, and also for metro lines so
+  // we can paint interchange badges on the map.
+  const isMetroSeleccio = seleccio?.tipus === 'metro';
   const { parades: totesParades } = useTotesParades(
-    viewMode === 'list' && !!seleccio,
+    (viewMode === 'list' && !!seleccio) || isMetroSeleccio,
   );
 
   const correspondencesPerParada = useMemo(() => {
     const map = new Map<string, LiniaResum[]>();
-    if (viewMode !== 'list' || totesParades.length === 0 || !seleccio) return map;
+    if (totesParades.length === 0 || !seleccio) return map;
     for (const p of parades) {
       map.set(
         p.codi,
@@ -68,7 +70,19 @@ export function LiniesView() {
       );
     }
     return map;
-  }, [viewMode, parades, totesParades, seleccio]);
+  }, [parades, totesParades, seleccio]);
+
+  // Restrict to metro-on-metro interchanges for the map: bus correspondences
+  // would clutter central stops with 5–10 chips.
+  const metroCorrespondencesPerParada = useMemo(() => {
+    if (!isMetroSeleccio) return undefined;
+    const out = new Map<string, LiniaResum[]>();
+    for (const [codi, lines] of correspondencesPerParada) {
+      const metroOnly = lines.filter((l) => l.tipus === 'metro');
+      if (metroOnly.length > 0) out.set(codi, metroOnly);
+    }
+    return out;
+  }, [correspondencesPerParada, isMetroSeleccio]);
 
   const vehiclesAmbPos = useMemo<VehiclePos[]>(() => {
     if (!seleccio || !vehiclesData) return [];
@@ -133,6 +147,7 @@ export function LiniesView() {
             linia={liniaAmbParades}
             parades={parades}
             vehicles={showVehicles ? vehiclesAmbPos : []}
+            correspondencesPerParada={metroCorrespondencesPerParada}
           />
         ) : (
           <LineListView
