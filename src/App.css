@@ -1042,24 +1042,70 @@ body {
   to { transform: rotate(360deg); }
 }
 
+.panel-toggle-mobile {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .app-main { flex-direction: column-reverse; }
   .panel {
+    display: none;
     width: 100%;
     min-width: 0;
-    height: 45vh;
+    height: 55vh;
     border-right: none;
     border-top: 1px solid #e0e0e0;
   }
-  .map-area { height: 55vh; }
-  .app-header h1 { font-size: 16px; }
-  .map-controls-stack { top: 10px; right: 10px; gap: 8px; }
+  .panel.panel--open { display: flex; }
+  .map-area { height: 100%; flex: 1; }
+
+  .app-header { padding: 6px 12px; gap: 8px; }
+  .app-header h1 { font-size: 14px; }
+  .app-title span { display: none; }
+  .tmb-logo { width: 30px; height: 30px; font-size: 10px; border-radius: 6px; }
+  .mode-toggle button { padding: 4px 10px; font-size: 11px; }
+
+  .panel-toggle-mobile {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    background: #ffffff;
+    color: #444;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    font-family: inherit;
+  }
+  .panel-toggle-mobile.active { color: #c8001e; background: #fff5f6; }
+
+  .map-controls-stack {
+    top: 10px;
+    right: 10px;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 8px;
+  }
   .vehicle-visibility-toggle { width: 40px; height: 40px; }
   .refresh-control { width: 40px; height: 40px; }
-  .view-toggle-wrapper { top: 10px; left: 50px; }
+
+  .view-toggle-wrapper { top: 10px; left: 60px; }
   .view-toggle button span { display: none; }
   .view-toggle button { padding: 6px 8px; }
-  .line-list-view { padding: 60px 8px 8px; }
+
+  .line-header-wrapper {
+    top: 60px;
+    max-width: calc(100% - 24px);
+  }
+  .line-header-banner { padding: 4px 12px 4px 4px; }
+
+  .line-list-view { padding: 100px 8px 8px; }
   .list-sentit-selector { display: flex; }
   .list-columns.multi .list-column:not(.active) { display: none; }
 }

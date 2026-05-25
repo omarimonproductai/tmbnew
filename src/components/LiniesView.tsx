@@ -35,6 +35,12 @@ export function LiniesView() {
   const [seleccio, setSeleccio] = useState<Linia | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('map');
   const [showVehicles, setShowVehicles] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  const handleSelect = (linia: Linia) => {
+    setSeleccio(linia);
+    setPanelOpen(false);
+  };
 
   const { parades, loading: paradesLoading, error: paradesError } = useParades(
     seleccio?.id ?? null,
@@ -120,7 +126,7 @@ export function LiniesView() {
 
   return (
     <main className="app-main">
-      <aside className="panel">
+      <aside className={`panel${panelOpen ? ' panel--open' : ''}`}>
         <FilterBar value={filtre} onChange={setFiltre} />
         <SearchInput value={cerca} onChange={setCerca} />
         <LineList
@@ -128,10 +134,29 @@ export function LiniesView() {
           loading={loading}
           error={error}
           selectedId={seleccio?.id ?? null}
-          onSelect={setSeleccio}
+          onSelect={handleSelect}
         />
       </aside>
       <section className="map-area" aria-label="Vista de la línia">
+        <button
+          type="button"
+          className={`panel-toggle-mobile${panelOpen ? ' active' : ''}`}
+          onClick={() => setPanelOpen((v) => !v)}
+          aria-label={panelOpen ? 'Tancar cerca de línies' : 'Obrir cerca de línies'}
+          aria-expanded={panelOpen}
+        >
+          {panelOpen ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="16" y1="16" x2="21" y2="21" />
+            </svg>
+          )}
+        </button>
         {seleccio && (
           <div className="line-header-wrapper">
             <LineHeaderBanner linia={seleccio} />
