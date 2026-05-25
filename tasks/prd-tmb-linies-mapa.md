@@ -72,9 +72,9 @@ Volem construir una pàgina web pública que consumeixi l'API gratuïta de TMB (
   - `GET /v1/transit/linies` — llistat de línies.
   - `GET /v1/transit/linies/{id}/parades` — parades d'una línia.
   - `GET /v1/ibus/lines/{line}/stops/{stop}` — temps real d'arribada (verificar si és gratuït).
-- **Allotjament:** GitHub Pages o Netlify (pla gratuït), ja que és una app estàtica.
-- **Variables d'entorn:** Les credencials de l'API de TMB s'han de gestionar com a variables d'entorn (`.env`) i no commitejar-les mai al repositori.
-- **CORS:** Verificar si l'API de TMB permet crides directes des del navegador o si cal un proxy lleuger.
+- **Allotjament:** Netlify (pla gratuït), necessari per poder usar Netlify Functions com a proxy.
+- **Variables d'entorn:** Les credencials de l'API de TMB s'han de gestionar com a variables d'entorn (`.env`) i no commitejar-les mai al repositori. A Netlify es configuren com a Environment Variables al panell.
+- **CORS — Proxy obligatori:** L'API de TMB (`api.tmb.cat`) no envia capçaleres CORS, de manera que no es pot cridar directament des del navegador. Cal un proxy intermediari. S'usaran **Netlify Functions** (serverless, pla gratuït) com a proxy lleuger: el frontend cridarà `/api/linies` i `/api/parades/:id`, i la funció serverless reenviarà la petició a `api.tmb.cat` afegint les credencials. Això evita exposar les credencials al codi client i resol el problema de CORS.
 
 ---
 
@@ -90,7 +90,7 @@ Volem construir una pàgina web pública que consumeixi l'API gratuïta de TMB (
 
 ## 9. Preguntes Obertes
 
-1. **CORS de l'API TMB:** Cal verificar si l'API permet crides directes des del navegador (client-side) o si caldrà un petit servidor proxy (ex: Netlify Functions, que té pla gratuït).
+1. ~~**CORS de l'API TMB:**~~ **Resolt.** L'API de `api.tmb.cat` no envia capçaleres CORS. S'usaran Netlify Functions com a proxy. Vegeu secció 7.
 2. **Temps real gratuït:** Cal confirmar durant el desenvolupament si l'endpoint de temps real d'iBus és accessible amb les credencials gratuïtes de TMB.
 3. **Cobertura de l'API:** Quins tipus de transport cobreix realment l'API de TMB? (Metro, Bus, Tramvia... però FGC i Rodalies poden tenir APIs pròpies separades.)
 4. **Dades de recorregut (shapes):** L'API de TMB proporciona les coordenades del traçat de la línia (per dibuixar la polilínia al mapa) o només les coordenades de les parades?
