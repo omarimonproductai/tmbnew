@@ -1,3 +1,4 @@
+import { DirectionsButton } from './DirectionsButton';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
 import type { Linia, LiniaResum, Parada } from '../types/tmb';
@@ -48,6 +49,7 @@ export function StopPopup({ linia, parada, enabled, correspondences }: Props) {
         data={data}
         liniaCodi={linia.codi}
       />
+      <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} variant="block" />
     </div>
   );
 }

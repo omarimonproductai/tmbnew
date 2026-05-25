@@ -4,10 +4,12 @@ import {
   Circle,
   CircleMarker,
   MapContainer,
+  Popup,
   TileLayer,
   Tooltip,
   useMap,
 } from 'react-leaflet';
+import { DirectionsButton } from './DirectionsButton';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
@@ -87,6 +89,23 @@ export function AproperMeuMap({ centre, radiM, parades, topN, bottomInset = 0 }:
               {isTop && <span className="rank-mini">{rank}</span>}
               <span className="tooltip-name">{p.nom}</span>
             </Tooltip>
+            <Popup>
+              <div className="aprop-popup">
+                <div className="aprop-popup-name">{p.nom}</div>
+                <div className="aprop-popup-lines">
+                  {p.liniesQueParen.map((l) => (
+                    <span
+                      key={l.id}
+                      className="aprop-popup-badge"
+                      style={{ background: getLineColor(l) }}
+                    >
+                      {l.codi}
+                    </span>
+                  ))}
+                </div>
+                <DirectionsButton lat={p.lat} lng={p.lng} nom={p.nom} variant="block" />
+              </div>
+            </Popup>
           </CircleMarker>
         );
       })}

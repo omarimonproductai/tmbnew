@@ -479,6 +479,12 @@ body {
 .stop-rank.muted { background: #e0e0e0; color: #888; }
 
 .stop-info { flex: 1; min-width: 0; }
+.stop-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stop-name-row .stop-name { flex: 1; min-width: 0; }
 .stop-name {
   font-size: 13px;
   font-weight: 600;
@@ -486,6 +492,55 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* "Indicacions" button — used inside list items, map popups and stop popups. */
+.directions-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid #1d7df2;
+  background: white;
+  color: #1d7df2;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.directions-btn:hover { background: #1d7df2; color: white; }
+.directions-btn--block {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 6px 10px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+/* Map popup for stops in the 'Aprop meu' view. */
+.aprop-popup { font-size: 12px; min-width: 160px; }
+.aprop-popup-name { font-weight: 700; font-size: 13px; color: #222; margin-bottom: 6px; }
+.aprop-popup-lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.aprop-popup-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: white;
 }
 .stop-meta {
   font-size: 11px;

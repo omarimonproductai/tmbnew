@@ -1,3 +1,4 @@
+import { DirectionsButton } from './DirectionsButton';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { formatDistance } from '../utils/distance';
 import { getLineColor } from '../utils/lineColor';
@@ -58,7 +59,10 @@ function StopItem({
     <div className={`stop-item${isTop ? ' highlight' : ''}`}>
       <div className={`stop-rank${isTop ? '' : ' muted'}`}>{rank}</div>
       <div className="stop-info">
-        <div className="stop-name" title={parada.nom}>{parada.nom}</div>
+        <div className="stop-name-row">
+          <div className="stop-name" title={parada.nom}>{parada.nom}</div>
+          <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} />
+        </div>
         <div className="stop-meta">
           <span className="meta-dist">{formatDistance(parada.distanciaM)}</span>
           <span>·</span>
