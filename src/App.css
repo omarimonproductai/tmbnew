@@ -1266,6 +1266,30 @@ body {
 .recenter-control button:hover { transform: scale(1.06); }
 .recenter-control button:active { transform: scale(0.95); }
 
+.aprop-refresh-control {
+  position: absolute;
+  right: 16px;
+  z-index: 700;
+  pointer-events: none;
+}
+.aprop-refresh-control button {
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.aprop-refresh-control button:hover { transform: scale(1.06); color: #c8001e; }
+.aprop-refresh-control button:active { transform: scale(0.95); }
+
 /* Bottom-sheet variant of .panel (Aprop meu on mobile) — desktop falls
    back to the normal sidebar layout below. */
 .sheet-handle { display: none; }

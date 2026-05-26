@@ -22,9 +22,17 @@ interface Props {
   parades: ParadaAprop[];
   topN: number;
   bottomInset?: number;
+  onRefresh?: () => void;
 }
 
-export function AproperMeuMap({ centre, radiM, parades, topN, bottomInset = 0 }: Props) {
+export function AproperMeuMap({
+  centre,
+  radiM,
+  parades,
+  topN,
+  bottomInset = 0,
+  onRefresh,
+}: Props) {
   return (
     <MapContainer
       center={centre ? [centre.lat, centre.lng] : FALLBACK_CENTER}
@@ -69,6 +77,9 @@ export function AproperMeuMap({ centre, radiM, parades, topN, bottomInset = 0 }:
           <MapFollowsUser centre={centre} radiM={radiM} bottomInset={bottomInset} />
           <RecenterButton centre={centre} radiM={radiM} bottomInset={bottomInset} />
         </>
+      )}
+      {onRefresh && (
+        <LocationRefreshButton bottomInset={bottomInset} onRefresh={onRefresh} />
       )}
       {parades.map((p, idx) => {
         const rank = idx + 1;
@@ -124,6 +135,33 @@ function MapFollowsUser({
     }
   }, [centre.lat, centre.lng, radiM, bottomInset, map]);
   return null;
+}
+
+function LocationRefreshButton({
+  bottomInset,
+  onRefresh,
+}: {
+  bottomInset: number;
+  onRefresh: () => void;
+}) {
+  return (
+    <div
+      className="aprop-refresh-control"
+      style={{ bottom: `${bottomInset + 72}px` }}
+    >
+      <button
+        type="button"
+        onClick={onRefresh}
+        aria-label="Actualitzar la meva ubicació"
+        title="Actualitzar ubicació"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <polyline points="23 4 23 10 17 10" />
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+        </svg>
+      </button>
+    </div>
+  );
 }
 
 function RecenterButton({

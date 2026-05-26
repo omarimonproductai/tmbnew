@@ -11,6 +11,22 @@ const SHEET_MIN_HEIGHT = 80; // peek height (px)
 const SHEET_DEFAULT_OPEN_RATIO = 0.55; // mid screen
 const SHEET_MAX_RATIO = 0.92; // never fully cover the header
 const DRAG_THRESHOLD = 4; // px before a press is treated as a drag
+const RADIUS_STORAGE_KEY = 'tmb-aprop-meu-radius';
+const RADIUS_MIN = 100;
+const RADIUS_MAX = 2000;
+const RADIUS_DEFAULT = 500;
+
+function loadStoredRadius(): number {
+  if (typeof window === 'undefined') return RADIUS_DEFAULT;
+  try {
+    const raw = window.localStorage.getItem(RADIUS_STORAGE_KEY);
+    const n = raw ? parseInt(raw, 10) : NaN;
+    if (Number.isFinite(n) && n >= RADIUS_MIN && n <= RADIUS_MAX) return n;
+  } catch {
+    // localStorage may throw in private browsing; fall through to default.
+  }
+  return RADIUS_DEFAULT;
+}
 
 function getViewportHeight(): number {
   if (typeof window === 'undefined') return 600;
@@ -25,7 +41,7 @@ function getIsMobile(): boolean {
 }
 
 export function AproperMeuView() {
-  const [radius, setRadius] = useState(500);
+  const [radius, setRadius] = useState<number>(loadStoredRadius);
   const [sheetHeight, setSheetHeight] = useState(SHEET_MIN_HEIGHT);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
@@ -48,6 +64,15 @@ export function AproperMeuView() {
       root.style.removeProperty('--sheet-height');
     };
   }, [sheetHeight, isMobile]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(RADIUS_STORAGE_KEY, String(radius));
+    } catch {
+      // ignore quota / private-mode errors
+    }
+  }, [radius]);
   const dragRef = useRef<{
     startY: number;
     startHeight: number;
@@ -187,6 +212,7 @@ export function AproperMeuView() {
           parades={paradesDins}
           topN={TOP_N}
           bottomInset={isMobile ? sheetHeight : 0}
+          onRefresh={refresh}
         />
         {!position && status !== 'requesting' && (
           <div className="map-hint">
