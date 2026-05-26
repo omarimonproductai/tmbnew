@@ -78,6 +78,7 @@ export function AproperMeuMap({
           <RecenterButton centre={centre} radiM={radiM} bottomInset={bottomInset} />
         </>
       )}
+      <ZoomAroundUser centre={centre} bottomInset={bottomInset} />
       {onRefresh && (
         <LocationRefreshButton
           bottomInset={bottomInset}
@@ -260,6 +261,56 @@ function AproperMeuStopMarker({
       </Popup>
     </CircleMarker>
   );
+}
+
+// Intercepts clicks on Leaflet's built-in +/- zoom buttons so that the
+// new map center keeps the user's location at the vertical middle of
+// the visible viewport (the strip above the bottom sheet) instead of at
+// the geometric centre of the map container, which usually sits behind
+// the sheet on mobile.
+function ZoomAroundUser({
+  centre,
+  bottomInset,
+}: {
+  centre: Coordinate | null;
+  bottomInset: number;
+}) {
+  const map = useMap();
+  const centreRef = useRef<Coordinate | null>(null);
+  const insetRef = useRef(0);
+  centreRef.current = centre;
+  insetRef.current = bottomInset;
+
+  useEffect(() => {
+    const container = map.getContainer();
+    const zoomInBtn = container.querySelector<HTMLElement>('.leaflet-control-zoom-in');
+    const zoomOutBtn = container.querySelector<HTMLElement>('.leaflet-control-zoom-out');
+
+    const handler = (delta: number) => (e: Event) => {
+      const c = centreRef.current;
+      if (!c) return; // Without a fix yet, let Leaflet's default kick in.
+      e.preventDefault();
+      e.stopPropagation();
+      const targetZoom = map.getZoom() + delta;
+      const inset = insetRef.current;
+      const userPx = map.project([c.lat, c.lng], targetZoom);
+      const newCenterPx = userPx.add([0, inset / 2]);
+      const newCenter = map.unproject(newCenterPx, targetZoom);
+      map.setView(newCenter, targetZoom);
+    };
+
+    const onIn = handler(1);
+    const onOut = handler(-1);
+
+    zoomInBtn?.addEventListener('click', onIn, { capture: true });
+    zoomOutBtn?.addEventListener('click', onOut, { capture: true });
+    return () => {
+      zoomInBtn?.removeEventListener('click', onIn, { capture: true });
+      zoomOutBtn?.removeEventListener('click', onOut, { capture: true });
+    };
+  }, [map]);
+
+  return null;
 }
 
 function InvalidateOnResize() {
