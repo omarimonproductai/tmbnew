@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { DirectionsButton } from './DirectionsButton';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { formatDistance } from '../utils/distance';
@@ -55,6 +56,26 @@ function StopItem({
     true,
   );
 
+  // Order lines by next-arrival so the train/bus coming sooner ends up
+  // at the top. Lines with no real-time data drop to the end.
+  const sortedLines = useMemo(() => {
+    const arribades = data?.arribades;
+    if (!arribades || arribades.length === 0) return parada.liniesQueParen;
+    const minByCodi = new Map<string, number>();
+    for (const l of parada.liniesQueParen) {
+      const next = arribades.find((a) => a.liniaCodi === l.codi);
+      minByCodi.set(
+        l.codi,
+        next?.minutsRestants ?? Number.POSITIVE_INFINITY,
+      );
+    }
+    return [...parada.liniesQueParen].sort((a, b) => {
+      const am = minByCodi.get(a.codi) ?? Number.POSITIVE_INFINITY;
+      const bm = minByCodi.get(b.codi) ?? Number.POSITIVE_INFINITY;
+      return am - bm;
+    });
+  }, [parada.liniesQueParen, data?.arribades]);
+
   return (
     <div className={`stop-item${isTop ? ' highlight' : ''}`}>
       <div className={`stop-rank${isTop ? '' : ' muted'}`}>{rank}</div>
@@ -69,7 +90,7 @@ function StopItem({
           <span>{TYPE_LABEL[parada.tipus]}</span>
         </div>
         <div className="line-arrivals">
-          {parada.liniesQueParen.map((l) => (
+          {sortedLines.map((l) => (
             <LineArrivalRow
               key={l.id}
               linia={l}
