@@ -16,6 +16,8 @@ interface Props {
   expanded: boolean;
   onToggle: () => void;
   linia: Linia;
+  isHere?: boolean;
+  rowRef?: React.Ref<HTMLDivElement>;
 }
 
 export function StopRow({
@@ -26,10 +28,13 @@ export function StopRow({
   expanded,
   onToggle,
   linia,
+  isHere = false,
+  rowRef,
 }: Props) {
   return (
     <div
-      className={`stop-row${expanded ? ' expanded' : ''}`}
+      ref={rowRef}
+      className={`stop-row${expanded ? ' expanded' : ''}${isHere ? ' here' : ''}`}
       style={expanded ? { borderLeftColor: linia.color } : undefined}
     >
       <button
@@ -41,6 +46,13 @@ export function StopRow({
         <span className="stop-row-ordre">{ordre}</span>
         <div className="stop-row-info">
           <div className="stop-row-name" title={parada.nom}>
+            {isHere && (
+              <span
+                className="stop-row-here-dot"
+                aria-label="La meva ubicació"
+                title="Tu hi ets"
+              />
+            )}
             {parada.nom}
           </div>
           {correspondencies.length > 0 && (

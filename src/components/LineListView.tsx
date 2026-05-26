@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StopRow } from './StopRow';
 import type { Linia, LiniaResum, Parada, VehicleRaw } from '../types/tmb';
 
@@ -7,6 +7,7 @@ interface Props {
   parades: Parada[];
   vehicles: VehicleRaw[];
   correspondencesPerParada: Map<string, LiniaResum[]>;
+  nearestStopCodi?: string | null;
 }
 
 interface Column {
@@ -24,8 +25,10 @@ export function LineListView({
   parades,
   vehicles,
   correspondencesPerParada,
+  nearestStopCodi,
 }: Props) {
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
+  const nearestRowRef = useRef<HTMLDivElement | null>(null);
 
   const columns = useMemo<Column[]>(() => {
     const bySentit = new Map<string, Parada[]>();
@@ -102,6 +105,15 @@ export function LineListView({
     columns[0]?.sentit ?? 'default',
   );
 
+  // Scroll the user's nearest stop into the viewport once we know it.
+  useEffect(() => {
+    if (!nearestStopCodi || !nearestRowRef.current) return;
+    nearestRowRef.current.scrollIntoView({
+      block: 'center',
+      behavior: 'smooth',
+    });
+  }, [nearestStopCodi, activeSentit, parades.length]);
+
   if (parades.length === 0) {
     return <div className="list-view-empty">Carregant parades…</div>;
   }
@@ -139,6 +151,8 @@ export function LineListView({
             <div className="list-column-rows">
               {col.parades.map((p, idx) => {
                 const key = `${col.sentit}|${p.id}`;
+                const isHere = !!nearestStopCodi && p.codi === nearestStopCodi;
+                const isActiveColumn = col.sentit === activeSentit;
                 return (
                   <StopRow
                     key={key}
@@ -151,6 +165,8 @@ export function LineListView({
                       setExpandedKey(expandedKey === key ? null : key)
                     }
                     linia={linia}
+                    isHere={isHere}
+                    rowRef={isHere && isActiveColumn ? nearestRowRef : undefined}
                   />
                 );
               })}

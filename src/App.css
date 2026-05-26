@@ -1079,6 +1079,24 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.stop-row.here { background: rgba(29, 125, 242, 0.06); }
+.stop-row.here .stop-row-name { color: #1d7df2; }
+.stop-row-here-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #1d7df2;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #1d7df2;
+  vertical-align: middle;
+  animation: stop-here-pulse 1.6s ease-in-out infinite;
+}
+@keyframes stop-here-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px #1d7df2, 0 0 0 0 rgba(29, 125, 242, 0.45); }
+  50% { box-shadow: 0 0 0 2px #1d7df2, 0 0 0 8px rgba(29, 125, 242, 0); }
+}
 .stop-row-corresp {
   display: flex;
   gap: 3px;

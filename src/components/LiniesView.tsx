@@ -14,6 +14,7 @@ import { useParades } from '../hooks/useParades';
 import { useTotesParades } from '../hooks/useTotesParades';
 import { useVehicles } from '../hooks/useVehicles';
 import { findCorrespondences } from '../utils/correspondences';
+import { haversine } from '../utils/distance';
 import { extrapolateVehiclePosition } from '../utils/route';
 import { SPEED_M_S } from '../utils/transit';
 import type {
@@ -78,6 +79,22 @@ export function LiniesView() {
   const { parades: totesParades } = useTotesParades(
     (viewMode === 'list' && !!seleccio) || isMetroSeleccio,
   );
+
+  // The line's stop closest to the user — drives the 'Tu hi ets' marker
+  // and the initial scroll position in the list view.
+  const nearestStopCodi = useMemo<string | null>(() => {
+    if (!userPosition || parades.length === 0) return null;
+    let bestCodi: string | null = null;
+    let bestD = Infinity;
+    for (const p of parades) {
+      const d = haversine(userPosition, { lat: p.lat, lng: p.lng });
+      if (d < bestD) {
+        bestD = d;
+        bestCodi = p.codi;
+      }
+    }
+    return bestCodi;
+  }, [userPosition, parades]);
 
   const correspondencesPerParada = useMemo(() => {
     const map = new Map<string, LiniaResum[]>();
@@ -202,6 +219,7 @@ export function LiniesView() {
               showVehicles && vehiclesData ? vehiclesData.vehicles : []
             }
             correspondencesPerParada={correspondencesPerParada}
+            nearestStopCodi={nearestStopCodi}
           />
         )}
         {seleccio && (
