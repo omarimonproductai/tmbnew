@@ -79,7 +79,12 @@ export function AproperMeuMap({
         </>
       )}
       {onRefresh && (
-        <LocationRefreshButton bottomInset={bottomInset} onRefresh={onRefresh} />
+        <LocationRefreshButton
+          bottomInset={bottomInset}
+          onRefresh={onRefresh}
+          centre={centre}
+          radiM={radiM}
+        />
       )}
       {parades.map((p, idx) => {
         const rank = idx + 1;
@@ -140,10 +145,25 @@ function MapFollowsUser({
 function LocationRefreshButton({
   bottomInset,
   onRefresh,
+  centre,
+  radiM,
 }: {
   bottomInset: number;
   onRefresh: () => void;
+  centre: Coordinate | null;
+  radiM: number;
 }) {
+  const map = useMap();
+  const handle = () => {
+    onRefresh();
+    if (centre) {
+      const bounds = L.latLng(centre.lat, centre.lng).toBounds(radiM * 2);
+      map.fitBounds(bounds, {
+        paddingTopLeft: [40, 40],
+        paddingBottomRight: [40, 40 + bottomInset],
+      });
+    }
+  };
   return (
     <div
       className="aprop-refresh-control"
@@ -151,9 +171,9 @@ function LocationRefreshButton({
     >
       <button
         type="button"
-        onClick={onRefresh}
-        aria-label="Actualitzar la meva ubicació"
-        title="Actualitzar ubicació"
+        onClick={handle}
+        aria-label="Actualitzar la meva ubicació i centrar el mapa"
+        title="Actualitzar ubicació i centrar"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <polyline points="23 4 23 10 17 10" />
