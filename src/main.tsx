@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// leaflet-rotate must be imported once globally before any MapContainer
-// is mounted; it patches Leaflet to support the rotate / touchRotate
-// options on the map.
+// Order matters: expose Leaflet as `window.L` BEFORE leaflet-rotate
+// runs its module-level side effects, since the plugin assumes the
+// global is already wired up.
+import './leafletGlobals';
 import 'leaflet-rotate';
 import App from './App';
 
