@@ -2,17 +2,13 @@ import { DirectionsButton } from './DirectionsButton';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { getLineColor } from '../utils/lineColor';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
-import type { ParadaAprop } from '../types/tmb';
+import type { LiniaResum, ParadaAprop } from '../types/tmb';
 
 interface Props {
   parada: ParadaAprop;
   enabled: boolean;
 }
 
-// Popup body for a stop in 'Aprop meu'. Shows the lines that serve the
-// stop and, when the popup is open, the live arrivals grouped by
-// destination. One temps-real subrequest per stop (all=1 fetches the
-// arrivals for every line at this stop in a single call).
 export function AproperMeuStopPopup({ parada, enabled }: Props) {
   const primary = parada.liniesQueParen[0];
   const { data, loading, error } = useTempsReal(
@@ -23,21 +19,31 @@ export function AproperMeuStopPopup({ parada, enabled }: Props) {
     true,
   );
 
+  const hasArrivals =
+    !!data && data.disponible && data.arribades.length > 0;
+
   return (
     <div className="aprop-popup">
       <div className="aprop-popup-name">{parada.nom}</div>
-      <div className="aprop-popup-lines">
-        {parada.liniesQueParen.map((l) => (
-          <span
-            key={l.id}
-            className="aprop-popup-badge"
-            style={{ background: getLineColor(l) }}
-          >
-            {l.codi}
-          </span>
-        ))}
-      </div>
-      <ArribadesBlock loading={loading} error={error} data={data} />
+      {!hasArrivals && (
+        <div className="aprop-popup-lines">
+          {parada.liniesQueParen.map((l) => (
+            <span
+              key={l.id}
+              className="aprop-popup-badge"
+              style={{ background: getLineColor(l) }}
+            >
+              {l.codi}
+            </span>
+          ))}
+        </div>
+      )}
+      <ArribadesBlock
+        loading={loading}
+        error={error}
+        data={data}
+        liniesQueParen={parada.liniesQueParen}
+      />
       <DirectionsButton
         lat={parada.lat}
         lng={parada.lng}
@@ -52,10 +58,12 @@ function ArribadesBlock({
   loading,
   error,
   data,
+  liniesQueParen,
 }: {
   loading: boolean;
   error: string | null;
   data: ReturnType<typeof useTempsReal>['data'];
+  liniesQueParen: LiniaResum[];
 }) {
   if (loading && !data) {
     return <div className="aprop-popup-status">Consultant temps real…</div>;
@@ -70,6 +78,9 @@ function ArribadesBlock({
     );
   }
 
+  const colorByCodi = new Map<string, string>();
+  for (const l of liniesQueParen) colorByCodi.set(l.codi, getLineColor(l));
+
   const groups = groupArrivalsByDestination(data.arribades.slice(0, 10));
   return (
     <div className="aprop-popup-arrivals">
@@ -79,9 +90,15 @@ function ArribadesBlock({
           <ul>
             {g.arribades.slice(0, 3).map((a, idx) => {
               const imminent = a.text.toLowerCase().includes('arribant');
+              const color = colorByCodi.get(a.liniaCodi) ?? '#888';
               return (
                 <li key={`${a.liniaCodi}-${idx}`}>
-                  <span className="aprop-popup-line">{a.liniaCodi || '—'}</span>
+                  <span
+                    className="aprop-popup-inline-badge"
+                    style={{ background: color }}
+                  >
+                    {a.liniaCodi || '—'}
+                  </span>
                   <span
                     className={`aprop-popup-time${imminent ? ' imminent' : ''}`}
                   >
