@@ -1,14 +1,16 @@
 import L from 'leaflet';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
+  CircleMarker,
   MapContainer,
   Polyline,
   TileLayer,
+  Tooltip,
   useMap,
 } from 'react-leaflet';
 import { StopMarker } from './StopMarker';
 import { VehicleMarker } from './VehicleMarker';
-import type { Linia, LiniaResum, Parada, VehiclePos } from '../types/tmb';
+import type { Coordinate, Linia, LiniaResum, Parada, VehiclePos } from '../types/tmb';
 
 const BARCELONA_CENTER: [number, number] = [41.3874, 2.1686];
 const DEFAULT_ZOOM = 13;
@@ -18,9 +20,10 @@ interface Props {
   parades: Parada[];
   vehicles?: VehiclePos[];
   correspondencesPerParada?: Map<string, LiniaResum[]>;
+  userPosition?: Coordinate | null;
 }
 
-export function MapView({ linia, parades, vehicles, correspondencesPerParada }: Props) {
+export function MapView({ linia, parades, vehicles, correspondencesPerParada, userPosition }: Props) {
   const polylinePoints = useMemo<[number, number][][]>(() => {
     if (linia?.geometry) {
       if (linia.geometry.type === 'LineString') {
@@ -76,9 +79,40 @@ export function MapView({ linia, parades, vehicles, correspondencesPerParada }: 
             tipus={linia.tipus}
           />
         ))}
+      {userPosition && <UserDot position={userPosition} hasLine={!!linia} />}
       <AutoFit linia={linia} parades={parades} />
       <InvalidateOnResize />
     </MapContainer>
+  );
+}
+
+// Shows the user's location as a blue dot. When no line is selected yet,
+// pans the map to centre on the user the first time we get a position
+// so the visitor lands looking at their neighbourhood rather than at
+// the Barcelona-wide fallback.
+function UserDot({ position, hasLine }: { position: Coordinate; hasLine: boolean }) {
+  const map = useMap();
+  const centeredRef = useRef(false);
+  useEffect(() => {
+    if (centeredRef.current || hasLine) return;
+    map.setView([position.lat, position.lng], 15, { animate: false });
+    centeredRef.current = true;
+  }, [position.lat, position.lng, hasLine, map]);
+  return (
+    <CircleMarker
+      center={[position.lat, position.lng]}
+      radius={7}
+      pathOptions={{
+        color: '#ffffff',
+        weight: 3,
+        fillColor: '#1d7df2',
+        fillOpacity: 1,
+      }}
+    >
+      <Tooltip permanent direction="top" offset={[0, -10]} className="user-tooltip">
+        Tu
+      </Tooltip>
+    </CircleMarker>
   );
 }
 

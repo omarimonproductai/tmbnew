@@ -8,6 +8,7 @@ import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
 import { ViewToggle, type ViewMode } from './ViewToggle';
+import { useGeolocation } from '../hooks/useGeolocation';
 import { useLinies } from '../hooks/useLinies';
 import { useParades } from '../hooks/useParades';
 import { useTotesParades } from '../hooks/useTotesParades';
@@ -22,6 +23,11 @@ import type {
   VehiclePos,
 } from '../types/tmb';
 
+function getIsMobile(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia('(max-width: 640px)').matches;
+}
+
 export function LiniesView() {
   const {
     liniesFiltrades,
@@ -33,12 +39,20 @@ export function LiniesView() {
     setCerca,
   } = useLinies();
   const [seleccio, setSeleccio] = useState<Linia | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('map');
+  // On mobile prefer the list view by default; on desktop the map.
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    getIsMobile() ? 'list' : 'map',
+  );
   const [showVehicles, setShowVehicles] = useState(true);
   // On mobile we want the line list to be the landing UI: it greets the
   // user expanded, and the FAB only appears once they've picked a line
   // (so they have something on the map to look at).
   const [panelOpen, setPanelOpen] = useState(true);
+
+  // We ask for geolocation so the map can show a 'Tu' dot — gives the
+  // user a quick sense of where the selected line passes relative to
+  // their position. Permission is the same one used in 'Aprop meu'.
+  const { position: userPosition } = useGeolocation(true);
 
   const handleSelect = (linia: Linia) => {
     setSeleccio(linia);
@@ -178,6 +192,7 @@ export function LiniesView() {
             parades={parades}
             vehicles={showVehicles ? vehiclesAmbPos : []}
             correspondencesPerParada={metroCorrespondencesPerParada}
+            userPosition={userPosition}
           />
         ) : (
           <LineListView

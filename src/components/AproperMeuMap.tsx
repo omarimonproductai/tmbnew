@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Circle,
   CircleMarker,
@@ -9,7 +9,7 @@ import {
   Tooltip,
   useMap,
 } from 'react-leaflet';
-import { DirectionsButton } from './DirectionsButton';
+import { AproperMeuStopPopup } from './AproperMeuStopPopup';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
@@ -70,43 +70,13 @@ export function AproperMeuMap({ centre, radiM, parades, topN, bottomInset = 0 }:
       )}
       {parades.map((p, idx) => {
         const rank = idx + 1;
-        const isTop = rank <= topN;
-        const rep = pickRepresentativeLine(p.liniesQueParen);
-        const color = rep ? getLineColor(rep) : '#666';
         return (
-          <CircleMarker
+          <AproperMeuStopMarker
             key={p.id}
-            center={[p.lat, p.lng]}
-            radius={isTop ? 10 : 5}
-            pathOptions={{
-              color: '#ffffff',
-              weight: isTop ? 3 : 1.5,
-              fillColor: color,
-              fillOpacity: 1,
-            }}
-          >
-            <Tooltip direction="top" offset={[0, -4]} className="stop-tooltip">
-              {isTop && <span className="rank-mini">{rank}</span>}
-              <span className="tooltip-name">{p.nom}</span>
-            </Tooltip>
-            <Popup>
-              <div className="aprop-popup">
-                <div className="aprop-popup-name">{p.nom}</div>
-                <div className="aprop-popup-lines">
-                  {p.liniesQueParen.map((l) => (
-                    <span
-                      key={l.id}
-                      className="aprop-popup-badge"
-                      style={{ background: getLineColor(l) }}
-                    >
-                      {l.codi}
-                    </span>
-                  ))}
-                </div>
-                <DirectionsButton lat={p.lat} lng={p.lng} nom={p.nom} variant="block" />
-              </div>
-            </Popup>
-          </CircleMarker>
+            parada={p}
+            rank={rank}
+            topN={topN}
+          />
         );
       })}
       <InvalidateOnResize />
@@ -190,6 +160,45 @@ function RecenterButton({
         </svg>
       </button>
     </div>
+  );
+}
+
+function AproperMeuStopMarker({
+  parada,
+  rank,
+  topN,
+}: {
+  parada: ParadaAprop;
+  rank: number;
+  topN: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const isTop = rank <= topN;
+  const rep = pickRepresentativeLine(parada.liniesQueParen);
+  const color = rep ? getLineColor(rep) : '#666';
+  return (
+    <CircleMarker
+      center={[parada.lat, parada.lng]}
+      radius={isTop ? 10 : 5}
+      pathOptions={{
+        color: '#ffffff',
+        weight: isTop ? 3 : 1.5,
+        fillColor: color,
+        fillOpacity: 1,
+      }}
+      eventHandlers={{
+        popupopen: () => setOpen(true),
+        popupclose: () => setOpen(false),
+      }}
+    >
+      <Tooltip direction="top" offset={[0, -4]} className="stop-tooltip">
+        {isTop && <span className="rank-mini">{rank}</span>}
+        <span className="tooltip-name">{parada.nom}</span>
+      </Tooltip>
+      <Popup>
+        <AproperMeuStopPopup parada={parada} enabled={open} />
+      </Popup>
+    </CircleMarker>
   );
 }
 

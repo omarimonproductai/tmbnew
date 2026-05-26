@@ -617,13 +617,13 @@ body {
 .dir-sheet-cancel:active { background: rgba(0, 0, 0, 0.06); }
 
 /* Map popup for stops in the 'Aprop meu' view. */
-.aprop-popup { font-size: 12px; min-width: 160px; }
+.aprop-popup { font-size: 12px; min-width: 200px; }
 .aprop-popup-name { font-weight: 700; font-size: 13px; color: #222; margin-bottom: 6px; }
 .aprop-popup-lines {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 .aprop-popup-badge {
   display: inline-flex;
@@ -637,6 +637,37 @@ body {
   font-weight: 800;
   color: white;
 }
+.aprop-popup-status {
+  color: #777;
+  font-size: 11px;
+  padding: 6px 0;
+  text-align: center;
+}
+.aprop-popup-status.error { color: #c8001e; }
+.aprop-popup-arrivals { border-top: 1px solid #f0f0f0; padding-top: 6px; }
+.aprop-popup-group + .aprop-popup-group { margin-top: 6px; padding-top: 6px; border-top: 1px solid #f4f4f4; }
+.aprop-popup-dest {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 3px;
+}
+.aprop-popup-arrivals ul { list-style: none; padding: 0; margin: 0; }
+.aprop-popup-arrivals li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 12px;
+}
+.aprop-popup-line {
+  font-size: 10px;
+  font-weight: 800;
+  color: #888;
+}
+.aprop-popup-time { color: #c8001e; font-weight: 700; font-size: 12px; }
+.aprop-popup-time.imminent { color: #1f9d55; }
 .stop-meta {
   font-size: 11px;
   color: #888;
