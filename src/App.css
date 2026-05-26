@@ -672,6 +672,42 @@ body {
 }
 .dir-sheet-cancel:active { background: rgba(0, 0, 0, 0.06); }
 
+/* Transient toast: bottom-center pill that auto-dismisses after a few
+   seconds. Used to surface non-blocking errors (e.g. stale data) */
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 2500;
+  max-width: 92vw;
+  pointer-events: none;
+  animation: toast-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.toast-inner {
+  pointer-events: auto;
+  display: inline-block;
+  max-width: 100%;
+  background: rgba(30, 30, 30, 0.94);
+  color: white;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 999px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.35;
+}
+.toast--warning .toast-inner { background: rgba(190, 110, 0, 0.96); }
+.toast--error .toast-inner { background: rgba(200, 0, 30, 0.96); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 18px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 /* Map popup for stops in the 'Aprop meu' view. */
 .aprop-popup { font-size: 12px; min-width: 200px; }
 .aprop-popup-name { font-weight: 700; font-size: 13px; color: #222; margin-bottom: 6px; }

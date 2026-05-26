@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
 import { LocationBlock } from './LocationBlock';
 import { ParadesAprop } from './ParadesAprop';
+import { Toast } from './Toast';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
@@ -93,8 +94,17 @@ export function AproperMeuView() {
   }, []);
 
   const { position, accuracy, status, error, refresh } = useGeolocation(true);
-  const { parades, loading: loadingParades, error: paradesError } = useTotesParades(true);
+  const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
+
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (lastFailureAt) {
+      setToastMsg(
+        "No s'han pogut actualitzar les dades. Mostrant les últimes guardades.",
+      );
+    }
+  }, [lastFailureAt]);
 
   const isOpen = sheetHeight > SHEET_MIN_HEIGHT + 20;
 
@@ -192,15 +202,10 @@ export function AproperMeuView() {
             radius={radius}
             onRadiusChange={setRadius}
           />
-          {loadingParades && (
+          {loadingParades && parades.length === 0 && (
             <div className="state-msg">Carregant parades de tota la xarxa…</div>
           )}
-          {paradesError && (
-            <div className="state-msg state-msg--error" role="alert">
-              No s'han pogut carregar les parades. {paradesError}
-            </div>
-          )}
-          {!loadingParades && !paradesError && (
+          {parades.length > 0 && (
             <ParadesAprop parades={paradesDins} topN={TOP_N} />
           )}
         </div>
@@ -222,6 +227,12 @@ export function AproperMeuView() {
           </div>
         )}
       </section>
+      {toastMsg && (
+        <Toast
+          message={toastMsg}
+          onDismiss={() => setToastMsg(null)}
+        />
+      )}
     </main>
   );
 }
