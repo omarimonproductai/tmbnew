@@ -1,7 +1,9 @@
 import { DirectionsButton } from './DirectionsButton';
+import { FavStar } from './FavStar';
+import { useFavorits } from '../hooks/useFavorits';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
-import type { Linia, LiniaResum, Parada } from '../types/tmb';
+import type { FavParada, Linia, LiniaResum, Parada } from '../types/tmb';
 
 interface Props {
   linia: Linia;
@@ -17,6 +19,24 @@ export function StopPopup({ linia, parada, enabled, correspondences }: Props) {
     parada.codi,
     enabled,
   );
+  const { isParadaFav, toggleParada } = useFavorits();
+
+  // Match the id scheme parades-all uses so a stop favourited here shows
+  // as favourited in 'Aprop meu' too (metro keyed by station group).
+  const favId =
+    linia.tipus === 'metro' ? `metro-${parada.id}` : `bus-${parada.codi}`;
+  const favParada: FavParada = {
+    id: favId,
+    codi: parada.codi,
+    nom: parada.nom,
+    lat: parada.lat,
+    lng: parada.lng,
+    tipus: linia.tipus,
+    liniesQueParen: [
+      { id: linia.id, codi: linia.codi, tipus: linia.tipus, color: linia.color },
+      ...(correspondences ?? []),
+    ],
+  };
 
   return (
     <div className="stop-popup-content">
@@ -25,6 +45,11 @@ export function StopPopup({ linia, parada, enabled, correspondences }: Props) {
           {linia.codi}
         </span>
         <span className="popup-title">{parada.nom}</span>
+        <FavStar
+          active={isParadaFav(favId)}
+          onToggle={() => toggleParada(favParada)}
+          size={20}
+        />
       </div>
       {correspondences && correspondences.length > 0 && (
         <div className="popup-interchanges" aria-label="Correspondències">

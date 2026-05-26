@@ -1,3 +1,5 @@
+import { FavStar } from './FavStar';
+import { useFavorits } from '../hooks/useFavorits';
 import type { Linia } from '../types/tmb';
 
 const TYPE_LABEL: Record<Linia['tipus'], string> = {
@@ -31,6 +33,7 @@ interface Props {
 }
 
 export function LineList({ linies, selectedId, loading, error, onSelect }: Props) {
+  const { isLiniaFav, toggleLinia } = useFavorits();
   if (loading) {
     return (
       <div className="state-msg" aria-live="polite">
@@ -53,37 +56,51 @@ export function LineList({ linies, selectedId, loading, error, onSelect }: Props
       {linies.map((l) => {
         const active = l.id === selectedId;
         return (
-          <button
+          <div
             key={l.id}
-            type="button"
             role="listitem"
-            className={`line-item${active ? ' active' : ''}`}
-            onClick={() => onSelect(l)}
-            aria-current={active}
+            className={`line-row${active ? ' active' : ''}`}
           >
-            <span
-              className={`line-type-glyph line-type-glyph--${l.tipus}`}
-              title={TYPE_LABEL[l.tipus]}
-              aria-label={TYPE_LABEL[l.tipus]}
+            <button
+              type="button"
+              className="line-item"
+              onClick={() => onSelect(l)}
+              aria-current={active}
             >
-              <TypeIcon tipus={l.tipus} />
-            </span>
-            <span
-              className="line-badge"
-              style={{ background: l.color }}
-              aria-hidden="true"
-            >
-              {l.codi}
-            </span>
-            <span className="line-info">
-              <span className="line-name" title={l.nom}>
-                {l.nom}
+              <span
+                className={`line-type-glyph line-type-glyph--${l.tipus}`}
+                title={TYPE_LABEL[l.tipus]}
+                aria-label={TYPE_LABEL[l.tipus]}
+              >
+                <TypeIcon tipus={l.tipus} />
               </span>
-            </span>
-            {typeof l.numParades === 'number' && (
-              <span className="line-count">{l.numParades} par.</span>
-            )}
-          </button>
+              <span
+                className="line-badge"
+                style={{ background: l.color }}
+                aria-hidden="true"
+              >
+                {l.codi}
+              </span>
+              <span className="line-info">
+                <span className="line-name" title={l.nom}>
+                  {l.nom}
+                </span>
+              </span>
+            </button>
+            <FavStar
+              active={isLiniaFav(l.id)}
+              onToggle={() =>
+                toggleLinia({
+                  id: l.id,
+                  codi: l.codi,
+                  nom: l.nom,
+                  tipus: l.tipus,
+                  color: l.color,
+                })
+              }
+              size={20}
+            />
+          </div>
         );
       })}
     </div>

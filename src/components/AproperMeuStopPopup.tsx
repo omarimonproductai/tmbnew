@@ -1,4 +1,6 @@
 import { DirectionsButton } from './DirectionsButton';
+import { FavStar } from './FavStar';
+import { useFavorits } from '../hooks/useFavorits';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { getLineColor } from '../utils/lineColor';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
@@ -18,13 +20,31 @@ export function AproperMeuStopPopup({ parada, enabled }: Props) {
     enabled && !!primary,
     true,
   );
+  const { isParadaFav, toggleParada } = useFavorits();
 
   const hasArrivals =
     !!data && data.disponible && data.arribades.length > 0;
 
   return (
     <div className="aprop-popup">
-      <div className="aprop-popup-name">{parada.nom}</div>
+      <div className="aprop-popup-head">
+        <span className="aprop-popup-name">{parada.nom}</span>
+        <FavStar
+          active={isParadaFav(parada.id)}
+          onToggle={() =>
+            toggleParada({
+              id: parada.id,
+              codi: parada.codi,
+              nom: parada.nom,
+              lat: parada.lat,
+              lng: parada.lng,
+              tipus: parada.tipus,
+              liniesQueParen: parada.liniesQueParen,
+            })
+          }
+          size={20}
+        />
+      </div>
       {!hasArrivals && (
         <div className="aprop-popup-lines">
           {parada.liniesQueParen.map((l) => (

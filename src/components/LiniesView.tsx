@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FilterBar } from './FilterBar';
 import { LineHeaderBanner } from './LineHeaderBanner';
 import { LineList } from './LineList';
@@ -31,8 +31,17 @@ function getIsMobile(): boolean {
   return window.matchMedia('(max-width: 640px)').matches;
 }
 
-export function LiniesView() {
+interface LiniesViewProps {
+  requestedLineId?: string | null;
+  onRequestedLineConsumed?: () => void;
+}
+
+export function LiniesView({
+  requestedLineId,
+  onRequestedLineConsumed,
+}: LiniesViewProps = {}) {
   const {
+    linies,
     liniesFiltrades,
     loading,
     error,
@@ -52,6 +61,18 @@ export function LiniesView() {
   // user expanded, and the FAB only appears once they've picked a line
   // (so they have something on the map to look at).
   const [panelOpen, setPanelOpen] = useState(true);
+
+  // When the favourites view asks to open a specific line, select it once
+  // the line catalogue is loaded, then tell the parent we've consumed it.
+  useEffect(() => {
+    if (!requestedLineId || linies.length === 0) return;
+    const match = linies.find((l) => l.id === requestedLineId);
+    if (match) {
+      setSeleccio(match);
+      setPanelOpen(false);
+    }
+    onRequestedLineConsumed?.();
+  }, [requestedLineId, linies, onRequestedLineConsumed]);
 
   // We ask for geolocation so the map can show a 'Tu' dot — gives the
   // user a quick sense of where the selected line passes relative to

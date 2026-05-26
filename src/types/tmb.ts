@@ -74,6 +74,24 @@ export interface LiniaAmbComptador extends LiniaResum {
   numParades: number;
 }
 
+export interface FavLinia {
+  id: string;
+  codi: string;
+  nom: string;
+  tipus: TransportType;
+  color: string;
+}
+
+export interface FavParada {
+  id: string;
+  codi: string;
+  nom: string;
+  lat: number;
+  lng: number;
+  tipus: TransportType;
+  liniesQueParen: LiniaResum[];
+}
+
 export interface CuaParada {
   codi: string;
   nom: string;
