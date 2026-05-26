@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mockup · On viuen els Favorits</title>
+    <style>
+      :root {
+        --tmb-red: #c8001e;
+        --metro: #1d7df2;
+        --bus: #f2a900;
+        --gold: #f7a700;
+        --ink: #222;
+        --muted: #8a8a8a;
+        --hair: rgba(0, 0, 0, 0.06);
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #eef0f3; color: var(--ink); padding: 28px 16px 60px; line-height: 1.4;
+      }
+      h1 { font-size: 22px; margin-bottom: 4px; }
+      .sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; max-width: 820px; }
+      .cols { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+      .col { width: 340px; }
+      .opt-tag {
+        display: inline-block; font-size: 12px; font-weight: 800; color: #fff;
+        padding: 3px 10px; border-radius: 999px; margin-bottom: 4px;
+      }
+      .opt-a { background: var(--gold); color:#3a2a00; }
+      .opt-b { background: var(--metro); }
+      .col h3 { font-size: 16px; margin: 6px 0 2px; }
+      .col .desc { font-size: 13px; color: #555; margin-bottom: 14px; }
+
+      .phone {
+        width: 340px; height: 540px; background: #fff; border-radius: 28px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.16); overflow: hidden;
+        display: flex; flex-direction: column; border: 1px solid #e2e2e2;
+      }
+      .header {
+        background: var(--tmb-red); color: #fff; padding: 10px 14px;
+        display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      }
+      .logo { width: 28px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 6px;
+        display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; }
+      .header h2 { font-size: 14px; font-weight: 700; flex: 1; }
+      .mode { display: inline-flex; background: rgba(0,0,0,0.18); border-radius: 999px; padding: 3px; gap: 2px; }
+      .mode button {
+        border: none; background: transparent; color: rgba(255,255,255,0.85);
+        font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 999px; font-family: inherit; cursor: pointer;
+      }
+      .mode button.on { background: #fff; color: var(--tmb-red); }
+      .mode button.star.on { color: var(--gold); }
+
+      .filters { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--hair); flex-wrap: wrap; }
+      .chip { padding: 5px 12px; border-radius: 20px; border: 1.5px solid #ddd; background: #fff; font-size: 12px; font-weight: 600; color: #555; }
+      .chip.on { background: var(--tmb-red); border-color: var(--tmb-red); color: #fff; }
+      .chip.fav { display: inline-flex; align-items: center; gap: 4px; }
+      .chip.fav.on { background: var(--gold); border-color: var(--gold); color: #3a2a00; }
+
+      .scroll { overflow-y: auto; flex: 1; }
+      .fav-head { display:flex; align-items:center; gap:6px; padding: 12px 14px 6px; font-size: 11px; font-weight: 800; color: #8a6d00; text-transform: uppercase; letter-spacing: 0.4px; }
+      .fav-stop { padding: 8px 14px; box-shadow: inset 0 -1px 0 var(--hair); display: flex; gap: 10px; }
+      .fav-rank { width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top: 2px; }
+      .nm { font-size: 13px; font-weight: 700; }
+      .meta { font-size: 11px; color: var(--muted); margin: 1px 0 5px; }
+      .arr { display:flex; align-items:center; gap:8px; padding: 2px 0; }
+      .lb { min-width: 30px; height: 17px; padding: 0 5px; border-radius: 4px; color:#fff; font-size:10px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; }
+      .dst { flex:1; font-size:12px; color:#555; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .tm { font-size:12px; font-weight:800; color: var(--tmb-red); }
+      .tm.now { color:#1f9d55; }
+
+      .row { display:flex; align-items:center; gap:10px; padding:8px 12px; box-shadow: inset 0 -1px 0 var(--hair); }
+      .glyph { width:20px; text-align:center; }
+      .glyph.metro { color: var(--metro); } .glyph.bus { color: var(--bus); }
+      .badge { min-width:30px; height:20px; padding:0 6px; border-radius:5px; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+      .rname { flex:1; font-size:12px; color:#4a4a4a; }
+      .star-row { color:#cfcfcf; } .star-row.on { color: var(--gold); }
+
+      .callout { font-size:12px; margin-top:12px; padding:10px 12px; border-radius:8px; }
+      .callout.good { background:#eaf7ee; color:#1f6b3a; }
+      .callout.bad { background:#fdeced; color:#a01020; }
+      .verdict { margin-top:40px; max-width:820px; font-size:14px; color:#444; background:#fff; border:1px solid var(--hair); border-radius:12px; padding:18px 20px; }
+      .verdict b { color: var(--ink); }
+      .pin { display:inline-block; width:9px; height:9px; border-radius:50%; background: var(--metro); margin-right:5px; }
+    </style>
+  </head>
+  <body>
+    <h1>Punt 1: on poses l'entrada als Favorits?</h1>
+    <p class="sub">
+      Mateix contingut (parades + línies guardades amb temps real), però l'<b>accés</b> canvia.
+      La diferència és si "Favorits" és un <b>filtre dins de Línies</b> (opció A) o una
+      <b>destinació pròpia al capçalera</b> (opció B). Fixa't NOMÉS en la zona de navegació de dalt.
+    </p>
+
+    <div class="cols">
+      <!-- OPTION A -->
+      <div class="col">
+        <span class="opt-tag opt-a">OPCIÓ A · chip dins de Línies</span>
+        <h3>Un chip ★ al costat de Tots/Metro/Bus</h3>
+        <p class="desc">Els favorits viuen dins del mode "Línies", com un filtre més.</p>
+        <div class="phone">
+          <div class="header">
+            <div class="logo">TMB</div>
+            <h2>Línies de Transport</h2>
+            <div class="mode"><button class="on">Línies</button><button>Aprop meu</button></div>
+          </div>
+          <div class="filters">
+            <span class="chip fav on">★ Favorits</span>
+            <span class="chip">Tots</span>
+            <span class="chip">Metro</span>
+            <span class="chip">Bus</span>
+          </div>
+          <div class="scroll">
+            <div class="fav-head">★ Parades guardades</div>
+            <div class="fav-stop">
+              <span class="fav-rank">★</span>
+              <div style="flex:1; min-width:0">
+                <div class="nm">Pla de Palau</div><div class="meta">Bus · 80 m</div>
+                <div class="arr"><span class="lb" style="background:#28922f">V17</span><span class="dst">Port Vell</span><span class="tm now">Arribant</span></div>
+                <div class="arr"><span class="lb" style="background:#7e2d8e">D20</span><span class="dst">Pg. Marítim</span><span class="tm">7 min</span></div>
+              </div>
+            </div>
+            <div class="fav-head">★ Línies guardades</div>
+            <div class="row"><span class="glyph metro">●</span><span class="badge" style="background:#f7a600">L4</span><span class="rname">La Pau – Trinitat Nova</span><span class="star-row on">★</span></div>
+          </div>
+        </div>
+        <div class="callout good">✓ Reaprofita el filtre existent. Cap canvi al header (que al mòbil ja va just d'espai).</div>
+        <div class="callout bad">✗ "Favorits" no és un tipus com Metro/Bus → barreja dos conceptes al mateix lloc. I conté parades, que no són "línies".</div>
+      </div>
+
+      <!-- OPTION B -->
+      <div class="col">
+        <span class="opt-tag opt-b">OPCIÓ B · mode propi al header</span>
+        <h3>Un tercer botó ★ a dalt</h3>
+        <p class="desc">Favorits és una destinació pròpia, al costat de Línies i Aprop meu.</p>
+        <div class="phone">
+          <div class="header">
+            <div class="logo">TMB</div>
+            <h2 style="font-size:13px">Transport</h2>
+            <div class="mode">
+              <button>Línies</button>
+              <button>Aprop</button>
+              <button class="star on">★</button>
+            </div>
+          </div>
+          <div class="scroll">
+            <div class="fav-head">★ Parades guardades</div>
+            <div class="fav-stop">
+              <span class="fav-rank">★</span>
+              <div style="flex:1; min-width:0">
+                <div class="nm">Pla de Palau</div><div class="meta">Bus · 80 m</div>
+                <div class="arr"><span class="lb" style="background:#28922f">V17</span><span class="dst">Port Vell</span><span class="tm now">Arribant</span></div>
+                <div class="arr"><span class="lb" style="background:#7e2d8e">D20</span><span class="dst">Pg. Marítim</span><span class="tm">7 min</span></div>
+              </div>
+            </div>
+            <div class="fav-head">★ Línies guardades</div>
+            <div class="row"><span class="glyph metro">●</span><span class="badge" style="background:#f7a600">L4</span><span class="rname">La Pau – Trinitat Nova</span><span class="star-row on">★</span></div>
+          </div>
+        </div>
+        <div class="callout good">✓ Separació neta: una destinació que conté parades I línies. Conceptualment correcte. Accés en 1 toc des de qualsevol mode.</div>
+        <div class="callout bad">✗ Tercer botó al header → més atapeït al mòbil. Cal escurçar textos ("Aprop" en lloc de "Aprop meu").</div>
+      </div>
+    </div>
+
+    <div class="verdict">
+      <b>La meva recomanació (rectifico la d'abans):</b> després de veure-ho, l'<b>opció B (mode propi)</b>
+      és més correcta. El motiu: els favorits contenen <b>parades I línies</b>, i una parada no encaixa
+      dins un filtre que es diu "Metro/Bus/Tots". Un mode propi ho separa net i hi arribes en 1 toc des
+      d'on siguis.<br><br>
+      <b>El cost</b> (header més atapeït) es resol fent el 3r botó <b>només una icona ★</b> (com a la captura),
+      no text. Així ocupa poc i l'estrella ja comunica "guardats".<br><br>
+      <span class="pin"></span><b>Alternativa C (si vols zero canvis al header):</b> deixar l'estrella ★ com a
+      <i>icona flotant</i> a una cantonada, però perd descobriment. No la recomano.
+    </div>
+  </body>
+</html>
