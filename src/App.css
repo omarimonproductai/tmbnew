@@ -85,9 +85,18 @@ body {
   overflow: hidden;
 }
 
-.filters {
-  padding: 12px;
+.filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 10px;
   border-bottom: 1px solid #eee;
+}
+.filters-row .filters { border-bottom: none; padding-right: 0; flex: 1; }
+
+.filters {
+  padding: 10px 12px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -104,6 +113,42 @@ body {
 }
 .filter-btn:hover { border-color: #c8001e; color: #c8001e; }
 .filter-btn.active { background: #c8001e; border-color: #c8001e; color: white; }
+
+.sort-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: auto;
+  min-width: 32px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  color: #777;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.sort-btn:hover:not(:disabled) { color: #1d7df2; border-color: #1d7df2; }
+.sort-btn.active {
+  background: #e9f1fd;
+  border-color: #1d7df2;
+  color: #1d7df2;
+}
+.sort-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.sort-alpha-letters { letter-spacing: 0.5px; font-size: 10px; }
+.sort-alpha-arrow { transition: transform 0.2s ease; }
+.sort-alpha-arrow.up { transform: rotate(180deg); }
 
 .search-box { padding: 10px 12px; border-bottom: 1px solid #eee; }
 .search-box input {
@@ -157,8 +202,19 @@ body {
 }
 .line-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .line-name { font-size: 12px; font-weight: 500; color: #4a4a4a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.line-type { font-size: 10px; color: #a5a5a5; margin-top: 1px; }
 .line-count { font-size: 10px; color: #bbb; flex-shrink: 0; }
+.line-type-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: #777;
+}
+.line-type-glyph--metro { color: #1d7df2; }
+.line-type-glyph--bus { color: #f2a900; }
+.line-type-icon { display: block; }
 
 .state-msg { padding: 24px 16px; color: #777; font-size: 13px; text-align: center; }
 .state-msg--error { color: #c8001e; }

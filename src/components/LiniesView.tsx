@@ -6,6 +6,7 @@ import { LineListView } from './LineListView';
 import { MapView } from './MapView';
 import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
+import { SortControls, type SortMode } from './SortControls';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
 import { ViewToggle, type ViewMode } from './ViewToggle';
 import { useGeolocation } from '../hooks/useGeolocation';
@@ -15,6 +16,7 @@ import { useTotesParades } from '../hooks/useTotesParades';
 import { useVehicles } from '../hooks/useVehicles';
 import { findCorrespondences } from '../utils/correspondences';
 import { haversine } from '../utils/distance';
+import { lineMinDistance } from '../utils/lineProximity';
 import { extrapolateVehiclePosition } from '../utils/route';
 import { SPEED_M_S } from '../utils/transit';
 import type {
@@ -45,6 +47,7 @@ export function LiniesView() {
     getIsMobile() ? 'list' : 'map',
   );
   const [showVehicles, setShowVehicles] = useState(true);
+  const [sortMode, setSortMode] = useState<SortMode>('proximity');
   // On mobile we want the line list to be the landing UI: it greets the
   // user expanded, and the FAB only appears once they've picked a line
   // (so they have something on the map to look at).
@@ -54,6 +57,23 @@ export function LiniesView() {
   // user a quick sense of where the selected line passes relative to
   // their position. Permission is the same one used in 'Aprop meu'.
   const { position: userPosition } = useGeolocation(true);
+
+  const liniesOrdenades = useMemo(() => {
+    const arr = [...liniesFiltrades];
+    if (sortMode === 'proximity' && userPosition) {
+      const dist = new Map<string, number>();
+      for (const l of arr) dist.set(l.id, lineMinDistance(l, userPosition));
+      arr.sort((a, b) => {
+        const da = dist.get(a.id) ?? Number.POSITIVE_INFINITY;
+        const db = dist.get(b.id) ?? Number.POSITIVE_INFINITY;
+        return da - db;
+      });
+      return arr;
+    }
+    arr.sort((a, b) => a.codi.localeCompare(b.codi, 'ca', { numeric: true }));
+    if (sortMode === 'za') arr.reverse();
+    return arr;
+  }, [liniesFiltrades, sortMode, userPosition]);
 
   const handleSelect = (linia: Linia) => {
     setSeleccio(linia);
@@ -161,10 +181,17 @@ export function LiniesView() {
   return (
     <main className="app-main">
       <aside className={`panel${panelOpen ? ' panel--open' : ''}`}>
-        <FilterBar value={filtre} onChange={setFiltre} />
+        <div className="filters-row">
+          <FilterBar value={filtre} onChange={setFiltre} />
+          <SortControls
+            value={sortMode}
+            onChange={setSortMode}
+            proximityAvailable={!!userPosition}
+          />
+        </div>
         <SearchInput value={cerca} onChange={setCerca} />
         <LineList
-          linies={liniesFiltrades}
+          linies={liniesOrdenades}
           loading={loading}
           error={error}
           selectedId={seleccio?.id ?? null}
