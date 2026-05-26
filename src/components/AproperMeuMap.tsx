@@ -11,6 +11,7 @@ import {
 } from 'react-leaflet';
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
+import { rotateOptions } from '../utils/leafletRotate';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
@@ -30,6 +31,7 @@ export function AproperMeuMap({ centre, radiM, parades, topN, bottomInset = 0 }:
       zoom={15}
       className="map-container"
       scrollWheelZoom
+      {...(rotateOptions() as Record<string, unknown>)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

@@ -10,6 +10,7 @@ import {
 } from 'react-leaflet';
 import { StopMarker } from './StopMarker';
 import { VehicleMarker } from './VehicleMarker';
+import { rotateOptions } from '../utils/leafletRotate';
 import type { Coordinate, Linia, LiniaResum, Parada, VehiclePos } from '../types/tmb';
 
 const BARCELONA_CENTER: [number, number] = [41.3874, 2.1686];
@@ -45,6 +46,7 @@ export function MapView({ linia, parades, vehicles, correspondencesPerParada, us
       zoom={DEFAULT_ZOOM}
       className="map-container"
       scrollWheelZoom
+      {...(rotateOptions() as Record<string, unknown>)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
