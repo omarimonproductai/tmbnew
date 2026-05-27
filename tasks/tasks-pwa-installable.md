@@ -40,14 +40,14 @@
   - [x] 2.6 Gestionar l'actualització del SW entre deploys (`autoUpdate`); verificar que un build nou substitueix el SW i no deixa l'usuari amb una versió antiga enganxada.
   - [ ] 2.7 Provar en mode avió: l'app obre, mostra mapa base + parades/favorits guardats, i el temps real indica que no està disponible. _(prova manual en dispositiu)_
 
-- [ ] 3.0 UX d'invitació a instal·lar (mockup → banner Android amb `beforeinstallprompt` + fitxa d'instruccions iOS + persistència del descartament)
-  - [ ] 3.1 Fer `mockup-pwa-install.html` a l'arrel amb el banner Android i la fitxa d'instruccions iOS (estètica actual: vermell de capçalera, cantonades arrodonides). Validar el disseny abans de codificar.
-  - [ ] 3.2 Crear `src/hooks/useInstallPrompt.ts`: capturar `beforeinstallprompt` (amb `preventDefault`), guardar l'event i exposar `canInstall` + `promptInstall()`; netejar en `appinstalled`.
-  - [ ] 3.3 Afegir detecció de plataforma iOS Safari (sense `beforeinstallprompt`) per decidir banner vs. fitxa d'instruccions.
-  - [ ] 3.4 Crear `src/components/InstallBanner.tsx`: a Android, botó "Instal·la l'app" que crida `promptInstall()`; a iOS, fitxa amb el flux "Compartir → Afegir a pantalla d'inici" (reaprofitar el patró `dir-sheet`/backdrop).
-  - [ ] 3.5 Persistir el descartament a localStorage (clau `tmb-install-dismissed-v1`); no mostrar la invitació si està descartada, si ja s'executa en standalone o si l'app ja està instal·lada.
-  - [ ] 3.6 Muntar `<InstallBanner />` a `src/App.tsx` (no intrusiu, descartable).
-  - [ ] 3.7 Tests: `useInstallPrompt.test.ts` (captura/neteja de l'event) i `InstallBanner.test.tsx` (Android vs iOS, ocult quan descartat/standalone).
+- [x] 3.0 UX d'invitació a instal·lar (mockup → banner Android amb `beforeinstallprompt` + fitxa d'instruccions iOS + persistència del descartament)
+  - [x] 3.1 Fer `mockup-pwa-install.html` a l'arrel amb el banner Android i la fitxa d'instruccions iOS (estètica actual: vermell de capçalera, cantonades arrodonides). Validar el disseny abans de codificar.
+  - [x] 3.2 Crear `src/hooks/useInstallPrompt.ts`: capturar `beforeinstallprompt` (amb `preventDefault`), guardar l'event i exposar `canInstall` + `promptInstall()`; netejar en `appinstalled`.
+  - [x] 3.3 Afegir detecció de plataforma iOS Safari (sense `beforeinstallprompt`) per decidir banner vs. fitxa d'instruccions.
+  - [x] 3.4 Crear `src/components/InstallBanner.tsx`: a Android, botó "Instal·la l'app" que crida `promptInstall()`; a iOS, fitxa amb el flux "Compartir → Afegir a pantalla d'inici" (reaprofitar el patró `dir-sheet`/backdrop).
+  - [x] 3.5 Persistir el descartament a localStorage (clau `tmb-install-dismissed-v1`); no mostrar la invitació si està descartada, si ja s'executa en standalone o si l'app ja està instal·lada.
+  - [x] 3.6 Muntar `<InstallBanner />` a `src/App.tsx` (no intrusiu, descartable).
+  - [x] 3.7 Tests: `useInstallPrompt.test.ts` (captura/neteja de l'event) i `InstallBanner.test.tsx` (Android vs iOS, ocult quan descartat/standalone).
 
 - [ ] 4.0 Vista d'arrencada en mode instal·lat (detectar standalone → arrencar a ★ Favorits si n'hi ha, si no "Aprop meu")
   - [x] 4.1 Ampliar `src/hooks/useDisplayMode.ts` amb detecció standalone: `matchMedia('(display-mode: standalone)')` + `navigator.standalone` (iOS).

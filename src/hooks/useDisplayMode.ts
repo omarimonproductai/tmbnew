@@ -10,6 +10,17 @@ export function isStandalone(): boolean {
   return Boolean(mql?.matches) || iosStandalone;
 }
 
+// iOS Safari has no beforeinstallprompt, so we detect the platform to show
+// manual "Add to Home Screen" instructions instead.
+export function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const iPhoneFamily = /iphone|ipad|ipod/i.test(ua);
+  // iPadOS 13+ reports as desktop Mac but has touch points.
+  const iPadOS = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  return iPhoneFamily || iPadOS;
+}
+
 export function useIsOffline(): boolean {
   const [offline, setOffline] = useState(
     typeof navigator !== 'undefined' ? !navigator.onLine : false,

@@ -1714,3 +1714,110 @@ body {
   flex-shrink: 0;
 }
 .favorits-map { flex: 1; min-height: 0; position: relative; }
+
+/* PWA install invitation */
+.install-banner {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 2500;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  animation: dir-sheet-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.install-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: #c8001e;
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+.ib-text { flex: 1; min-width: 0; }
+.ib-title { font-weight: 700; font-size: 15px; }
+.ib-sub { font-size: 12.5px; color: #6b7280; margin-top: 2px; }
+.ib-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; flex: 0 0 auto; }
+.btn-install {
+  background: #c8001e;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-dismiss {
+  background: transparent;
+  border: none;
+  color: #9aa0a6;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.install-sheet {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 14px 18px 20px;
+  animation: dir-sheet-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.install-sheet .sheet-grip {
+  display: block;
+  width: 38px;
+  height: 5px;
+  border-radius: 3px;
+  background: #d8d8dd;
+  margin: 0 auto 14px;
+}
+.install-sheet-title { margin: 0 0 4px; font-size: 18px; }
+.install-sheet-sub { margin: 0 0 12px; color: #6b7280; font-size: 13px; }
+.install-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f2;
+}
+.install-step:first-of-type { border-top: none; }
+.install-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #c8001e;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+.install-step-txt { font-size: 14px; }
+.ios-share { display: inline-grid; place-items: center; width: 24px; height: 24px; color: #1d7df2; vertical-align: middle; }
+.install-sheet-close {
+  margin-top: 16px;
+  width: 100%;
+  background: #f1f1f4;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1c1c1e;
+  cursor: pointer;
+}

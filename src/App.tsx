@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AproperMeuView } from './components/AproperMeuView';
 import { FavoritsView } from './components/FavoritsView';
+import { InstallBanner } from './components/InstallBanner';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
 import { Toast } from './components/Toast';
@@ -55,6 +56,7 @@ export default function App() {
       )}
       {appMode === 'aprop-meu' && <AproperMeuView />}
       {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}
+      <InstallBanner />
       {offlineToast && (
         <Toast
           message="Sense connexió: el temps real no s'actualitza."
