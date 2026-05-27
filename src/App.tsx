@@ -41,7 +41,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <div className="tmb-logo">TMB</div>
+        <img className="tmb-logo" src="/pwa-512.png" alt="Tu et Mous Bé" />
         <div className="app-title">
           <h1>Tu et Mous Bé</h1>
           <span>Barcelona · Àrea Metropolitana</span>
