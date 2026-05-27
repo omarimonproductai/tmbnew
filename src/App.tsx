@@ -4,12 +4,12 @@ import { FavoritsView } from './components/FavoritsView';
 import { InstallBanner } from './components/InstallBanner';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
+import { SharedStopSheet } from './components/SharedStopSheet';
 import { Toast } from './components/Toast';
 import { isStandalone, useIsOffline } from './hooks/useDisplayMode';
 import { useTotesParades } from './hooks/useTotesParades';
 import { getLiniesSnapshot, getParadesSnapshot } from './stores/favorits';
-import { pickRepresentativeLine } from './utils/lineColor';
-import type { Coordinate } from './types/tmb';
+import type { Coordinate, ParadaAmbLinies } from './types/tmb';
 import './App.css';
 
 export interface RequestedLine {
@@ -38,6 +38,7 @@ export default function App() {
   const [appMode, setAppMode] = useState<AppMode>(initialMode);
   const [requestedLine, setRequestedLine] = useState<RequestedLine | null>(null);
   const [requestedParada, setRequestedParada] = useState<string | null>(readParadaParam);
+  const [sharedStop, setSharedStop] = useState<ParadaAmbLinies | null>(null);
 
   const offline = useIsOffline();
   const [offlineToast, setOfflineToast] = useState(false);
@@ -50,17 +51,13 @@ export default function App() {
     setAppMode('linies');
   };
 
-  // Resolve a shared ?parada= link: find the stop and open its
-  // representative line zoomed onto it, then tidy the URL so a refresh
-  // won't re-trigger.
+  // Resolve a shared ?parada= link: find the stop and open its card (all
+  // lines + real-time), then tidy the URL so a refresh won't re-trigger.
   const { parades } = useTotesParades(!!requestedParada);
   useEffect(() => {
     if (!requestedParada || parades.length === 0) return;
     const stop = parades.find((p) => p.id === requestedParada);
-    if (stop) {
-      const rep = pickRepresentativeLine(stop.liniesQueParen);
-      if (rep) openLine(rep.id, { lat: stop.lat, lng: stop.lng });
-    }
+    if (stop) setSharedStop(stop);
     setRequestedParada(null);
     const url = new URL(window.location.href);
     url.searchParams.delete('parada');
@@ -86,6 +83,9 @@ export default function App() {
       {appMode === 'aprop-meu' && <AproperMeuView />}
       {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}
       <InstallBanner />
+      {sharedStop && (
+        <SharedStopSheet stop={sharedStop} onClose={() => setSharedStop(null)} />
+      )}
       {offlineToast && (
         <Toast
           message="Sense connexió: el temps real no s'actualitza."
