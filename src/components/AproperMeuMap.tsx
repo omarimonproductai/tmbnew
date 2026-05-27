@@ -54,7 +54,7 @@ export function AproperMeuMap({
     <MapContainer
       center={initialCenter}
       zoom={15}
-      zoomSnap={0.5}
+      zoomSnap={0}
       className="map-container"
       scrollWheelZoom
       {...(rotateOptions() as Record<string, unknown>)}
