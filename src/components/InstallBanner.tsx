@@ -44,23 +44,25 @@ export function InstallBanner() {
 
   return (
     <>
-      <div className="install-banner" role="region" aria-label="Instal·la l'app">
-        <div className="install-badge" aria-hidden="true">TMB</div>
-        <div className="ib-text">
-          <div className="ib-title">Instal·la l'app</div>
-          <div className="ib-sub">
-            Accés directe des de la pantalla d'inici, a pantalla completa.
+      {!iosSheet && (
+        <div className="install-banner" role="region" aria-label="Instal·la l'app">
+          <div className="install-badge" aria-hidden="true">TMB</div>
+          <div className="ib-text">
+            <div className="ib-title">Instal·la l'app</div>
+            <div className="ib-sub">
+              Accés directe des de la pantalla d'inici, a pantalla completa.
+            </div>
+          </div>
+          <div className="ib-actions">
+            <button type="button" className="btn-install" onClick={handleInstall}>
+              Instal·la
+            </button>
+            <button type="button" className="btn-dismiss" onClick={dismiss}>
+              Ara no
+            </button>
           </div>
         </div>
-        <div className="ib-actions">
-          <button type="button" className="btn-install" onClick={handleInstall}>
-            Instal·la
-          </button>
-          <button type="button" className="btn-dismiss" onClick={dismiss}>
-            Ara no
-          </button>
-        </div>
-      </div>
+      )}
       {iosSheet && <IOSInstructions onClose={() => setIosSheet(false)} />}
     </>
   );
@@ -84,7 +86,7 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
         <div className="install-step">
           <span className="install-step-num">1</span>
           <span className="install-step-txt">
-            Toca el botó <strong>Compartir</strong>
+            A la barra de Safari, toca <strong>···</strong> o el botó
             <span className="ios-share" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 16V4" />
@@ -92,13 +94,13 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
                 <rect x="4" y="12" width="16" height="9" rx="2" />
               </svg>
             </span>
-            a la barra de Safari.
+            <strong>Compartir</strong>.
           </span>
         </div>
         <div className="install-step">
           <span className="install-step-num">2</span>
           <span className="install-step-txt">
-            Tria <strong>"Afegir a pantalla d'inici"</strong>.
+            Tria <strong>"Afegeix a la pantalla d'inici"</strong>.
           </span>
         </div>
         <button type="button" className="install-sheet-close" onClick={onClose}>
