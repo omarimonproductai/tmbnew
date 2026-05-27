@@ -45,7 +45,7 @@ export function FavoritsView({ onOpenLine }: Props) {
 
         {favParades.length > 0 && (
           <section className="favorits-section">
-            <div className="favorits-head">★ Parades guardades</div>
+            <div className="favorits-head">★ Parades desades</div>
             {orderedParades.map((p) => (
               <FavStopItem
                 key={p.id}
@@ -63,7 +63,7 @@ export function FavoritsView({ onOpenLine }: Props) {
 
         {favLinies.length > 0 && (
           <section className="favorits-section">
-            <div className="favorits-head">★ Línies guardades</div>
+            <div className="favorits-head">★ Línies desades</div>
             {favLinies.map((l) => (
               <FavLineRow
                 key={l.id}
@@ -115,6 +115,7 @@ function FavStopItem({
             {distanceM != null && <> · {formatDistance(distanceM)}</>}
           </div>
         </div>
+        <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} />
         <FavStar active onToggle={onRemove} size={20} />
       </div>
       {groups.length > 0 ? (
@@ -148,12 +149,6 @@ function FavStopItem({
           {loading ? 'Consultant temps real…' : 'Sense vehicles propers ara mateix.'}
         </div>
       )}
-      <DirectionsButton
-        lat={parada.lat}
-        lng={parada.lng}
-        nom={parada.nom}
-        variant="block"
-      />
     </div>
   );
 }
