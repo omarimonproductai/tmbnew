@@ -21,6 +21,7 @@ interface Props {
   radiM: number;
   parades: ParadaAprop[];
   topN: number;
+  winkTarget?: { id: string; nonce: number } | null;
   bottomInset?: number;
   onRefresh?: () => void;
 }
@@ -30,6 +31,7 @@ export function AproperMeuMap({
   radiM,
   parades,
   topN,
+  winkTarget = null,
   bottomInset = 0,
   onRefresh,
 }: Props) {
@@ -95,6 +97,7 @@ export function AproperMeuMap({
             parada={p}
             rank={rank}
             topN={topN}
+            winkNonce={winkTarget?.id === p.id ? winkTarget.nonce : null}
           />
         );
       })}
@@ -228,22 +231,35 @@ function AproperMeuStopMarker({
   parada,
   rank,
   topN,
+  winkNonce,
 }: {
   parada: ParadaAprop;
   rank: number;
   topN: number;
+  winkNonce: number | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [winking, setWinking] = useState(false);
   const isTop = rank <= topN;
   const rep = pickRepresentativeLine(parada.liniesQueParen);
   const color = rep ? getLineColor(rep) : '#666';
+
+  // Briefly enlarge the marker when its list row is tapped ("wink").
+  useEffect(() => {
+    if (winkNonce == null) return;
+    setWinking(true);
+    const t = window.setTimeout(() => setWinking(false), 500);
+    return () => window.clearTimeout(t);
+  }, [winkNonce]);
+
+  const baseRadius = isTop ? 10 : 5;
   return (
     <CircleMarker
       center={[parada.lat, parada.lng]}
-      radius={isTop ? 10 : 5}
+      radius={winking ? baseRadius + 8 : baseRadius}
       pathOptions={{
         color: '#ffffff',
-        weight: isTop ? 3 : 1.5,
+        weight: winking ? 4 : isTop ? 3 : 1.5,
         fillColor: color,
         fillOpacity: 1,
       }}

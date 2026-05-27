@@ -551,6 +551,8 @@ body {
   cursor: default;
   background: white;
 }
+.stop-item.clickable { cursor: pointer; }
+.stop-item.clickable:active { background: #f6f6f6; }
 .stop-item.highlight {
   background: #fffaec;
   border-left: 3px solid #f4a300;

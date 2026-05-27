@@ -46,6 +46,9 @@ function getIsMobile(): boolean {
 export function AproperMeuView() {
   const [radius, setRadius] = useState<number>(loadStoredRadius);
   const [filtre, setFiltre] = useState<FilterType>('tots');
+  // A list tap "winks" the matching map marker. The nonce lets the same
+  // stop re-trigger the animation on repeated taps.
+  const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
   const [sheetHeight, setSheetHeight] = useState(SHEET_MIN_HEIGHT);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
@@ -218,7 +221,13 @@ export function AproperMeuView() {
           {parades.length > 0 && (
             <>
               <FilterBar value={filtre} onChange={setFiltre} />
-              <ParadesAprop parades={paradesFiltrades} topN={TOP_N} />
+              <ParadesAprop
+                parades={paradesFiltrades}
+                topN={TOP_N}
+                onSelectParada={(id) =>
+                  setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
+                }
+              />
             </>
           )}
         </div>
@@ -229,6 +238,7 @@ export function AproperMeuView() {
           radiM={radius}
           parades={paradesFiltrades}
           topN={TOP_N}
+          winkTarget={winkTarget}
           bottomInset={isMobile ? sheetHeight : 0}
           onRefresh={refresh}
         />
