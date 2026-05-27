@@ -13,9 +13,10 @@ const TYPE_LABEL: Record<TransportType, string> = {
 interface Props {
   parades: ParadaAprop[];
   topN: number;
+  onSelectParada?: (id: string) => void;
 }
 
-export function ParadesAprop({ parades, topN }: Props) {
+export function ParadesAprop({ parades, topN, onSelectParada }: Props) {
   if (parades.length === 0) {
     return (
       <div className="state-msg">
@@ -30,7 +31,13 @@ export function ParadesAprop({ parades, topN }: Props) {
       </div>
       <div className="stops-list">
         {parades.map((p, idx) => (
-          <StopItem key={p.id} parada={p} rank={idx + 1} topN={topN} />
+          <StopItem
+            key={p.id}
+            parada={p}
+            rank={idx + 1}
+            topN={topN}
+            onSelect={onSelectParada}
+          />
         ))}
       </div>
     </>
@@ -41,10 +48,12 @@ function StopItem({
   parada,
   rank,
   topN,
+  onSelect,
 }: {
   parada: ParadaAprop;
   rank: number;
   topN: number;
+  onSelect?: (id: string) => void;
 }) {
   const isTop = rank <= topN;
   const primary = parada.liniesQueParen[0];
@@ -77,7 +86,10 @@ function StopItem({
   }, [parada.liniesQueParen, data?.arribades]);
 
   return (
-    <div className={`stop-item${isTop ? ' highlight' : ''}`}>
+    <div
+      className={`stop-item${isTop ? ' highlight' : ''}${onSelect ? ' clickable' : ''}`}
+      onClick={onSelect ? () => onSelect(parada.id) : undefined}
+    >
       <div className={`stop-rank${isTop ? '' : ' muted'}`}>{rank}</div>
       <div className="stop-info">
         <div className="stop-name-row">
