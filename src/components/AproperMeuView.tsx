@@ -13,7 +13,7 @@ import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
 const TOP_N = 5;
 const SHEET_MIN_HEIGHT = 80; // peek height (px)
-const SHEET_DEFAULT_OPEN_RATIO = 0.55; // mid screen
+const SHEET_DEFAULT_OPEN_RATIO = 0.6; // opens showing the stops list
 const SHEET_MAX_RATIO = 0.92; // never fully cover the header
 const DRAG_THRESHOLD = 4; // px before a press is treated as a drag
 const RADIUS_STORAGE_KEY = 'tmb-aprop-meu-radius';
@@ -45,6 +45,13 @@ function getIsMobile(): boolean {
   return window.matchMedia('(max-width: 640px)').matches;
 }
 
+// Start the bottom sheet open (showing the list) on mobile so users see
+// there are stops to browse without having to drag it up first.
+function initialSheetHeight(): number {
+  if (!getIsMobile()) return SHEET_MIN_HEIGHT;
+  return Math.round(getViewportHeight() * SHEET_DEFAULT_OPEN_RATIO);
+}
+
 export function AproperMeuView({
   focusStop = null,
 }: {
@@ -55,7 +62,7 @@ export function AproperMeuView({
   // A list tap "winks" the matching map marker. The nonce lets the same
   // stop re-trigger the animation on repeated taps.
   const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
-  const [sheetHeight, setSheetHeight] = useState(SHEET_MIN_HEIGHT);
+  const [sheetHeight, setSheetHeight] = useState(initialSheetHeight);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
 
