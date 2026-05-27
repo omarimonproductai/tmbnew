@@ -4,6 +4,59 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
+---
+
+## Project: "Tu et Mous Bé" (app transport TMB Barcelona)
+
+> **Visió de producte i roadmap:** veure [`HANDOVER.md`](./HANDOVER.md) (què construir després i per què).
+> Aquesta secció és el context **tècnic** que cada sessió ha de conèixer.
+
+### Què és
+App web (React 18 + TS + Vite) que mostra línies/parades de metro i bus de TMB Barcelona sobre
+mapa Leaflet, amb temps real i posicions de vehicles. Es deia "tmbnew"; ara és **"Tu et Mous Bé"**.
+- Producció: https://tuetmousbe.pages.dev (Cloudflare Pages)
+- Repo: `omarimonproductai/tmbnew` (⚠️ pendent renombrar a `tuetmousbe`)
+- Dades: TMB Open Data via Cloudflare Pages Functions (proxy amb credencials).
+- 3 modes al header: Línies | Aprop meu | ★ Favorits. Arrenca a Aprop meu.
+
+### Stack i estructura
+- Backend: Cloudflare Pages Functions a `functions/` (migrat des de Netlify).
+  `functions/_tmb.ts` (helpers, reben creds per paràmetre), `functions/api/*`.
+- Frontend `src/`: components, hooks, `stores/favorits.ts`, `utils/`.
+- Leaflet + `leaflet-rotate` (cal `src/leafletGlobals.ts` → `window.L=L` ABANS del plugin).
+- Tests Vitest (33). CSS únic `src/App.css`. Build `npm run build` → `dist/`.
+
+### ⚠️ Restricció crítica Cloudflare free: 50 subrequests/invocació
+`parades-all` fa 1 fetch per línia (~212). Solució: chunking — frontend demana 6 chunks paral·lels
+(`?chunks=6&chunk=0..5`); backend ordena per prioritat metro→V/H/D/M→numèriques→N. Per garantir
+TOTES les parades en el futur: pre-bake JSON en build, o pla paid.
+
+### Persistència (localStorage)
+`tmb-parades-all-v1` (cache fallback), `tmb-aprop-meu-radius`, `tmb-fav-linies`,
+`tmb-fav-parades`, `tmb-fav-sort`. Fetch fallit → s'usa cache + Toast (no bloqueja).
+
+### Features ja fetes
+Migració a Cloudflare; Favorits complets (★ a línies/parades, mode propi, vista llista+mapa,
+ordenació proximitat/recents persistida, clic badge→mapa de línia amb zoom a la parada, estrella
+daurada a parades fav al mapa); Indicacions (action sheet Apple/Google Maps); rotació mapa (touch);
+ordenació línies (proximitat/A·Z/Z·A); icones metro/bus; correspondències metro↔metro; UX mòbil
+(lupa FAB + backdrop, bottom sheet arrossegable, zoom centrat en usuari, dot "Tu", auto-scroll a
+parada propera).
+
+### Convencions
+Workflow PRD+tasklist a `tasks/` per features grans; mockups HTML a l'arrel abans d'UI gran;
+verificar lint+test+build abans de push; comentaris escassos (només el WHY).
+
+### Pendents tècnics
+1. Renombrar repo GitHub a `tuetmousbe` + `git remote set-url`.
+2. Esborrar projecte Cloudflare antic `tmbnew`.
+
+### Dev local
+`npm install` → `npm run dev:functions` (cal `.dev.vars` amb TMB_APP_ID/KEY). Credencials runtime
+a Cloudflare: Settings → Variables and Secrets → Production; afegir-les requereix re-deploy.
+
+---
+
 ## 0. Session Start — Read Project Commands
 
 At the start of every session or new project, **scan `.claude/commands/` and read every `.md` file inside** before doing any other work. These files define project-specific rules and slash commands (e.g. `create-prd`, `generate-tasks`, or anything else added later by the team).
