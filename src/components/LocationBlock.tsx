@@ -42,7 +42,7 @@ export function LocationBlock({
         <input
           type="range"
           id="radius"
-          min={100}
+          min={300}
           max={2000}
           step={50}
           value={radius}
