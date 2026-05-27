@@ -22,9 +22,17 @@ interface Props {
   vehicles?: VehiclePos[];
   correspondencesPerParada?: Map<string, LiniaResum[]>;
   userPosition?: Coordinate | null;
+  focusPoint?: Coordinate | null;
 }
 
-export function MapView({ linia, parades, vehicles, correspondencesPerParada, userPosition }: Props) {
+export function MapView({
+  linia,
+  parades,
+  vehicles,
+  correspondencesPerParada,
+  userPosition,
+  focusPoint,
+}: Props) {
   const polylinePoints = useMemo<[number, number][][]>(() => {
     if (linia?.geometry) {
       if (linia.geometry.type === 'LineString') {
@@ -82,10 +90,22 @@ export function MapView({ linia, parades, vehicles, correspondencesPerParada, us
           />
         ))}
       {userPosition && <UserDot position={userPosition} hasLine={!!linia} />}
-      <AutoFit linia={linia} parades={parades} />
+      <AutoFit linia={linia} parades={parades} disabled={!!focusPoint} />
+      {focusPoint && <FocusOnPoint point={focusPoint} />}
       <InvalidateOnResize />
     </MapContainer>
   );
+}
+
+// Zooms tight onto a given point (a favourite stop opened from the
+// favourites view) instead of fitting the whole line, so the user can
+// see the vehicles around that stop right away.
+function FocusOnPoint({ point }: { point: Coordinate }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([point.lat, point.lng], 16, { animate: false });
+  }, [point.lat, point.lng, map]);
+  return null;
 }
 
 // Shows the user's location as a blue dot. When no line is selected yet,
@@ -118,10 +138,18 @@ function UserDot({ position, hasLine }: { position: Coordinate; hasLine: boolean
   );
 }
 
-function AutoFit({ linia, parades }: { linia: Linia | null; parades: Parada[] }) {
+function AutoFit({
+  linia,
+  parades,
+  disabled,
+}: {
+  linia: Linia | null;
+  parades: Parada[];
+  disabled?: boolean;
+}) {
   const map = useMap();
   useEffect(() => {
-    if (!linia) return;
+    if (disabled || !linia) return;
     const bounds = L.latLngBounds([]);
     if (linia.geometry) {
       const coords =
@@ -134,7 +162,7 @@ function AutoFit({ linia, parades }: { linia: Linia | null; parades: Parada[] })
     if (bounds.isValid()) {
       map.fitBounds(bounds, { padding: [40, 40] });
     }
-  }, [linia, parades, map]);
+  }, [linia, parades, map, disabled]);
   return null;
 }
 

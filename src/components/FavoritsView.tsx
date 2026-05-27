@@ -8,10 +8,11 @@ import { useTempsReal } from '../hooks/useTempsReal';
 import { haversine, formatDistance } from '../utils/distance';
 import { getLineColor } from '../utils/lineColor';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
-import type { FavLinia, FavParada } from '../types/tmb';
+import type { Coordinate, FavLinia, FavParada } from '../types/tmb';
 
 type FavSort = 'proximity' | 'recent';
 type FavView = 'list' | 'map';
+type OpenLine = (id: string, focus?: Coordinate) => void;
 
 const SORT_STORAGE_KEY = 'tmb-fav-sort';
 
@@ -27,7 +28,7 @@ function loadStoredSort(): FavSort {
 }
 
 interface Props {
-  onOpenLine: (id: string) => void;
+  onOpenLine: OpenLine;
 }
 
 export function FavoritsView({ onOpenLine }: Props) {
@@ -158,6 +159,7 @@ export function FavoritsView({ onOpenLine }: Props) {
                       : null
                   }
                   onRemove={() => toggleParada(p)}
+                  onOpenLine={onOpenLine}
                 />
               ))}
             </section>
@@ -186,10 +188,12 @@ function FavStopItem({
   parada,
   distanceM,
   onRemove,
+  onOpenLine,
 }: {
   parada: FavParada;
   distanceM: number | null;
   onRemove: () => void;
+  onOpenLine: OpenLine;
 }) {
   const primary = parada.liniesQueParen[0];
   const { data, loading } = useTempsReal(
@@ -201,7 +205,12 @@ function FavStopItem({
   );
 
   const colorByCodi = new Map<string, string>();
-  for (const l of parada.liniesQueParen) colorByCodi.set(l.codi, getLineColor(l));
+  const idByCodi = new Map<string, string>();
+  for (const l of parada.liniesQueParen) {
+    colorByCodi.set(l.codi, getLineColor(l));
+    idByCodi.set(l.codi, l.id);
+  }
+  const focus: Coordinate = { lat: parada.lat, lng: parada.lng };
 
   const groups =
     data && data.disponible
@@ -229,14 +238,25 @@ function FavStopItem({
               <ul>
                 {g.arribades.slice(0, 3).map((a, idx) => {
                   const imminent = a.text.toLowerCase().includes('arribant');
+                  const lineId = idByCodi.get(a.liniaCodi);
+                  const color = colorByCodi.get(a.liniaCodi) ?? '#888';
                   return (
                     <li key={`${a.liniaCodi}-${idx}`}>
-                      <span
-                        className="fav-stop-line"
-                        style={{ background: colorByCodi.get(a.liniaCodi) ?? '#888' }}
-                      >
-                        {a.liniaCodi || '—'}
-                      </span>
+                      {lineId ? (
+                        <button
+                          type="button"
+                          className="fav-stop-line fav-stop-line--btn"
+                          style={{ background: color }}
+                          onClick={() => onOpenLine(lineId, focus)}
+                          title={`Veure la línia ${a.liniaCodi} al mapa`}
+                        >
+                          {a.liniaCodi || '—'}
+                        </button>
+                      ) : (
+                        <span className="fav-stop-line" style={{ background: color }}>
+                          {a.liniaCodi || '—'}
+                        </span>
+                      )}
                       <span className={`fav-stop-time${imminent ? ' imminent' : ''}`}>
                         {a.text}
                       </span>

@@ -1653,6 +1653,15 @@ body {
   justify-content: center;
   flex-shrink: 0;
 }
+.fav-stop-line--btn {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.fav-stop-line--btn:hover { box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15); }
+.fav-stop-line--btn:active { transform: scale(0.92); }
 .fav-stop-time { margin-left: auto; font-size: 12px; font-weight: 800; color: #c8001e; }
 .fav-stop-time.imminent { color: #1f9d55; }
 

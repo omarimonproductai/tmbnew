@@ -20,6 +20,7 @@ import { lineMinDistance } from '../utils/lineProximity';
 import { extrapolateVehiclePosition } from '../utils/route';
 import { SPEED_M_S } from '../utils/transit';
 import type {
+  Coordinate,
   Linia,
   LiniaResum,
   Parada,
@@ -32,12 +33,12 @@ function getIsMobile(): boolean {
 }
 
 interface LiniesViewProps {
-  requestedLineId?: string | null;
+  requestedLine?: { id: string; focus?: Coordinate } | null;
   onRequestedLineConsumed?: () => void;
 }
 
 export function LiniesView({
-  requestedLineId,
+  requestedLine,
   onRequestedLineConsumed,
 }: LiniesViewProps = {}) {
   const {
@@ -61,18 +62,24 @@ export function LiniesView({
   // user expanded, and the FAB only appears once they've picked a line
   // (so they have something on the map to look at).
   const [panelOpen, setPanelOpen] = useState(true);
+  // When set, the map zooms onto this point (a favourite stop) instead of
+  // fitting the whole line. Cleared on any manual line pick.
+  const [mapFocus, setMapFocus] = useState<Coordinate | null>(null);
 
   // When the favourites view asks to open a specific line, select it once
-  // the line catalogue is loaded, then tell the parent we've consumed it.
+  // the line catalogue is loaded, switch to the map, and zoom to the
+  // favourite stop if one was passed.
   useEffect(() => {
-    if (!requestedLineId || linies.length === 0) return;
-    const match = linies.find((l) => l.id === requestedLineId);
+    if (!requestedLine || linies.length === 0) return;
+    const match = linies.find((l) => l.id === requestedLine.id);
     if (match) {
       setSeleccio(match);
       setPanelOpen(false);
+      setViewMode('map');
+      setMapFocus(requestedLine.focus ?? null);
     }
     onRequestedLineConsumed?.();
-  }, [requestedLineId, linies, onRequestedLineConsumed]);
+  }, [requestedLine, linies, onRequestedLineConsumed]);
 
   // We ask for geolocation so the map can show a 'Tu' dot — gives the
   // user a quick sense of where the selected line passes relative to
@@ -99,6 +106,7 @@ export function LiniesView({
   const handleSelect = (linia: Linia) => {
     setSeleccio(linia);
     setPanelOpen(false);
+    setMapFocus(null);
   };
 
   const { parades, loading: paradesLoading, error: paradesError } = useParades(
@@ -265,6 +273,7 @@ export function LiniesView({
             vehicles={showVehicles ? vehiclesAmbPos : []}
             correspondencesPerParada={metroCorrespondencesPerParada}
             userPosition={userPosition}
+            focusPoint={mapFocus}
           />
         ) : (
           <LineListView

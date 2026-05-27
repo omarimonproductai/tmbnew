@@ -3,14 +3,20 @@ import { AproperMeuView } from './components/AproperMeuView';
 import { FavoritsView } from './components/FavoritsView';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
+import type { Coordinate } from './types/tmb';
 import './App.css';
+
+export interface RequestedLine {
+  id: string;
+  focus?: Coordinate;
+}
 
 export default function App() {
   const [appMode, setAppMode] = useState<AppMode>('aprop-meu');
-  const [requestedLineId, setRequestedLineId] = useState<string | null>(null);
+  const [requestedLine, setRequestedLine] = useState<RequestedLine | null>(null);
 
-  const openLine = (id: string) => {
-    setRequestedLineId(id);
+  const openLine = (id: string, focus?: Coordinate) => {
+    setRequestedLine({ id, focus });
     setAppMode('linies');
   };
 
@@ -26,8 +32,8 @@ export default function App() {
       </header>
       {appMode === 'linies' && (
         <LiniesView
-          requestedLineId={requestedLineId}
-          onRequestedLineConsumed={() => setRequestedLineId(null)}
+          requestedLine={requestedLine}
+          onRequestedLineConsumed={() => setRequestedLine(null)}
         />
       )}
       {appMode === 'aprop-meu' && <AproperMeuView />}
