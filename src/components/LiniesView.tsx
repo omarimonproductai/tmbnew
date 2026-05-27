@@ -201,6 +201,13 @@ export function LiniesView({
 
   return (
     <main className="app-main">
+      {panelOpen && seleccio && (
+        <div
+          className="panel-backdrop"
+          onClick={() => setPanelOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <aside className={`panel${panelOpen ? ' panel--open' : ''}`}>
         <div className="filters-row">
           <FilterBar value={filtre} onChange={setFiltre} />

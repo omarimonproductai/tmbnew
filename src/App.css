@@ -1391,6 +1391,10 @@ body {
   display: none;
 }
 
+/* Scrim shown behind the mobile line-search panel so the stop list under
+   it is dimmed and not tappable. Desktop never renders it (sidebar). */
+.panel-backdrop { display: none; }
+
 .recenter-control {
   position: absolute;
   right: 16px;
@@ -1454,8 +1458,21 @@ body {
     border-right: none;
     border-top: 1px solid #e0e0e0;
   }
-  .panel.panel--open { display: flex; }
+  .panel.panel--open { display: flex; position: relative; z-index: 695; }
   .map-area { height: 100%; flex: 1; }
+
+  .panel-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 690;
+    animation: panel-backdrop-fade 0.2s ease;
+  }
+  @keyframes panel-backdrop-fade {
+    from { background: rgba(0, 0, 0, 0); }
+    to { background: rgba(0, 0, 0, 0.45); }
+  }
 
   /* Aprop meu bottom sheet: peek + draggable. Height is driven from
      JS (inline style) so the user can leave it at any position; we
