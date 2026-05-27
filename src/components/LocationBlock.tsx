@@ -42,8 +42,8 @@ export function LocationBlock({
         <input
           type="range"
           id="radius"
-          min={300}
-          max={2000}
+          min={100}
+          max={1500}
           step={50}
           value={radius}
           onChange={(e) => onRadiusChange(Number(e.target.value))}
