@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { DirectionsButton } from './DirectionsButton';
+import { ShareButton } from './ShareButton';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { formatDistance } from '../utils/distance';
 import { getLineColor } from '../utils/lineColor';
@@ -94,6 +95,7 @@ function StopItem({
       <div className="stop-info">
         <div className="stop-name-row">
           <div className="stop-name" title={parada.nom}>{parada.nom}</div>
+          <ShareButton parada={parada} />
           <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} />
         </div>
         <div className="stop-meta">
