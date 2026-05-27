@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
+import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
 import { ParadesAprop } from './ParadesAprop';
 import { Toast } from './Toast';
 import { useGeolocation } from '../hooks/useGeolocation';
+import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
 
@@ -43,6 +45,7 @@ function getIsMobile(): boolean {
 
 export function AproperMeuView() {
   const [radius, setRadius] = useState<number>(loadStoredRadius);
+  const [filtre, setFiltre] = useState<FilterType>('tots');
   const [sheetHeight, setSheetHeight] = useState(SHEET_MIN_HEIGHT);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
@@ -96,6 +99,13 @@ export function AproperMeuView() {
   const { position, accuracy, status, error, refresh } = useGeolocation(true);
   const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
+  const paradesFiltrades = useMemo(
+    () =>
+      filtre === 'tots'
+        ? paradesDins
+        : paradesDins.filter((p) => p.tipus === filtre),
+    [paradesDins, filtre],
+  );
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   useEffect(() => {
@@ -174,7 +184,7 @@ export function AproperMeuView() {
           <span className="sheet-grip" aria-hidden="true" />
           <span className="sheet-label">
             {position
-              ? `${paradesDins.length} parades a prop · ${radius} m`
+              ? `${paradesFiltrades.length} parades a prop · ${radius} m`
               : 'Esperant ubicació'}
             <svg
               className={`sheet-chevron${isOpen ? ' open' : ''}`}
@@ -206,7 +216,10 @@ export function AproperMeuView() {
             <div className="state-msg">Carregant parades de tota la xarxa…</div>
           )}
           {parades.length > 0 && (
-            <ParadesAprop parades={paradesDins} topN={TOP_N} />
+            <>
+              <FilterBar value={filtre} onChange={setFiltre} />
+              <ParadesAprop parades={paradesFiltrades} topN={TOP_N} />
+            </>
           )}
         </div>
       </aside>
@@ -214,7 +227,7 @@ export function AproperMeuView() {
         <AproperMeuMap
           centre={position}
           radiM={radius}
-          parades={paradesDins}
+          parades={paradesFiltrades}
           topN={TOP_N}
           bottomInset={isMobile ? sheetHeight : 0}
           onRefresh={refresh}
