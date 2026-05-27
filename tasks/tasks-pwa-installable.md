@@ -32,13 +32,13 @@
   - [x] 1.5 Verificar amb `npm run build` que es genera `manifest.webmanifest` + service worker i que el manifest és vàlid (sense errors a la consola).
 
 - [ ] 2.0 Service worker i comportament offline (precache del shell, dades cachejades offline, temps real "no disponible offline")
-  - [ ] 2.1 Configurar el precache de Workbox per a l'app shell (assets del build: HTML/CSS/JS) via la config de `vite-plugin-pwa`.
-  - [ ] 2.2 (Opcional, per defecte OFF — open question #2) Afegir un runtime cache conservador per als tiles de CARTO amb límit d'entrades/edat; deixar-ho documentat però desactivat si es decideix no fer-ho.
-  - [ ] 2.3 Confirmar que les dades ja guardades a localStorage (`tmb-parades-all-v1`, `tmb-fav-*`) es llegeixen i es pinten sense xarxa (revisar que cap fetch bloqueja el render inicial).
-  - [ ] 2.4 Crear `src/hooks/useDisplayMode.ts` amb detecció `navigator.onLine` + esdeveniments `online`/`offline` (i, reaprofitat a la 4.0, detecció de standalone).
-  - [ ] 2.5 Mostrar un estat clar de "temps real no disponible offline" reutilitzant el patró de `Toast`/estat existent, sense bloquejar la UI.
-  - [ ] 2.6 Gestionar l'actualització del SW entre deploys (`autoUpdate`); verificar que un build nou substitueix el SW i no deixa l'usuari amb una versió antiga enganxada.
-  - [ ] 2.7 Provar en mode avió: l'app obre, mostra mapa base + parades/favorits guardats, i el temps real indica que no està disponible.
+  - [x] 2.1 Configurar el precache de Workbox per a l'app shell (assets del build: HTML/CSS/JS) via la config de `vite-plugin-pwa`. _(generateSW, 10 entrades precachejades)_
+  - [ ] 2.2 (Opcional, per defecte OFF — open question #2) Afegir un runtime cache conservador per als tiles de CARTO amb límit d'entrades/edat; deixar-ho documentat però desactivat si es decideix no fer-ho. _(deixat OFF de moment)_
+  - [x] 2.3 Confirmar que les dades ja guardades a localStorage (`tmb-parades-all-v1`, `tmb-fav-*`) es llegeixen i es pinten sense xarxa (revisar que cap fetch bloqueja el render inicial). _(ja ho fa `useTotesParades`: hidrata des de cache + manté dades en fallada)_
+  - [x] 2.4 Crear `src/hooks/useDisplayMode.ts` amb detecció `navigator.onLine` + esdeveniments `online`/`offline` (i, reaprofitat a la 4.0, detecció de standalone).
+  - [x] 2.5 Mostrar un estat clar de "temps real no disponible offline" reutilitzant el patró de `Toast`/estat existent, sense bloquejar la UI.
+  - [x] 2.6 Gestionar l'actualització del SW entre deploys (`autoUpdate`); verificar que un build nou substitueix el SW i no deixa l'usuari amb una versió antiga enganxada.
+  - [ ] 2.7 Provar en mode avió: l'app obre, mostra mapa base + parades/favorits guardats, i el temps real indica que no està disponible. _(prova manual en dispositiu)_
 
 - [ ] 3.0 UX d'invitació a instal·lar (mockup → banner Android amb `beforeinstallprompt` + fitxa d'instruccions iOS + persistència del descartament)
   - [ ] 3.1 Fer `mockup-pwa-install.html` a l'arrel amb el banner Android i la fitxa d'instruccions iOS (estètica actual: vermell de capçalera, cantonades arrodonides). Validar el disseny abans de codificar.
@@ -50,10 +50,10 @@
   - [ ] 3.7 Tests: `useInstallPrompt.test.ts` (captura/neteja de l'event) i `InstallBanner.test.tsx` (Android vs iOS, ocult quan descartat/standalone).
 
 - [ ] 4.0 Vista d'arrencada en mode instal·lat (detectar standalone → arrencar a ★ Favorits si n'hi ha, si no "Aprop meu")
-  - [ ] 4.1 Ampliar `src/hooks/useDisplayMode.ts` amb detecció standalone: `matchMedia('(display-mode: standalone)')` + `navigator.standalone` (iOS).
-  - [ ] 4.2 Llegir el nombre de favorits des de `stores/favorits.ts` per decidir la vista inicial.
-  - [ ] 4.3 A `src/App.tsx`, fixar el mode inicial: si standalone **i** té favorits → `Favorits`; altrament mantenir `Aprop meu`. Afecta només l'arrencada, no la navegació posterior.
-  - [ ] 4.4 Verificar que al navegador normal (no instal·lat) el comportament d'arrencada no canvia (cap regressió).
+  - [x] 4.1 Ampliar `src/hooks/useDisplayMode.ts` amb detecció standalone: `matchMedia('(display-mode: standalone)')` + `navigator.standalone` (iOS).
+  - [x] 4.2 Llegir el nombre de favorits des de `stores/favorits.ts` per decidir la vista inicial.
+  - [x] 4.3 A `src/App.tsx`, fixar el mode inicial: si standalone **i** té favorits → `Favorits`; altrament mantenir `Aprop meu`. Afecta només l'arrencada, no la navegació posterior.
+  - [ ] 4.4 Verificar que al navegador normal (no instal·lat) el comportament d'arrencada no canvia (cap regressió). _(prova manual)_
 
 - [ ] 5.0 Verificació i tancament (Lighthouse PWA, prova manual install/offline en dispositiu, lint/test/build, PR)
   - [ ] 5.1 `npm run lint`, `npx vitest run` (33+ verds) i `npm run build` sense errors.

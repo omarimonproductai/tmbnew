@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AproperMeuView } from './components/AproperMeuView';
 import { FavoritsView } from './components/FavoritsView';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
+import { Toast } from './components/Toast';
+import { isStandalone, useIsOffline } from './hooks/useDisplayMode';
+import { getLiniesSnapshot, getParadesSnapshot } from './stores/favorits';
 import type { Coordinate } from './types/tmb';
 import './App.css';
 
@@ -11,9 +14,23 @@ export interface RequestedLine {
   focus?: Coordinate;
 }
 
+// Installed (standalone) launches land on Favourites when the user has any,
+// reinforcing the daily-habit loop; otherwise keep the default landing view.
+function initialMode(): AppMode {
+  const hasFavs =
+    getLiniesSnapshot().length + getParadesSnapshot().length > 0;
+  return isStandalone() && hasFavs ? 'favorits' : 'aprop-meu';
+}
+
 export default function App() {
-  const [appMode, setAppMode] = useState<AppMode>('aprop-meu');
+  const [appMode, setAppMode] = useState<AppMode>(initialMode);
   const [requestedLine, setRequestedLine] = useState<RequestedLine | null>(null);
+
+  const offline = useIsOffline();
+  const [offlineToast, setOfflineToast] = useState(false);
+  useEffect(() => {
+    if (offline) setOfflineToast(true);
+  }, [offline]);
 
   const openLine = (id: string, focus?: Coordinate) => {
     setRequestedLine({ id, focus });
@@ -38,6 +55,13 @@ export default function App() {
       )}
       {appMode === 'aprop-meu' && <AproperMeuView />}
       {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}
+      {offlineToast && (
+        <Toast
+          message="Sense connexió: el temps real no s'actualitza."
+          tone="error"
+          onDismiss={() => setOfflineToast(false)}
+        />
+      )}
     </div>
   );
 }
