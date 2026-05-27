@@ -46,7 +46,7 @@ export function InstallBanner() {
     <>
       {!iosSheet && (
         <div className="install-banner" role="region" aria-label="Instal·la l'app">
-          <div className="install-badge" aria-hidden="true">TMB</div>
+          <img className="install-badge" src="/pwa-512.png" alt="" />
           <div className="ib-text">
             <div className="ib-title">Instal·la l'app</div>
             <div className="ib-sub">
