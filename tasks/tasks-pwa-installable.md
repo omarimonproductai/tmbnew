@@ -21,15 +21,15 @@
 
 ## Tasks
 
-- [ ] 0.0 Create feature branch
-  - [ ] 0.1 Treballar a la branca designada de la sessió (`claude/lucid-ritchie-GtQ1u`); confirmar amb `git status` que partim neta i actualitzada.
+- [x] 0.0 Create feature branch
+  - [x] 0.1 Treballar a la branca designada de la sessió (`claude/lucid-ritchie-GtQ1u`); confirmar amb `git status` que partim neta i actualitzada.
 
-- [ ] 1.0 Configurar tooling PWA, manifest i icones (vite-plugin-pwa, meta tags iOS, icones placeholder)
-  - [ ] 1.1 Instal·lar `vite-plugin-pwa` com a devDependency i afegir-lo a `package.json`.
-  - [ ] 1.2 Registrar `VitePWA(...)` a `vite.config.ts` amb `registerType: 'autoUpdate'` i el bloc `manifest` (name "Tu et Mous Bé", short_name curt, `start_url: '/'`, `display: 'standalone'`, `theme_color: '#c8001e'`, `background_color`).
-  - [ ] 1.3 Generar icones placeholder a partir del badge "TMB" a `public/`: `pwa-192.png`, `pwa-512.png` i una variant `maskable` (purpose `maskable`), i referenciar-les al manifest.
-  - [ ] 1.4 Afegir a `index.html` els meta/link d'iOS: `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, `apple-touch-icon` i `theme-color`.
-  - [ ] 1.5 Verificar amb `npm run build` que es genera `manifest.webmanifest` + service worker i que el manifest és vàlid (sense errors a la consola).
+- [x] 1.0 Configurar tooling PWA, manifest i icones (vite-plugin-pwa, meta tags iOS, icones placeholder)
+  - [x] 1.1 Instal·lar `vite-plugin-pwa` com a devDependency i afegir-lo a `package.json`.
+  - [x] 1.2 Registrar `VitePWA(...)` a `vite.config.ts` amb `registerType: 'autoUpdate'` i el bloc `manifest` (name "Tu et Mous Bé", short_name curt, `start_url: '/'`, `display: 'standalone'`, `theme_color: '#c8001e'`, `background_color`).
+  - [x] 1.3 Generar icones placeholder a partir del badge "TMB" a `public/`: `pwa-192.png`, `pwa-512.png` i una variant `maskable` (purpose `maskable`), i referenciar-les al manifest.
+  - [x] 1.4 Afegir a `index.html` els meta/link d'iOS: `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, `apple-touch-icon` i `theme-color`.
+  - [x] 1.5 Verificar amb `npm run build` que es genera `manifest.webmanifest` + service worker i que el manifest és vàlid (sense errors a la consola).
 
 - [ ] 2.0 Service worker i comportament offline (precache del shell, dades cachejades offline, temps real "no disponible offline")
   - [ ] 2.1 Configurar el precache de Workbox per a l'app shell (assets del build: HTML/CSS/JS) via la config de `vite-plugin-pwa`.
