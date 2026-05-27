@@ -25,7 +25,7 @@ export default function App() {
       <header className="app-header">
         <div className="tmb-logo">TMB</div>
         <div className="app-title">
-          <h1>Línies de Transport</h1>
+          <h1>Tu et Mous Bé</h1>
           <span>Barcelona · Àrea Metropolitana</span>
         </div>
         <ModeToggle value={appMode} onChange={setAppMode} />

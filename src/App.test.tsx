@@ -16,7 +16,7 @@ beforeEach(() => {
 describe('App', () => {
   it('mostra la capçalera i el toggle de mode', async () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: /línies de transport/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /tu et mous bé/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /línies/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /aprop meu/i })).toBeInTheDocument();
   });
