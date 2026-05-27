@@ -4,7 +4,6 @@ import { FavoritsView } from './components/FavoritsView';
 import { InstallBanner } from './components/InstallBanner';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
-import { SharedStopSheet } from './components/SharedStopSheet';
 import { Toast } from './components/Toast';
 import { isStandalone, useIsOffline } from './hooks/useDisplayMode';
 import { useTotesParades } from './hooks/useTotesParades';
@@ -80,12 +79,9 @@ export default function App() {
           onRequestedLineConsumed={() => setRequestedLine(null)}
         />
       )}
-      {appMode === 'aprop-meu' && <AproperMeuView />}
+      {appMode === 'aprop-meu' && <AproperMeuView focusStop={sharedStop} />}
       {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}
       <InstallBanner />
-      {sharedStop && (
-        <SharedStopSheet stop={sharedStop} onClose={() => setSharedStop(null)} />
-      )}
       {offlineToast && (
         <Toast
           message="Sense connexió: el temps real no s'actualitza."

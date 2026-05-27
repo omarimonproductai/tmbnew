@@ -22,6 +22,7 @@ interface Props {
   parades: ParadaAprop[];
   topN: number;
   winkTarget?: { id: string; nonce: number } | null;
+  focusStopId?: string | null;
   bottomInset?: number;
   onRefresh?: () => void;
 }
@@ -32,12 +33,21 @@ export function AproperMeuMap({
   parades,
   topN,
   winkTarget = null,
+  focusStopId = null,
   bottomInset = 0,
   onRefresh,
 }: Props) {
+  const focusStop = focusStopId
+    ? parades.find((p) => p.id === focusStopId) ?? null
+    : null;
+  const initialCenter: [number, number] = focusStop
+    ? [focusStop.lat, focusStop.lng]
+    : centre
+      ? [centre.lat, centre.lng]
+      : FALLBACK_CENTER;
   return (
     <MapContainer
-      center={centre ? [centre.lat, centre.lng] : FALLBACK_CENTER}
+      center={initialCenter}
       zoom={15}
       className="map-container"
       scrollWheelZoom
@@ -76,10 +86,13 @@ export function AproperMeuMap({
               Tu
             </Tooltip>
           </CircleMarker>
-          <MapFollowsUser centre={centre} radiM={radiM} bottomInset={bottomInset} />
+          {!focusStopId && (
+            <MapFollowsUser centre={centre} radiM={radiM} bottomInset={bottomInset} />
+          )}
           <RecenterButton centre={centre} radiM={radiM} bottomInset={bottomInset} />
         </>
       )}
+      <FocusOnStop stop={focusStop} bottomInset={bottomInset} />
       <ZoomAroundUser centre={centre} bottomInset={bottomInset} />
       {onRefresh && (
         <LocationRefreshButton
@@ -98,6 +111,7 @@ export function AproperMeuMap({
             rank={rank}
             topN={topN}
             winkNonce={winkTarget?.id === p.id ? winkTarget.nonce : null}
+            autoOpen={p.id === focusStopId}
           />
         );
       })}
@@ -227,19 +241,44 @@ function RecenterButton({
   );
 }
 
+// Centres the map on a shared stop once (keeping it in the visible strip
+// above the bottom sheet). Runs a single time per stop id.
+function FocusOnStop({
+  stop,
+  bottomInset,
+}: {
+  stop: ParadaAprop | null;
+  bottomInset: number;
+}) {
+  const map = useMap();
+  const focusedId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!stop || focusedId.current === stop.id) return;
+    focusedId.current = stop.id;
+    const zoom = 16;
+    const px = map.project([stop.lat, stop.lng], zoom);
+    const target = map.unproject(px.add([0, bottomInset / 2]), zoom);
+    map.setView(target, zoom, { animate: true });
+  }, [stop, bottomInset, map]);
+  return null;
+}
+
 function AproperMeuStopMarker({
   parada,
   rank,
   topN,
   winkNonce,
+  autoOpen = false,
 }: {
   parada: ParadaAprop;
   rank: number;
   topN: number;
   winkNonce: number | null;
+  autoOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [winking, setWinking] = useState(false);
+  const markerRef = useRef<L.CircleMarker>(null);
   const isTop = rank <= topN;
   const rep = pickRepresentativeLine(parada.liniesQueParen);
   const color = rep ? getLineColor(rep) : '#666';
@@ -252,9 +291,17 @@ function AproperMeuStopMarker({
     return () => window.clearTimeout(t);
   }, [winkNonce]);
 
+  // A shared ?parada= link opens this stop's popup on arrival.
+  useEffect(() => {
+    if (!autoOpen) return;
+    const t = window.setTimeout(() => markerRef.current?.openPopup(), 0);
+    return () => window.clearTimeout(t);
+  }, [autoOpen]);
+
   const baseRadius = isTop ? 10 : 5;
   return (
     <CircleMarker
+      ref={markerRef}
       center={[parada.lat, parada.lng]}
       radius={winking ? baseRadius + 8 : baseRadius}
       pathOptions={{
