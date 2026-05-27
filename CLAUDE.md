@@ -46,8 +46,9 @@ parada propera); filtre Tots/Metro/Bus a "Aprop meu"; "guinyo" del marcador en t
 llista; PWA installable (vite-plugin-pwa: manifest + service worker amb precache del shell, icones
 placeholder, banner d'instal·lació Android + fitxa d'instruccions iOS, avís d'offline, arrenca a
 ★ Favorits si s'obre instal·lada amb favorits); compartir parada per enllaç (botó ⬆ al popup i
-a la llista d'Aprop meu → `navigator.share`/copiar; enllaç `?parada=<id>` que en obrir-lo mostra
-una fitxa de la parada amb totes les seves línies i temps real, funcioni a prop o lluny).
+a la llista d'Aprop meu → `navigator.share`/copiar; enllaç `?parada=<id>` que en obrir-lo centra el
+mapa d'Aprop meu a la parada i obre el seu popup amb totes les línies i temps real —injecta el
+marcador encara que la parada sigui fora del radi/filtre).
 
 ### Convencions
 Workflow PRD+tasklist a `tasks/` per features grans; mockups HTML a l'arrel abans d'UI gran;

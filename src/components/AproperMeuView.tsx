@@ -8,6 +8,8 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
+import { haversine } from '../utils/distance';
+import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
 const TOP_N = 5;
 const SHEET_MIN_HEIGHT = 80; // peek height (px)
@@ -43,7 +45,11 @@ function getIsMobile(): boolean {
   return window.matchMedia('(max-width: 640px)').matches;
 }
 
-export function AproperMeuView() {
+export function AproperMeuView({
+  focusStop = null,
+}: {
+  focusStop?: ParadaAmbLinies | null;
+} = {}) {
   const [radius, setRadius] = useState<number>(loadStoredRadius);
   const [filtre, setFiltre] = useState<FilterType>('tots');
   // A list tap "winks" the matching map marker. The nonce lets the same
@@ -109,6 +115,18 @@ export function AproperMeuView() {
         : paradesDins.filter((p) => p.tipus === filtre),
     [paradesDins, filtre],
   );
+
+  // A shared ?parada= link focuses a stop on the map; make sure its marker
+  // is present even if it falls outside the radius or the active filter.
+  const mapParades = useMemo<ParadaAprop[]>(() => {
+    if (!focusStop || paradesFiltrades.some((p) => p.id === focusStop.id)) {
+      return paradesFiltrades;
+    }
+    const distanciaM = position
+      ? haversine(position, { lat: focusStop.lat, lng: focusStop.lng })
+      : 0;
+    return [{ ...focusStop, distanciaM }, ...paradesFiltrades];
+  }, [paradesFiltrades, focusStop, position]);
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   useEffect(() => {
@@ -236,9 +254,10 @@ export function AproperMeuView() {
         <AproperMeuMap
           centre={position}
           radiM={radius}
-          parades={paradesFiltrades}
+          parades={mapParades}
           topN={TOP_N}
           winkTarget={winkTarget}
+          focusStopId={focusStop?.id ?? null}
           bottomInset={isMobile ? sheetHeight : 0}
           onRefresh={refresh}
         />
