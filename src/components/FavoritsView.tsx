@@ -81,47 +81,57 @@ export function FavoritsView({ onOpenLine }: Props) {
   return (
     <main className="app-main favorits-view">
       <div className="favorits-toolbar">
-        <div className="fav-sort" role="group" aria-label="Ordenació">
+        <div className="sort-controls" role="group" aria-label="Ordenació">
           <button
             type="button"
-            className={effectiveSort === 'proximity' ? 'on' : ''}
+            className={`sort-btn${effectiveSort === 'proximity' ? ' active' : ''}`}
             disabled={!position}
             onClick={() => setSort('proximity')}
+            aria-pressed={effectiveSort === 'proximity'}
             title={position ? 'Ordenar per proximitat' : 'Proximitat (cal geolocalització)'}
           >
-            Proximitat
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="10" r="3" />
+              <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z" />
+            </svg>
           </button>
           <button
             type="button"
-            className={effectiveSort === 'recent' ? 'on' : ''}
+            className={`sort-btn${effectiveSort === 'recent' ? ' active' : ''}`}
             onClick={() => setSort('recent')}
+            aria-pressed={effectiveSort === 'recent'}
             title="Ordenar pels més recents"
           >
-            Recents
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <polyline points="12 7 12 12 15 14" />
+            </svg>
           </button>
         </div>
         {favParades.length > 0 && (
-          <div className="fav-viewtoggle" role="group" aria-label="Vista">
+          <div className="sort-controls" role="group" aria-label="Vista">
             <button
               type="button"
-              className={view === 'list' ? 'on' : ''}
+              className={`sort-btn${view === 'list' ? ' active' : ''}`}
               onClick={() => setView('list')}
+              aria-pressed={view === 'list'}
               aria-label="Veure com a llista"
               title="Llista"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
                 <line x1="8" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="20" y2="12" /><line x1="8" y1="18" x2="20" y2="18" />
                 <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
               </svg>
             </button>
             <button
               type="button"
-              className={view === 'map' ? 'on' : ''}
+              className={`sort-btn${view === 'map' ? ' active' : ''}`}
               onClick={() => setView('map')}
+              aria-pressed={view === 'map'}
               aria-label="Veure les parades al mapa"
               title="Mapa"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20 3 7" /><line x1="9" y1="4" x2="9" y2="17" /><line x1="15" y1="7" x2="15" y2="20" />
               </svg>
             </button>
