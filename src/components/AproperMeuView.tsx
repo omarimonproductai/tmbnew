@@ -17,9 +17,9 @@ const SHEET_DEFAULT_OPEN_RATIO = 0.5; // opens enough to reveal the list
 const SHEET_MAX_RATIO = 0.92; // never fully cover the header
 const DRAG_THRESHOLD = 4; // px before a press is treated as a drag
 const RADIUS_STORAGE_KEY = 'tmb-aprop-meu-radius';
-const RADIUS_MIN = 300;
-const RADIUS_MAX = 2000;
-const RADIUS_DEFAULT = 500;
+const RADIUS_MIN = 100;
+const RADIUS_MAX = 1500;
+const RADIUS_DEFAULT = 300;
 
 function loadStoredRadius(): number {
   if (typeof window === 'undefined') return RADIUS_DEFAULT;
