@@ -13,7 +13,7 @@ import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
 const TOP_N = 5;
 const SHEET_MIN_HEIGHT = 80; // peek height (px)
-const SHEET_DEFAULT_OPEN_RATIO = 0.6; // opens showing the stops list
+const SHEET_DEFAULT_OPEN_RATIO = 0.5; // opens enough to reveal the list
 const SHEET_MAX_RATIO = 0.92; // never fully cover the header
 const DRAG_THRESHOLD = 4; // px before a press is treated as a drag
 const RADIUS_STORAGE_KEY = 'tmb-aprop-meu-radius';
