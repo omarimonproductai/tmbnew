@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DirectionsButton } from './DirectionsButton';
 import { FavMap } from './FavMap';
 import { FavStar } from './FavStar';
@@ -13,6 +13,19 @@ import type { FavLinia, FavParada } from '../types/tmb';
 type FavSort = 'proximity' | 'recent';
 type FavView = 'list' | 'map';
 
+const SORT_STORAGE_KEY = 'tmb-fav-sort';
+
+function loadStoredSort(): FavSort {
+  if (typeof window === 'undefined') return 'proximity';
+  try {
+    const raw = window.localStorage.getItem(SORT_STORAGE_KEY);
+    if (raw === 'proximity' || raw === 'recent') return raw;
+  } catch {
+    // ignore
+  }
+  return 'proximity';
+}
+
 interface Props {
   onOpenLine: (id: string) => void;
 }
@@ -20,8 +33,17 @@ interface Props {
 export function FavoritsView({ onOpenLine }: Props) {
   const { favLinies, favParades, toggleLinia, toggleParada } = useFavorits();
   const { position } = useGeolocation(true);
-  const [sort, setSort] = useState<FavSort>('proximity');
+  const [sort, setSort] = useState<FavSort>(loadStoredSort);
   const [view, setView] = useState<FavView>('list');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(SORT_STORAGE_KEY, sort);
+    } catch {
+      // quota / private mode — ignore
+    }
+  }, [sort]);
 
   // Effective sort: proximity needs a location, otherwise fall back to the
   // most-recently-added order.
