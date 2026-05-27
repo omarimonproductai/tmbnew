@@ -4,10 +4,12 @@ import { useFavorits } from '../hooks/useFavorits';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { getLineColor } from '../utils/lineColor';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
-import type { LiniaResum, ParadaAprop } from '../types/tmb';
+import type { LiniaResum, ParadaAmbLinies } from '../types/tmb';
 
 interface Props {
-  parada: ParadaAprop;
+  // Accepts any stop with lines (ParadaAprop, FavParada, …) — we only read
+  // the common ParadaAmbLinies fields here.
+  parada: ParadaAmbLinies;
   enabled: boolean;
 }
 

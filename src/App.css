@@ -1666,3 +1666,45 @@ body {
 .favorits-empty-star { font-size: 44px; color: #e3c14d; margin-bottom: 8px; }
 .favorits-empty-title { font-size: 17px; font-weight: 700; color: #444; margin-bottom: 6px; }
 .favorits-empty-sub { font-size: 13px; line-height: 1.5; max-width: 280px; margin: 0 auto; }
+
+/* Favorits toolbar (sort + view toggle) */
+.favorits-view { flex-direction: column; }
+.favorits-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+.fav-sort, .fav-viewtoggle { display: inline-flex; gap: 4px; }
+.fav-sort button {
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #666;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fav-sort button.on { background: #fff4d6; border-color: #f7a700; color: #8a6d00; }
+.fav-sort button:disabled { opacity: 0.4; cursor: not-allowed; }
+.fav-viewtoggle button {
+  width: 34px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #777;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.fav-viewtoggle button.on { background: #e9f1fd; border-color: #1d7df2; color: #1d7df2; }
+
+.favorits-map { flex: 1; min-height: 0; position: relative; }
