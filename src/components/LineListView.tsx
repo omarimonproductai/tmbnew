@@ -105,6 +105,18 @@ export function LineListView({
     columns[0]?.sentit ?? 'default',
   );
 
+  // Stops arrive after the view mounts, so the columns (and their sentit
+  // keys) change from the initial empty 'default' to the real ones. If the
+  // active tab no longer matches any column, snap it to the first — without
+  // this the mobile layout hides every column and the list looks empty
+  // until you toggle to the map and back.
+  useEffect(() => {
+    if (columns.length === 0) return;
+    if (!columns.some((c) => c.sentit === activeSentit)) {
+      setActiveSentit(columns[0].sentit);
+    }
+  }, [columns, activeSentit]);
+
   // Scroll the user's nearest stop into the viewport once we know it.
   useEffect(() => {
     if (!nearestStopCodi || !nearestRowRef.current) return;
