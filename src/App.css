@@ -621,6 +621,41 @@ body {
 .dir-btn--block:hover { background: #176adf; }
 .dir-btn--block:active { transform: scale(0.98); }
 
+/* "Comparteix" — secondary action next to directions. */
+.share-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  padding: 0;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+.share-btn--icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.share-btn--icon:hover { background: rgba(0, 0, 0, 0.06); color: #1d7df2; }
+.share-btn--icon:active { transform: scale(0.92); }
+.share-btn--block {
+  flex: 1;
+  padding: 9px 12px;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f1f1f4;
+  color: #1c1c1e;
+  border-radius: 10px;
+}
+.share-btn--block:active { transform: scale(0.98); }
+.aprop-popup-actions { display: flex; gap: 8px; margin-top: 8px; }
+.aprop-popup-actions .dir-btn--block { margin-top: 0; }
+
 /* iOS-style action sheet shown when both Apple Maps and Google Maps are
    plausibly installed. */
 .dir-backdrop {

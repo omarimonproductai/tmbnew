@@ -1,5 +1,6 @@
 import { DirectionsButton } from './DirectionsButton';
 import { FavStar } from './FavStar';
+import { ShareButton } from './ShareButton';
 import { useFavorits } from '../hooks/useFavorits';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { getLineColor } from '../utils/lineColor';
@@ -66,12 +67,15 @@ export function AproperMeuStopPopup({ parada, enabled }: Props) {
         data={data}
         liniesQueParen={parada.liniesQueParen}
       />
-      <DirectionsButton
-        lat={parada.lat}
-        lng={parada.lng}
-        nom={parada.nom}
-        variant="block"
-      />
+      <div className="aprop-popup-actions">
+        <DirectionsButton
+          lat={parada.lat}
+          lng={parada.lng}
+          nom={parada.nom}
+          variant="block"
+        />
+        <ShareButton parada={parada} variant="block" />
+      </div>
     </div>
   );
 }
