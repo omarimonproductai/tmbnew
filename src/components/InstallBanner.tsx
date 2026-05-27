@@ -86,7 +86,7 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
         <div className="install-step">
           <span className="install-step-num">1</span>
           <span className="install-step-txt">
-            A la barra de Safari, toca <strong>···</strong> o el botó
+            A la barra de Safari, toca <strong>···</strong> i el botó
             <span className="ios-share" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 16V4" />
