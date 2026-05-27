@@ -36,8 +36,8 @@ describe('InstallBanner', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing once dismissed', () => {
-    window.localStorage.setItem('tmb-install-dismissed-v1', '1');
+  it('renders nothing while a recent dismissal is still valid', () => {
+    window.localStorage.setItem('tmb-install-dismissed-v1', String(Date.now()));
     const { container } = render(<InstallBanner />);
     expect(container).toBeEmptyDOMElement();
   });
@@ -46,8 +46,17 @@ describe('InstallBanner', () => {
     render(<InstallBanner />);
     expect(screen.getByText('Instal·la')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Ara no'));
-    expect(window.localStorage.getItem('tmb-install-dismissed-v1')).toBe('1');
+    const ts = Number(window.localStorage.getItem('tmb-install-dismissed-v1'));
+    expect(ts).toBeGreaterThan(0);
+    expect(Date.now() - ts).toBeLessThan(5000);
     expect(screen.queryByText('Instal·la')).not.toBeInTheDocument();
+  });
+
+  it('re-shows the banner once the dismissal is older than a day', () => {
+    const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000;
+    window.localStorage.setItem('tmb-install-dismissed-v1', String(twoDaysAgo));
+    render(<InstallBanner />);
+    expect(screen.getByText('Instal·la')).toBeInTheDocument();
   });
 
   it('opens the iOS instructions sheet instead of a native prompt', () => {

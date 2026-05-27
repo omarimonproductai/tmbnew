@@ -119,6 +119,6 @@ Aquesta feature es manté a **cost zero** (Cloudflare free): tot passa al client
 1. `short_name` definitiu i `theme_color` exacte (confirmar el vermell de marca).
 2. Volem un **runtime cache conservador dels tiles** del mapa (millora l'obertura offline) o ho
    deixem totalment fora per simplicitat?
-3. Quant de temps esperem abans de tornar a mostrar la invitació a instal·lar si l'usuari l'ha
-   descartada (mai més vs. al cap d'X dies)?
+3. ~~Quant de temps esperem abans de tornar a mostrar la invitació a instal·lar si l'usuari l'ha
+   descartada?~~ → Resolt: reapareix **un cop al dia** (TTL de 24 h sobre el timestamp de descartament).
 4. Les icones placeholder: partim del quadrat "TMB" de la capçalera o d'algun altre asset?

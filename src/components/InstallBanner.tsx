@@ -4,10 +4,13 @@ import { isIOS, isStandalone } from '../hooks/useDisplayMode';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
 
 const DISMISS_KEY = 'tmb-install-dismissed-v1';
+const DISMISS_TTL_MS = 24 * 60 * 60 * 1000; // re-offer once a day
 
+// Dismissal stores a timestamp; the banner comes back after the TTL.
 function loadDismissed(): boolean {
   try {
-    return window.localStorage.getItem(DISMISS_KEY) === '1';
+    const ts = Number(window.localStorage.getItem(DISMISS_KEY));
+    return Number.isFinite(ts) && ts > 0 && Date.now() - ts < DISMISS_TTL_MS;
   } catch {
     return false;
   }
@@ -26,7 +29,7 @@ export function InstallBanner() {
 
   const dismiss = () => {
     try {
-      window.localStorage.setItem(DISMISS_KEY, '1');
+      window.localStorage.setItem(DISMISS_KEY, String(Date.now()));
     } catch {
       // private mode / quota — ignore
     }
