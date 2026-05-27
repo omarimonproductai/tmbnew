@@ -15,7 +15,7 @@ const SHEET_DEFAULT_OPEN_RATIO = 0.55; // mid screen
 const SHEET_MAX_RATIO = 0.92; // never fully cover the header
 const DRAG_THRESHOLD = 4; // px before a press is treated as a drag
 const RADIUS_STORAGE_KEY = 'tmb-aprop-meu-radius';
-const RADIUS_MIN = 100;
+const RADIUS_MIN = 300;
 const RADIUS_MAX = 2000;
 const RADIUS_DEFAULT = 500;
 
