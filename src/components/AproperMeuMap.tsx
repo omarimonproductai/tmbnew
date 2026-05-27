@@ -54,6 +54,7 @@ export function AproperMeuMap({
     <MapContainer
       center={initialCenter}
       zoom={15}
+      zoomSnap={0.5}
       className="map-container"
       scrollWheelZoom
       {...(rotateOptions() as Record<string, unknown>)}
@@ -149,8 +150,8 @@ function MapTracker({
     if (needsFit) {
       const bounds = L.latLng(target.lat, target.lng).toBounds(radiM * 2);
       map.fitBounds(bounds, {
-        paddingTopLeft: [40, 40],
-        paddingBottomRight: [40, 40 + bottomInset],
+        paddingTopLeft: [24, 24],
+        paddingBottomRight: [24, 24 + bottomInset],
       });
       lastFitRef.current = { lat: target.lat, lng: target.lng, radiM };
     } else {
@@ -181,8 +182,8 @@ function LocationRefreshButton({
     if (centre) {
       const bounds = L.latLng(centre.lat, centre.lng).toBounds(radiM * 2);
       map.fitBounds(bounds, {
-        paddingTopLeft: [40, 40],
-        paddingBottomRight: [40, 40 + bottomInset],
+        paddingTopLeft: [24, 24],
+        paddingBottomRight: [24, 24 + bottomInset],
       });
     }
   };
@@ -219,8 +220,8 @@ function RecenterButton({
   const recenter = () => {
     const bounds = L.latLng(centre.lat, centre.lng).toBounds(radiM * 2);
     map.fitBounds(bounds, {
-      paddingTopLeft: [40, 40],
-      paddingBottomRight: [40, 40 + bottomInset],
+      paddingTopLeft: [24, 24],
+      paddingBottomRight: [24, 24 + bottomInset],
     });
   };
   return (
