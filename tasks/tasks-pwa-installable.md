@@ -56,8 +56,8 @@
   - [ ] 4.4 Verificar que al navegador normal (no instal·lat) el comportament d'arrencada no canvia (cap regressió). _(prova manual)_
 
 - [ ] 5.0 Verificació i tancament (Lighthouse PWA, prova manual install/offline en dispositiu, lint/test/build, PR)
-  - [ ] 5.1 `npm run lint`, `npx vitest run` (33+ verds) i `npm run build` sense errors.
-  - [ ] 5.2 Auditoria Lighthouse PWA: instal·labilitat, manifest, SW, standalone.
-  - [ ] 5.3 Prova manual en dispositiu real: instal·lar i obrir en standalone a Android/Chrome i a iOS Safari; obrir instal·lada amb favorits → arrenca a ★ Favorits.
-  - [ ] 5.4 Actualitzar `CLAUDE.md`: afegir la clau de persistència `tmb-install-dismissed-v1` i la PWA a la llista de "Features ja fetes".
+  - [x] 5.1 `npm run lint`, `npx vitest run` (40 verds) i `npm run build` sense errors.
+  - [ ] 5.2 Auditoria Lighthouse PWA: instal·labilitat, manifest, SW, standalone. _(requereix lloc desplegat/HTTPS)_
+  - [ ] 5.3 Prova manual en dispositiu real: instal·lar i obrir en standalone a Android/Chrome i a iOS Safari; obrir instal·lada amb favorits → arrenca a ★ Favorits. _(prova en dispositiu)_
+  - [x] 5.4 Actualitzar `CLAUDE.md`: afegir la clau de persistència `tmb-install-dismissed-v1` i la PWA a la llista de "Features ja fetes".
   - [ ] 5.5 Commit final i obrir PR cap a `main` amb resum + test plan manual (o merge segons workflow).

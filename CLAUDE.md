@@ -33,7 +33,8 @@ TOTES les parades en el futur: pre-bake JSON en build, o pla paid.
 
 ### Persistència (localStorage)
 `tmb-parades-all-v1` (cache fallback), `tmb-aprop-meu-radius`, `tmb-fav-linies`,
-`tmb-fav-parades`, `tmb-fav-sort`. Fetch fallit → s'usa cache + Toast (no bloqueja).
+`tmb-fav-parades`, `tmb-fav-sort`, `tmb-install-dismissed-v1` (banner PWA descartat).
+Fetch fallit → s'usa cache + Toast (no bloqueja).
 
 ### Features ja fetes
 Migració a Cloudflare; Favorits complets (★ a línies/parades, mode propi, vista llista+mapa,
@@ -41,7 +42,10 @@ ordenació proximitat/recents persistida, clic badge→mapa de línia amb zoom a
 daurada a parades fav al mapa); Indicacions (action sheet Apple/Google Maps); rotació mapa (touch);
 ordenació línies (proximitat/A·Z/Z·A); icones metro/bus; correspondències metro↔metro; UX mòbil
 (lupa FAB + backdrop, bottom sheet arrossegable, zoom centrat en usuari, dot "Tu", auto-scroll a
-parada propera).
+parada propera); filtre Tots/Metro/Bus a "Aprop meu"; "guinyo" del marcador en triar parada de la
+llista; PWA installable (vite-plugin-pwa: manifest + service worker amb precache del shell, icones
+placeholder, banner d'instal·lació Android + fitxa d'instruccions iOS, avís d'offline, arrenca a
+★ Favorits si s'obre instal·lada amb favorits).
 
 ### Convencions
 Workflow PRD+tasklist a `tasks/` per features grans; mockups HTML a l'arrel abans d'UI gran;
