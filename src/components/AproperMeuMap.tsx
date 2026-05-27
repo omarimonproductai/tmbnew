@@ -40,6 +40,11 @@ export function AproperMeuMap({
   const focusStop = focusStopId
     ? parades.find((p) => p.id === focusStopId) ?? null
     : null;
+  // The map tracks the shared stop when arriving from a link, otherwise the
+  // user. Tracking (not just an initial centre) keeps the sheet-follow alive.
+  const trackTarget: Coordinate | null = focusStop
+    ? { lat: focusStop.lat, lng: focusStop.lng }
+    : centre;
   const initialCenter: [number, number] = focusStop
     ? [focusStop.lat, focusStop.lng]
     : centre
@@ -86,13 +91,12 @@ export function AproperMeuMap({
               Tu
             </Tooltip>
           </CircleMarker>
-          {!focusStopId && (
-            <MapFollowsUser centre={centre} radiM={radiM} bottomInset={bottomInset} />
-          )}
           <RecenterButton centre={centre} radiM={radiM} bottomInset={bottomInset} />
         </>
       )}
-      <FocusOnStop stop={focusStop} bottomInset={bottomInset} />
+      {trackTarget && (
+        <MapTracker target={trackTarget} radiM={radiM} bottomInset={bottomInset} />
+      )}
       <ZoomAroundUser centre={centre} bottomInset={bottomInset} />
       {onRefresh && (
         <LocationRefreshButton
@@ -124,12 +128,12 @@ export function AproperMeuMap({
 // (the strip above the bottom sheet). When only the sheet moves, keep zoom
 // stable and just slide the centre so the 'Tu' dot stays in the visible
 // vertical middle.
-function MapFollowsUser({
-  centre,
+function MapTracker({
+  target,
   radiM,
   bottomInset,
 }: {
-  centre: Coordinate;
+  target: Coordinate;
   radiM: number;
   bottomInset: number;
 }) {
@@ -138,25 +142,25 @@ function MapFollowsUser({
   useEffect(() => {
     const needsFit =
       !lastFitRef.current ||
-      lastFitRef.current.lat !== centre.lat ||
-      lastFitRef.current.lng !== centre.lng ||
+      lastFitRef.current.lat !== target.lat ||
+      lastFitRef.current.lng !== target.lng ||
       lastFitRef.current.radiM !== radiM;
 
     if (needsFit) {
-      const bounds = L.latLng(centre.lat, centre.lng).toBounds(radiM * 2);
+      const bounds = L.latLng(target.lat, target.lng).toBounds(radiM * 2);
       map.fitBounds(bounds, {
         paddingTopLeft: [40, 40],
         paddingBottomRight: [40, 40 + bottomInset],
       });
-      lastFitRef.current = { lat: centre.lat, lng: centre.lng, radiM };
+      lastFitRef.current = { lat: target.lat, lng: target.lng, radiM };
     } else {
       const zoom = map.getZoom();
-      const userPx = map.project([centre.lat, centre.lng], zoom);
-      const newCenterPx = userPx.add([0, bottomInset / 2]);
+      const targetPx = map.project([target.lat, target.lng], zoom);
+      const newCenterPx = targetPx.add([0, bottomInset / 2]);
       const newCenter = map.unproject(newCenterPx, zoom);
       map.setView(newCenter, zoom, { animate: false });
     }
-  }, [centre.lat, centre.lng, radiM, bottomInset, map]);
+  }, [target.lat, target.lng, radiM, bottomInset, map]);
   return null;
 }
 
@@ -239,28 +243,6 @@ function RecenterButton({
       </button>
     </div>
   );
-}
-
-// Centres the map on a shared stop once (keeping it in the visible strip
-// above the bottom sheet). Runs a single time per stop id.
-function FocusOnStop({
-  stop,
-  bottomInset,
-}: {
-  stop: ParadaAprop | null;
-  bottomInset: number;
-}) {
-  const map = useMap();
-  const focusedId = useRef<string | null>(null);
-  useEffect(() => {
-    if (!stop || focusedId.current === stop.id) return;
-    focusedId.current = stop.id;
-    const zoom = 16;
-    const px = map.project([stop.lat, stop.lng], zoom);
-    const target = map.unproject(px.add([0, bottomInset / 2]), zoom);
-    map.setView(target, zoom, { animate: true });
-  }, [stop, bottomInset, map]);
-  return null;
 }
 
 function AproperMeuStopMarker({
