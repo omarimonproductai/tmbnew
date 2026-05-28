@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { DirectionsButton } from './DirectionsButton';
 import { FavStar } from './FavStar';
 import { ShareButton } from './ShareButton';
@@ -12,9 +13,12 @@ interface Props {
   // the common ParadaAmbLinies fields here.
   parada: ParadaAmbLinies;
   enabled: boolean;
+  // Called when the popup's content resizes (real-time data loads grow it)
+  // so the parent can re-trigger Leaflet autoPan.
+  onContentResize?: () => void;
 }
 
-export function AproperMeuStopPopup({ parada, enabled }: Props) {
+export function AproperMeuStopPopup({ parada, enabled, onContentResize }: Props) {
   const primary = parada.liniesQueParen[0];
   const { data, loading, error } = useTempsReal(
     primary ? parada.tipus : null,
@@ -28,8 +32,23 @@ export function AproperMeuStopPopup({ parada, enabled }: Props) {
   const hasArrivals =
     !!data && data.disponible && data.arribades.length > 0;
 
+  // Real-time arrivals load asynchronously and grow the popup vertically.
+  // Tell the parent so it can re-trigger Leaflet's autoPan and keep the
+  // popup fully on screen (not hidden behind the app header).
+  const wrapRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!onContentResize || !wrapRef.current) return;
+    if (typeof ResizeObserver === 'undefined') {
+      onContentResize();
+      return;
+    }
+    const ro = new ResizeObserver(() => onContentResize());
+    ro.observe(wrapRef.current);
+    return () => ro.disconnect();
+  }, [onContentResize]);
+
   return (
-    <div className="aprop-popup">
+    <div ref={wrapRef} className="aprop-popup">
       <div className="aprop-popup-head">
         <span className="aprop-popup-name">{parada.nom}</span>
         <FavStar

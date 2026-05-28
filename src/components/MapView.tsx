@@ -148,8 +148,12 @@ function AutoFit({
   disabled?: boolean;
 }) {
   const map = useMap();
+  // Only fit once per line so the user's pan/zoom isn't wiped out by data
+  // updates (e.g. a vehicle refresh changing parades references).
+  const lastFitId = useRef<string | null>(null);
   useEffect(() => {
     if (disabled || !linia) return;
+    if (lastFitId.current === linia.id) return;
     const bounds = L.latLngBounds([]);
     if (linia.geometry) {
       const coords =
@@ -161,6 +165,7 @@ function AutoFit({
     parades.forEach((p) => bounds.extend([p.lat, p.lng]));
     if (bounds.isValid()) {
       map.fitBounds(bounds, { padding: [40, 40] });
+      lastFitId.current = linia.id;
     }
   }, [linia, parades, map, disabled]);
   return null;
