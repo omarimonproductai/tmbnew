@@ -139,29 +139,38 @@ function MapTracker({
   bottomInset: number;
 }) {
   const map = useMap();
-  const lastFitRef = useRef<{ lat: number; lng: number; radiM: number } | null>(null);
-  useEffect(() => {
-    const needsFit =
-      !lastFitRef.current ||
-      lastFitRef.current.lat !== target.lat ||
-      lastFitRef.current.lng !== target.lng ||
-      lastFitRef.current.radiM !== radiM;
+  const lastFitRef = useRef<{ radiM: number } | null>(null);
+  // Read the latest target inside effects without triggering re-runs on
+  // every position update (GPS jitter would otherwise refit the map and
+  // make it flicker).
+  const targetRef = useRef(target);
+  targetRef.current = target;
 
-    if (needsFit) {
-      const bounds = L.latLng(target.lat, target.lng).toBounds(radiM * 2);
-      map.fitBounds(bounds, {
-        paddingTopLeft: [24, 24],
-        paddingBottomRight: [24, 24 + bottomInset],
-      });
-      lastFitRef.current = { lat: target.lat, lng: target.lng, radiM };
-    } else {
-      const zoom = map.getZoom();
-      const targetPx = map.project([target.lat, target.lng], zoom);
-      const newCenterPx = targetPx.add([0, bottomInset / 2]);
-      const newCenter = map.unproject(newCenterPx, zoom);
-      map.setView(newCenter, zoom, { animate: false });
-    }
-  }, [target.lat, target.lng, radiM, bottomInset, map]);
+  // Fit the radius circle once on first mount and again when the radius
+  // changes. Position jitter doesn't refit.
+  useEffect(() => {
+    if (lastFitRef.current && lastFitRef.current.radiM === radiM) return;
+    const t = targetRef.current;
+    const bounds = L.latLng(t.lat, t.lng).toBounds(radiM * 2);
+    map.fitBounds(bounds, {
+      paddingTopLeft: [24, 24],
+      paddingBottomRight: [24, 24 + bottomInset],
+    });
+    lastFitRef.current = { radiM };
+  }, [radiM, bottomInset, map]);
+
+  // Slide the map so the target stays in the strip above the bottom sheet
+  // whenever the sheet moves. Position updates don't trigger a slide.
+  useEffect(() => {
+    if (!lastFitRef.current) return;
+    const t = targetRef.current;
+    const zoom = map.getZoom();
+    const targetPx = map.project([t.lat, t.lng], zoom);
+    const newCenterPx = targetPx.add([0, bottomInset / 2]);
+    const newCenter = map.unproject(newCenterPx, zoom);
+    map.setView(newCenter, zoom, { animate: false });
+  }, [bottomInset, map]);
+
   return null;
 }
 

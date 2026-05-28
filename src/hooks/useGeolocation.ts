@@ -94,11 +94,11 @@ export function useGeolocation(autoRequest = true): UseGeolocationResult {
             setError(err.message);
           }
         },
-        { enableHighAccuracy: true, timeout: 10_000, maximumAge: 5_000 },
+        { enableHighAccuracy: true, timeout: 10_000, maximumAge: 8_000 },
       );
     };
     fetchPos();
-    const interval = window.setInterval(fetchPos, 5_000);
+    const interval = window.setInterval(fetchPos, 10_000);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
