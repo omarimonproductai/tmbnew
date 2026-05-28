@@ -66,8 +66,8 @@ function FavMarker({ parada }: { parada: FavParada }) {
   return (
     <CircleMarker
       center={[parada.lat, parada.lng]}
-      radius={18}
-      pathOptions={{ color: '#ffffff', weight: 3, fillColor: color, fillOpacity: 1 }}
+      radius={10}
+      pathOptions={{ color: '#ffffff', weight: 2.5, fillColor: color, fillOpacity: 1 }}
       eventHandlers={{
         popupopen: () => setOpen(true),
         popupclose: () => setOpen(false),
