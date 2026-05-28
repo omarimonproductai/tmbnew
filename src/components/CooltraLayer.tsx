@@ -29,10 +29,10 @@ function vehicleIcon(kind: 'scooter' | 'bike'): L.DivIcon {
   const svg = kind === 'bike' ? BIKE_SVG : SCOOTER_SVG;
   return L.divIcon({
     className: `cooltra-marker cooltra-marker--${kind}`,
-    html: `<span class="cooltra-marker__bubble">${svg}</span><span class="cooltra-marker__tail" aria-hidden="true"></span>`,
-    iconSize: [30, 38],
-    iconAnchor: [15, 36],
-    popupAnchor: [0, -34],
+    html: `<span class="cooltra-marker__bubble">${svg}</span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
   });
 }
 

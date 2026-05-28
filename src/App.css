@@ -467,7 +467,7 @@ body {
   text-overflow: ellipsis;
 }
 .geo-btn {
-  background: #1d7df2;
+  background: #1c1c1e;
   color: white;
   border: none;
   padding: 6px 10px;
@@ -478,7 +478,7 @@ body {
   font-family: inherit;
 }
 .geo-btn:disabled {
-  background: #b3cefb;
+  background: #6b6b70;
   cursor: progress;
 }
 
@@ -1855,10 +1855,10 @@ body {
   align-items: center;
   gap: 6px;
 }
-.filter-btn--cooltra:hover { border-color: #00a651; color: #00a651; }
+.filter-btn--cooltra:hover { border-color: #1098f0; color: #1098f0; }
 .filter-btn--cooltra.active {
-  background: #00a651;
-  border-color: #00a651;
+  background: #1098f0;
+  border-color: #1098f0;
   color: #fff;
 }
 .filter-btn__count {
@@ -1872,12 +1872,8 @@ body {
 .cooltra-marker {
   background: transparent;
   border: none;
-  position: relative;
 }
 .cooltra-marker__bubble {
-  position: absolute;
-  top: 0;
-  left: 1px;
   display: grid;
   place-items: center;
   width: 28px;
@@ -1887,21 +1883,7 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   border: 2px solid #fff;
 }
-.cooltra-marker__tail {
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 12px solid currentColor;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
-}
-.cooltra-marker--bike { color: #00a651; }
 .cooltra-marker--bike .cooltra-marker__bubble { background: #00a651; }
-.cooltra-marker--scooter { color: #1098f0; }
 .cooltra-marker--scooter .cooltra-marker__bubble { background: #1098f0; }
 
 .cooltra-cluster {
@@ -1953,11 +1935,10 @@ body {
   margin-bottom: 10px;
 }
 .cooltra-popup__model { font-size: 11px; color: #888; }
-.cooltra-popup__dir {
+.cooltra-popup__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #00a651;
   color: #fff;
   text-decoration: none;
   padding: 8px 12px;
@@ -1966,4 +1947,7 @@ body {
   font-size: 13px;
   width: 100%;
 }
-.cooltra-popup__dir:hover { background: #008542; }
+.cooltra-popup__cta--directions { background: #00a651; }
+.cooltra-popup__cta--directions:hover { background: #008542; }
+.cooltra-popup__cta--reserve { background: #1098f0; }
+.cooltra-popup__cta--reserve:hover { background: #0a7bc4; }
