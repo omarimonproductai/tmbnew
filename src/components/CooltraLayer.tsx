@@ -76,17 +76,24 @@ export function CooltraLayer({ vehicles }: Props) {
     const group = groupRef.current;
     if (!group) return;
     group.clearLayers();
-    const markers = vehicles.map((v) => {
-      const kind = inferKind(v.model_id);
-      const m = L.marker([v.position.lat, v.position.lon], {
-        icon: vehicleIcon(kind),
+    const markers = vehicles
+      .filter(
+        (v) =>
+          v?.position &&
+          Number.isFinite(v.position.lat) &&
+          Number.isFinite(v.position.lon),
+      )
+      .map((v) => {
+        const kind = inferKind(v.model_id);
+        const m = L.marker([v.position.lat, v.position.lon], {
+          icon: vehicleIcon(kind),
+        });
+        m.bindPopup(
+          renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
+          { autoPanPaddingTopLeft: [10, 90] },
+        );
+        return m;
       });
-      m.bindPopup(
-        renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
-        { autoPanPaddingTopLeft: [10, 90] },
-      );
-      return m;
-    });
     group.addLayers(markers);
   }, [vehicles]);
 
