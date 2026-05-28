@@ -4,6 +4,7 @@ interface Props {
   results: GeocodeResult[];
   onSelect: (r: GeocodeResult) => void;
   loading?: boolean;
+  error?: string | null;
   empty?: React.ReactNode;
 }
 
@@ -51,7 +52,7 @@ function CategoryIcon({ category }: { category?: GeocodeCategory }) {
   );
 }
 
-export function GeocodeDropdown({ results, onSelect, loading = false, empty }: Props) {
+export function GeocodeDropdown({ results, onSelect, loading = false, error = null, empty }: Props) {
   if (loading) {
     return (
       <div className="planner-dropdown">
@@ -59,9 +60,21 @@ export function GeocodeDropdown({ results, onSelect, loading = false, empty }: P
       </div>
     );
   }
+  if (error) {
+    return (
+      <div className="planner-dropdown">
+        <div className="planner-dropdown__msg planner-dropdown__msg--error">
+          {error}
+        </div>
+      </div>
+    );
+  }
   if (results.length === 0) {
-    if (!empty) return null;
-    return <div className="planner-dropdown">{empty}</div>;
+    return (
+      <div className="planner-dropdown">
+        {empty ?? <div className="planner-dropdown__msg">Cap resultat. Prova una altra cerca.</div>}
+      </div>
+    );
   }
   return (
     <div className="planner-dropdown" role="listbox">

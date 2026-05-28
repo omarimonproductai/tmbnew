@@ -46,7 +46,7 @@ export function RouteSearchForm({
   const [destDraft, setDestDraft] = useState('');
 
   const activeDraft = focused === 'origin' ? originDraft : destDraft;
-  const { results, loading } = usePhotonSearch(activeDraft);
+  const { results, loading, error: searchError } = usePhotonSearch(activeDraft);
 
   const handlePick = (r: GeocodeResult) => {
     if (focused === 'origin') {
@@ -128,7 +128,12 @@ export function RouteSearchForm({
       </div>
 
       {focused && activeDraft.trim().length >= 3 && (
-        <GeocodeDropdown results={results} onSelect={handlePick} loading={loading} />
+        <GeocodeDropdown
+          results={results}
+          onSelect={handlePick}
+          loading={loading}
+          error={searchError}
+        />
       )}
 
       {focused === 'destination' && !destDraft && history.length > 0 && (
