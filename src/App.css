@@ -2053,6 +2053,7 @@ body {
   color: #888;
   text-align: center;
 }
+.planner-dropdown__msg--error { color: #c8001e; }
 .planner-drop-item {
   width: 100%;
   display: flex;
