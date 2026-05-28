@@ -8,9 +8,11 @@ import {
   Tooltip,
   useMap,
 } from 'react-leaflet';
+import { CooltraLayer } from './CooltraLayer';
 import { StopMarker } from './StopMarker';
 import { VehicleMarker } from './VehicleMarker';
 import { rotateOptions } from '../utils/leafletRotate';
+import type { CooltraVehicle } from '../types/cooltra';
 import type { Coordinate, Linia, LiniaResum, Parada, VehiclePos } from '../types/tmb';
 
 const BARCELONA_CENTER: [number, number] = [41.3874, 2.1686];
@@ -23,6 +25,7 @@ interface Props {
   correspondencesPerParada?: Map<string, LiniaResum[]>;
   userPosition?: Coordinate | null;
   focusPoint?: Coordinate | null;
+  cooltraVehicles?: CooltraVehicle[];
 }
 
 export function MapView({
@@ -32,6 +35,7 @@ export function MapView({
   correspondencesPerParada,
   userPosition,
   focusPoint,
+  cooltraVehicles = [],
 }: Props) {
   const polylinePoints = useMemo<[number, number][][]>(() => {
     if (linia?.geometry) {
@@ -89,6 +93,7 @@ export function MapView({
             tipus={linia.tipus}
           />
         ))}
+      {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
       {userPosition && <UserDot position={userPosition} hasLine={!!linia} />}
       <AutoFit linia={linia} parades={parades} disabled={!!focusPoint} />
       {focusPoint && <FocusOnPoint point={focusPoint} />}
