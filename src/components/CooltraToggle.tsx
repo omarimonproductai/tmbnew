@@ -8,15 +8,14 @@ export function CooltraToggle({ value, onChange, count = null }: Props) {
   return (
     <button
       type="button"
-      className={`cooltra-toggle${value ? ' on' : ''}`}
+      className={`filter-btn filter-btn--cooltra${value ? ' active' : ''}`}
       onClick={() => onChange(!value)}
       aria-pressed={value}
       title={value ? 'Amaga la flota Cooltra' : 'Mostra la flota Cooltra'}
     >
-      <span className="cooltra-toggle__emoji" aria-hidden="true">🛵</span>
-      <span className="cooltra-toggle__label">Cooltra</span>
+      Cooltra
       {value && count != null && (
-        <span className="cooltra-toggle__count">{count}</span>
+        <span className="filter-btn__count">{count}</span>
       )}
     </button>
   );
