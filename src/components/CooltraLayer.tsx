@@ -7,14 +7,32 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CooltraVehiclePopup } from './CooltraVehiclePopup';
 import { inferKind, type CooltraVehicle } from '../types/cooltra';
 
+const BIKE_SVG = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <circle cx="5.5" cy="17.5" r="3.5"/>
+  <circle cx="18.5" cy="17.5" r="3.5"/>
+  <path d="M5.5 17.5 10 9h5l3.5 8.5"/>
+  <path d="M10 9l-2-3h2"/>
+  <path d="M15 9V6h-1"/>
+</svg>`;
+
+const SCOOTER_SVG = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <circle cx="5.5" cy="17.5" r="3"/>
+  <circle cx="18.5" cy="17.5" r="3"/>
+  <path d="M5.5 17.5h6l2-5h4"/>
+  <path d="M17.5 12.5l1-5h-3"/>
+  <path d="M11.5 12.5l2-4"/>
+</svg>`;
+
 function vehicleIcon(kind: 'scooter' | 'bike'): L.DivIcon {
-  const emoji = kind === 'bike' ? '🚲' : '🛵';
+  const svg = kind === 'bike' ? BIKE_SVG : SCOOTER_SVG;
   return L.divIcon({
-    className: 'cooltra-marker',
-    html: `<span class="cooltra-marker__bubble" aria-hidden="true">${emoji}</span>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -14],
+    className: `cooltra-marker cooltra-marker--${kind}`,
+    html: `<span class="cooltra-marker__bubble">${svg}</span><span class="cooltra-marker__tail" aria-hidden="true"></span>`,
+    iconSize: [30, 38],
+    iconAnchor: [15, 36],
+    popupAnchor: [0, -34],
   });
 }
 
