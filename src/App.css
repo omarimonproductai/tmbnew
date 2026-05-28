@@ -1758,17 +1758,29 @@ body {
   border-radius: 50%;
   background: #fff;
   border: none;
+  padding: 0;
   display: grid;
   place-items: center;
   cursor: pointer;
-  color: #666;
+  overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: background 0.15s, color 0.15s;
+  transition: box-shadow 0.15s, transform 0.1s;
 }
-.cooltra-map-btn:hover { color: #1098f0; }
-.cooltra-map-btn.active {
-  background: #1098f0;
-  color: #fff;
+.cooltra-map-btn:hover { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28); }
+.cooltra-map-btn:active { transform: scale(0.96); }
+.cooltra-map-btn__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.45;
+  filter: grayscale(0.4);
+  transition: opacity 0.15s, filter 0.15s;
+}
+.cooltra-map-btn.active { box-shadow: 0 0 0 2px #1098f0, 0 2px 6px rgba(0, 0, 0, 0.25); }
+.cooltra-map-btn.active .cooltra-map-btn__logo {
+  opacity: 1;
+  filter: none;
 }
 .cooltra-map-btn__count {
   position: absolute;
