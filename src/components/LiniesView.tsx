@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CooltraToggle } from './CooltraToggle';
 import { FilterBar } from './FilterBar';
 import { LineHeaderBanner } from './LineHeaderBanner';
 import { LineList } from './LineList';
@@ -9,6 +10,7 @@ import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
 import { ViewToggle, type ViewMode } from './ViewToggle';
+import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useLinies } from '../hooks/useLinies';
 import { useParades } from '../hooks/useParades';
@@ -30,6 +32,17 @@ import type {
 function getIsMobile(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
   return window.matchMedia('(max-width: 640px)').matches;
+}
+
+const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
+
+function loadStoredCooltra(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(COOLTRA_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
 }
 
 interface LiniesViewProps {
@@ -58,6 +71,16 @@ export function LiniesView({
   );
   const [showVehicles, setShowVehicles] = useState(true);
   const [sortMode, setSortMode] = useState<SortMode>('proximity');
+  const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
+  const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(COOLTRA_STORAGE_KEY, cooltraOn ? '1' : '0');
+    } catch {
+      // ignore quota / private-mode errors
+    }
+  }, [cooltraOn]);
   // On mobile we want the line list to be the landing UI: it greets the
   // user expanded, and the FAB only appears once they've picked a line
   // (so they have something on the map to look at).
@@ -218,7 +241,17 @@ export function LiniesView({
       )}
       <aside className={`panel${panelOpen ? ' panel--open' : ''}`}>
         <div className="filters-row">
-          <FilterBar value={filtre} onChange={setFiltre} />
+          <FilterBar
+            value={filtre}
+            onChange={setFiltre}
+            extra={
+              <CooltraToggle
+                value={cooltraOn}
+                onChange={setCooltraOn}
+                count={cooltraOn ? cooltraVehicles.length : null}
+              />
+            }
+          />
           <SortControls
             value={sortMode}
             onChange={setSortMode}
@@ -274,6 +307,7 @@ export function LiniesView({
             correspondencesPerParada={metroCorrespondencesPerParada}
             userPosition={userPosition}
             focusPoint={mapFocus}
+            cooltraVehicles={cooltraOn ? cooltraVehicles : []}
           />
         ) : (
           <LineListView
