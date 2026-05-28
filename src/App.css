@@ -1782,18 +1782,6 @@ body {
   opacity: 1;
   filter: none;
 }
-.cooltra-map-btn__count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #1c1c1e;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 999px;
-  font-variant-numeric: tabular-nums;
-}
 
 /* PWA install invitation */
 .install-banner {

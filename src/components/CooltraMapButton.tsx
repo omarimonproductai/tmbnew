@@ -1,10 +1,9 @@
 interface Props {
   value: boolean;
   onChange: (v: boolean) => void;
-  count?: number | null;
 }
 
-export function CooltraMapButton({ value, onChange, count = null }: Props) {
+export function CooltraMapButton({ value, onChange }: Props) {
   return (
     <button
       type="button"
@@ -19,9 +18,6 @@ export function CooltraMapButton({ value, onChange, count = null }: Props) {
         className="cooltra-map-btn__logo"
         draggable={false}
       />
-      {value && count != null && (
-        <span className="cooltra-map-btn__count">{count}</span>
-      )}
     </button>
   );
 }

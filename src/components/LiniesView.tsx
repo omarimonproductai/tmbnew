@@ -315,7 +315,6 @@ export function LiniesView({
             <CooltraMapButton
               value={cooltraOn}
               onChange={setCooltraOn}
-              count={cooltraOn ? cooltraVehicles.length : null}
             />
             <RefreshControl onRefresh={refreshVehicles} />
             <VehicleVisibilityToggle
@@ -330,7 +329,6 @@ export function LiniesView({
             <CooltraMapButton
               value={cooltraOn}
               onChange={setCooltraOn}
-              count={cooltraOn ? cooltraVehicles.length : null}
             />
           </div>
         )}
