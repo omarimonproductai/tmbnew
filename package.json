@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:functions": "wrangler pages dev -- npm run dev",
+    "dev:functions": "concurrently -k -n vite,cf \"vite\" \"wrangler pages dev --proxy 5173\"",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "tsc -b --noEmit",
@@ -27,6 +27,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
+    "concurrently": "^9.1.0",
     "jsdom": "^25.0.1",
     "typescript": "^5.6.2",
     "vite": "^5.4.8",
