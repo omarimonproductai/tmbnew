@@ -173,7 +173,6 @@ export function FavoritsView({ onOpenLine }: Props) {
             <CooltraMapButton
               value={cooltraOn}
               onChange={setCooltraOn}
-              count={cooltraOn ? cooltraVehicles.length : null}
             />
           </div>
         </div>

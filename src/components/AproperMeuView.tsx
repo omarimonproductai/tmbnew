@@ -296,7 +296,6 @@ export function AproperMeuView({
           <CooltraMapButton
             value={cooltraOn}
             onChange={setCooltraOn}
-            count={cooltraOn ? cooltraVehicles.length : null}
           />
         </div>
         {!position && status !== 'requesting' && (
