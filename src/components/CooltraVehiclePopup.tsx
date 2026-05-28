@@ -6,9 +6,10 @@ interface Props {
 }
 
 export function CooltraVehiclePopup({ vehicle, kind }: Props) {
-  const { license_plate, range, position } = vehicle;
+  const { id, license_plate, range, position } = vehicle;
   const [lng, lat] = position;
   const km = Math.round((range ?? 0) / 1000);
+  const reserveHref = `https://link.cooltra.com/reserve?vehicle_id=${encodeURIComponent(id)}`;
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
   return (
     <div className="cooltra-popup">
@@ -21,14 +22,25 @@ export function CooltraVehiclePopup({ vehicle, kind }: Props) {
       <div className="cooltra-popup__meta">
         <span>Autonomia: <strong>{km} km</strong></span>
       </div>
-      <a
-        className="cooltra-popup__dir"
-        href={directionsHref}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Com arribar-hi
-      </a>
+      {kind === 'scooter' ? (
+        <a
+          className="cooltra-popup__cta cooltra-popup__cta--reserve"
+          href={reserveHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Reserva gratis
+        </a>
+      ) : (
+        <a
+          className="cooltra-popup__cta cooltra-popup__cta--directions"
+          href={directionsHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Com arribar-hi
+        </a>
+      )}
     </div>
   );
 }
