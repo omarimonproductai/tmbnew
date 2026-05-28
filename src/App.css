@@ -1869,44 +1869,6 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.cooltra-marker {
-  background: transparent;
-  border: none;
-}
-.cooltra-marker__bubble {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  border: 2px solid #fff;
-}
-.cooltra-marker--bike .cooltra-marker__bubble { background: #00a651; }
-.cooltra-marker--scooter .cooltra-marker__bubble { background: #1098f0; }
-
-.cooltra-cluster {
-  background: transparent;
-  border: none;
-}
-.cooltra-cluster__bubble {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: #00a651;
-  color: #fff;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
-}
-.cooltra-cluster--sm .cooltra-cluster__bubble { font-size: 12px; }
-.cooltra-cluster--md .cooltra-cluster__bubble { font-size: 13px; }
-.cooltra-cluster--lg .cooltra-cluster__bubble { font-size: 14px; background: #008542; }
-
 .cooltra-popup {
   min-width: 180px;
   font-family: inherit;
