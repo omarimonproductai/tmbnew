@@ -26,6 +26,8 @@ interface Props {
   canSearch: boolean;
   noGps: boolean;
   samePlace: boolean;
+  /** Hide the search button when we already show a stale-free result. */
+  hideSearchButton?: boolean;
 }
 
 export function RouteSearchForm({
@@ -40,6 +42,7 @@ export function RouteSearchForm({
   canSearch,
   noGps,
   samePlace,
+  hideSearchButton = false,
 }: Props) {
   const [focused, setFocused] = useState<FieldKey | null>(null);
   const [originDraft, setOriginDraft] = useState('');
@@ -169,14 +172,16 @@ export function RouteSearchForm({
         onBusChange={modes.setBus}
       />
 
-      <button
-        type="button"
-        className="planner-search-btn"
-        onClick={onSearch}
-        disabled={!canSearch}
-      >
-        Buscar rutes
-      </button>
+      {!hideSearchButton && (
+        <button
+          type="button"
+          className="planner-search-btn"
+          onClick={onSearch}
+          disabled={!canSearch}
+        >
+          Buscar rutes
+        </button>
+      )}
 
       {noGps && !origin && (
         <p className="planner-hint">

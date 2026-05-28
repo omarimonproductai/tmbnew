@@ -21,7 +21,8 @@ export const onRequest: PagesFunction = async ({ request }) => {
       q,
       lat: parseNumberOrUndefined(url.searchParams.get('lat')),
       lon: parseNumberOrUndefined(url.searchParams.get('lon')),
-      lang: 'ca',
+      // Photon's lang param only supports default/de/en/fr; Catalan results
+      // already come back as 'name' under the default locale, so omit it.
     });
     return jsonResponse(200, results, {
       // Geocode results for the same query are stable enough to cache for an
