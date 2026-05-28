@@ -1,15 +1,15 @@
 const COOLTRA_BASE = 'https://maas.zeus.cooltra.com';
 
 export interface CooltraEnv {
-  ZEUS_API_PROD?: string;
-  ZEUS_API_STAGE?: string;
+  ZEUS_KEY_PROD?: string;
+  ZEUS_KEY_STAGE?: string;
 }
 
 export function getCooltraToken(env: CooltraEnv): string {
-  const token = env.ZEUS_API_PROD || env.ZEUS_API_STAGE;
+  const token = env.ZEUS_KEY_PROD || env.ZEUS_KEY_STAGE;
   if (!token) {
     throw new Error(
-      'Credencial Cooltra no configurada. Defineix ZEUS_API_PROD (producció) o ZEUS_API_STAGE (preview/dev) a Cloudflare Pages o .dev.vars.',
+      'Credencial Cooltra no configurada. Defineix ZEUS_KEY_PROD (producció) o ZEUS_KEY_STAGE (preview/dev) a Cloudflare Pages o .dev.vars.',
     );
   }
   return token;
