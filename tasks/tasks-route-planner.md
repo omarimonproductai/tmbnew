@@ -75,31 +75,31 @@ UI reference: [`/mockup-route-planner.html`](../mockup-route-planner.html)
 
 ## Tasks
 
-- [ ] **0.0 Create feature branch**
-  - [ ] 0.1 `git checkout main && git pull`
-  - [ ] 0.2 `git checkout -b feature/route-planner && git push -u origin feature/route-planner`
-  - [ ] 0.3 Confirm the PRD (`tasks/prd-route-planner.md`) and the mockup
+- [x] **0.0 Create feature branch**
+  - [x] 0.1 `git checkout main && git pull`
+  - [x] 0.2 `git checkout -b feature/route-planner && git push -u origin feature/route-planner`
+  - [x] 0.3 Confirm the PRD (`tasks/prd-route-planner.md`) and the mockup
         (`mockup-route-planner.html`) exist on this branch.
 
 - [ ] **1.0 Backend proxies (TMB Planner + Photon geocoder)**
-  - [ ] 1.1 Create `functions/_planner.ts` with `OTPItinerary` / `OTPLeg` types
+  - [x] 1.1 Create `functions/_planner.ts` with `OTPItinerary` / `OTPLeg` types
         reflecting the fields used by the frontend (mode, route, routeShortName,
         startTime, endTime, from, to, distance, duration, legGeometry.points,
         intermediateStops, transitTime, walkTime, transfers, walkDistance).
-  - [ ] 1.2 In `_planner.ts`, write `buildPlanUrl(params)` that emits the TMB
+  - [x] 1.2 In `_planner.ts`, write `buildPlanUrl(params)` that emits the TMB
         URL with `mode=TRANSIT,WALK` (configurable), `maxWalkDistance=800`,
         `showIntermediateStops=true`, `numItineraries=5`, MM-DD-YYYY date
         and `hh:mmam/pm` time computed server-side from `Date.now()`.
-  - [ ] 1.3 Write `normalisePlan(rawOtpResponse)` that strips OTP cruft and
+  - [x] 1.3 Write `normalisePlan(rawOtpResponse)` that strips OTP cruft and
         returns `{itineraries: Itinerary[]}` matching the frontend type.
-  - [ ] 1.4 Create `functions/api/planner/plan.ts` with the `onRequest`
+  - [x] 1.4 Create `functions/api/planner/plan.ts` with the `onRequest`
         handler. Validate required query params (`fromLat`, `fromLon`,
         `toLat`, `toLon`). Allow optional `modes=metro,bus`. Set
         `cache-control: no-store` because plans are time-sensitive.
-  - [ ] 1.5 Create `functions/_photon.ts` with `buildPhotonUrl(q, bias?)`
+  - [x] 1.5 Create `functions/_photon.ts` with `buildPhotonUrl(q, bias?)`
         adding `&lat=41.387&lon=2.168&location_bias_scale=0.2` by default
         and `&limit=5`.
-  - [ ] 1.6 Create `functions/api/geocode/search.ts` with the handler.
+  - [x] 1.6 Create `functions/api/geocode/search.ts` with the handler.
         Require `q` of length ≥ 3. Set `cache-control: public, max-age=3600`.
   - [ ] 1.7 Probe both endpoints from the dev server with curl (one expected
         success, one validation error per endpoint). Save sample output to
