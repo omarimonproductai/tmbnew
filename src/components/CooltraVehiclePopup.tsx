@@ -6,8 +6,10 @@ interface Props {
 }
 
 export function CooltraVehiclePopup({ vehicle, kind }: Props) {
-  const { license_plate, range, model_id, position } = vehicle;
-  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${position.lat},${position.lon}`;
+  const { license_plate, range, position } = vehicle;
+  const [lng, lat] = position;
+  const km = Math.round((range ?? 0) / 1000);
+  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
   return (
     <div className="cooltra-popup">
       <div className="cooltra-popup__head">
@@ -17,8 +19,7 @@ export function CooltraVehiclePopup({ vehicle, kind }: Props) {
         <span className="cooltra-popup__plate">{license_plate}</span>
       </div>
       <div className="cooltra-popup__meta">
-        <span>Autonomia: <strong>{Math.round(range)} km</strong></span>
-        <span className="cooltra-popup__model">{model_id}</span>
+        <span>Autonomia: <strong>{km} km</strong></span>
       </div>
       <a
         className="cooltra-popup__dir"
