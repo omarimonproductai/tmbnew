@@ -4,3 +4,8 @@
 # Aquestes variables NOMÉS s'usen dins les Functions (servidor), mai al client.
 TMB_APP_ID=
 TMB_APP_KEY=
+
+# Credencial Cooltra MaaS Level 1 (https://maas.zeus.cooltra.com)
+# Defineix STAGE per a dev local i preview; PROD només a producció.
+ZEUS_KEY_STAGE=
+ZEUS_KEY_PROD=

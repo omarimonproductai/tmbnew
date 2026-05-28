@@ -10,8 +10,10 @@ import {
   useMap,
 } from 'react-leaflet';
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
+import { CooltraLayer } from './CooltraLayer';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
+import type { CooltraVehicle } from '../types/cooltra';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
@@ -25,6 +27,7 @@ interface Props {
   focusStopId?: string | null;
   bottomInset?: number;
   onRefresh?: () => void;
+  cooltraVehicles?: CooltraVehicle[];
 }
 
 export function AproperMeuMap({
@@ -36,6 +39,7 @@ export function AproperMeuMap({
   focusStopId = null,
   bottomInset = 0,
   onRefresh,
+  cooltraVehicles = [],
 }: Props) {
   const focusStop = focusStopId
     ? parades.find((p) => p.id === focusStopId) ?? null
@@ -120,6 +124,7 @@ export function AproperMeuMap({
           />
         );
       })}
+      {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
       <InvalidateOnResize />
     </MapContainer>
   );
