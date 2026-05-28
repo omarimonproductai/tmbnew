@@ -1,10 +1,25 @@
 import { cooltraFetch, getCooltraToken, type CooltraEnv } from '../../_cooltra';
 import { errorResponse, jsonResponse } from '../../_tmb';
 
-export const onRequest: PagesFunction<CooltraEnv> = async ({ env }) => {
+interface CooltraSystem {
+  id?: string;
+  name?: string;
+  geofence?: unknown;
+}
+
+export const onRequest: PagesFunction<CooltraEnv> = async ({ env, request }) => {
+  const url = new URL(request.url);
+  const systemId = url.searchParams.get('system_id');
+  if (!systemId) {
+    return errorResponse(400, 'Falta el paràmetre system_id (ex: barcelona).');
+  }
   try {
-    const data = await cooltraFetch<unknown>('/integrator/v1/systems', getCooltraToken(env));
-    return jsonResponse(200, data, {
+    const all = await cooltraFetch<CooltraSystem[]>('/integrator/v1/systems', getCooltraToken(env));
+    const match = Array.isArray(all) ? all.find((s) => s?.id === systemId) : undefined;
+    if (!match) {
+      return errorResponse(404, `Ciutat '${systemId}' no trobada a Cooltra.`);
+    }
+    return jsonResponse(200, match, {
       'cache-control': 'public, max-age=3600',
       'cdn-cache-control': 'public, max-age=3600',
     });
