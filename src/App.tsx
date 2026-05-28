@@ -4,10 +4,12 @@ import { FavoritsView } from './components/FavoritsView';
 import { InstallBanner } from './components/InstallBanner';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
+import { RoutePlannerView } from './components/RoutePlannerView';
 import { Toast } from './components/Toast';
 import { isStandalone, useIsOffline } from './hooks/useDisplayMode';
 import { useTotesParades } from './hooks/useTotesParades';
 import { getLiniesSnapshot, getParadesSnapshot } from './stores/favorits';
+import { PLANNER_OPEN_EVENT } from './utils/plannerSeed';
 import type { Coordinate, ParadaAmbLinies } from './types/tmb';
 import './App.css';
 
@@ -45,6 +47,13 @@ export default function App() {
     if (offline) setOfflineToast(true);
   }, [offline]);
 
+  // Stop popups can ask the planner to take over with a pre-filled destination
+  useEffect(() => {
+    const handler = () => setAppMode('route');
+    window.addEventListener(PLANNER_OPEN_EVENT, handler);
+    return () => window.removeEventListener(PLANNER_OPEN_EVENT, handler);
+  }, []);
+
   const openLine = (id: string, focus?: Coordinate) => {
     setRequestedLine({ id, focus });
     setAppMode('linies');
@@ -73,6 +82,7 @@ export default function App() {
         </div>
         <ModeToggle value={appMode} onChange={setAppMode} />
       </header>
+      {appMode === 'route' && <RoutePlannerView />}
       {appMode === 'linies' && (
         <LiniesView
           requestedLine={requestedLine}
