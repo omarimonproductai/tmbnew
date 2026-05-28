@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   CircleMarker,
   MapContainer,
@@ -250,20 +250,43 @@ export function RoutePlanMap({
 }
 
 function SummaryChip({ itinerary }: { itinerary: Itinerary }) {
+  const [open, setOpen] = useState(false);
   const minutes = Math.round(itinerary.duration / 60);
   const walkM = Math.round(itinerary.walkDistance);
   const arrival = formatTime(itinerary.endTime);
   return (
-    <div className="planner-summary-chip">
-      <div className="planner-summary-duration">{minutes}′</div>
-      <div className="planner-summary-meta">
-        <div className="planner-summary-arrival">Arribada {arrival}</div>
-        <div className="planner-summary-line">
-          <span>{itinerary.transfers} transbord{itinerary.transfers === 1 ? '' : 's'}</span>
-          <span> · {walkM}m a peu</span>
-        </div>
-      </div>
-    </div>
+    <button
+      type="button"
+      className={`planner-summary-chip${open ? ' open' : ''}`}
+      onClick={() => setOpen((v) => !v)}
+      aria-expanded={open}
+      aria-label={open ? 'Amaga els detalls de la ruta' : 'Mostra els detalls de la ruta'}
+    >
+      <span className="planner-summary-duration">{minutes}′</span>
+      {open && (
+        <span className="planner-summary-meta">
+          <span className="planner-summary-arrival">Arribada {arrival}</span>
+          <span className="planner-summary-line">
+            <span>{itinerary.transfers} transbord{itinerary.transfers === 1 ? '' : 's'}</span>
+            <span> · {walkM}m a peu</span>
+          </span>
+        </span>
+      )}
+      <svg
+        className="planner-summary-chev"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        {open ? <polyline points="18 15 12 9 6 15" /> : <polyline points="6 9 12 15 18 9" />}
+      </svg>
+    </button>
   );
 }
 
