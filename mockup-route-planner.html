@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8" />
+<title>Mockup · Route Planner · Tu et Mous Bé</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #ececef;
+    padding: 30px 20px 60px;
+    color: #1c1c1e;
+  }
+  h1 { text-align: center; font-size: 22px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 28px; font-size: 14px; }
+  .frames {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .frame {
+    width: 360px;
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #1c1c1e;
+  }
+  .frame-label {
+    text-align: center;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #555;
+    font-size: 13px;
+  }
+  /* ==== Header ==== */
+  .header {
+    background: #c8001e;
+    color: white;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-logo {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-size: 9px; font-weight: 800;
+    flex-shrink: 0;
+    line-height: 1;
+    text-align: center;
+  }
+  .header-logo span { font-size: 7px; font-weight: 800; }
+  .header-title { font-size: 14px; font-weight: 700; flex: 1; }
+  .mode-toggle {
+    display: inline-flex;
+    background: rgba(0,0,0,0.18);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .mode-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.75);
+    padding: 6px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .mode-btn.active {
+    background: white;
+    color: #c8001e;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .mode-btn svg { display: block; }
+  /* ==== Search form ==== */
+  .planner-form {
+    padding: 14px;
+    background: #fafafa;
+    border-bottom: 1px solid #eee;
+  }
+  .field-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .field-icon-col {
+    width: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 0;
+  }
+  .field-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .field-dot.origin { background: #1d7df2; box-shadow: 0 0 0 3px rgba(29,125,242,0.25); }
+  .field-dot.dest { background: #c8001e; box-shadow: 0 0 0 3px rgba(200,0,30,0.25); }
+  .field-line {
+    width: 2px;
+    flex: 1;
+    background: repeating-linear-gradient(to bottom, #c7c7cc 0, #c7c7cc 3px, transparent 3px, transparent 6px);
+    margin: 2px 0;
+  }
+  .field-stack { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .field {
+    background: white;
+    border: 1px solid #e5e5ea;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+  }
+  .field.focused { border-color: #1d7df2; box-shadow: 0 0 0 3px rgba(29,125,242,0.12); }
+  .field-placeholder { color: #aaa; }
+  .field-input {
+    color: #1c1c1e;
+    flex: 1;
+  }
+  .field-input.muted { color: #888; }
+  .swap-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #e5e5ea;
+    display: grid;
+    place-items: center;
+    color: #888;
+    align-self: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  /* ==== Filters ==== */
+  .modes-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .mode-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid #e5e5ea;
+    background: white;
+    color: #888;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .mode-pill.active { background: #c8001e; color: white; border-color: #c8001e; }
+  /* ==== Dropdown ==== */
+  .dropdown {
+    background: white;
+    border: 1px solid #e5e5ea;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-top: -2px;
+  }
+  .drop-section { padding: 6px 0; }
+  .drop-section-head {
+    padding: 6px 14px 4px;
+    font-size: 10px;
+    color: #999;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .drop-item {
+    padding: 9px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-top: 1px solid #f4f4f6;
+    cursor: pointer;
+  }
+  .drop-item:first-of-type { border-top: none; }
+  .drop-item:hover { background: #f7f7f9; }
+  .drop-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #f1f1f4;
+    display: grid;
+    place-items: center;
+    color: #666;
+    flex-shrink: 0;
+  }
+  .drop-text { flex: 1; min-width: 0; }
+  .drop-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1c1e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .drop-sub {
+    font-size: 11px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* ==== Map (fake) ==== */
+  .map {
+    height: 320px;
+    position: relative;
+    background:
+      radial-gradient(ellipse at 60% 70%, #d5e8f5 0, transparent 50%),
+      linear-gradient(to bottom, #f3efe6 0%, #ede8de 100%);
+    overflow: hidden;
+  }
+  .map::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .map-roads {
+    position: absolute;
+    inset: 0;
+  }
+  /* Route line */
+  .route-walk-1, .route-walk-2 {
+    position: absolute;
+    height: 0;
+    border-top: 3px dashed #888;
+    transform-origin: left center;
+  }
+  .route-walk-1 { width: 50px; top: 248px; left: 38px; transform: rotate(-25deg); }
+  .route-walk-2 { width: 36px; top: 84px; left: 246px; transform: rotate(20deg); }
+  .route-bus-1 {
+    position: absolute;
+    height: 0;
+    width: 200px;
+    border-top: 5px solid #1d7df2;
+    top: 220px;
+    left: 80px;
+    transform-origin: left center;
+    transform: rotate(-32deg);
+    border-radius: 2px;
+  }
+  .route-metro {
+    position: absolute;
+    height: 0;
+    width: 60px;
+    border-top: 5px solid #FF3300;
+    top: 96px;
+    left: 196px;
+    transform-origin: left center;
+    transform: rotate(10deg);
+    border-radius: 2px;
+  }
+  /* Map markers */
+  .map-dot {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.15);
+    transform: translate(-50%, -50%);
+  }
+  .map-dot.origin {
+    background: #1d7df2;
+    box-shadow: 0 0 0 5px rgba(29,125,242,0.2), 0 0 0 1px rgba(0,0,0,0.1);
+  }
+  .map-dot.board { background: #1d7df2; }
+  .map-dot.alight { background: #FF3300; }
+  .map-dot.transfer {
+    background: white;
+    border-color: #1d7df2;
+    width: 18px; height: 18px;
+  }
+  .map-dot.transfer::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: #FF3300;
+  }
+  .map-pin {
+    position: absolute;
+    width: 22px; height: 22px;
+    border-radius: 50% 50% 50% 0;
+    background: #c8001e;
+    border: 2px solid white;
+    transform: translate(-50%, -100%) rotate(-45deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  /* Map popups */
+  .map-popup {
+    position: absolute;
+    background: white;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    transform: translate(-50%, -100%);
+    white-space: nowrap;
+    color: #1c1c1e;
+  }
+  .map-popup::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px; height: 8px;
+    background: white;
+  }
+  .map-popup .badge {
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 4px;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+  .map-popup .badge.bus { background: #1d7df2; }
+  .map-popup .badge.metro { background: #FF3300; }
+  /* Summary chip */
+  .summary-chip {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    background: rgba(28,28,30,0.92);
+    color: white;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    backdrop-filter: blur(8px);
+    z-index: 5;
+  }
+  .summary-chip .duration { font-size: 18px; font-weight: 800; }
+  .summary-chip .summary-meta {
+    display: flex;
+    gap: 10px;
+    color: rgba(255,255,255,0.75);
+    font-size: 11px;
+  }
+  .summary-meta-dot::before { content: "·"; margin-right: 6px; opacity: 0.6; }
+  .summary-arrival { margin-left: auto; font-weight: 600; }
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #eee;
+    padding: 0 8px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 12px 12px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .tab.active { color: #c8001e; border-color: #c8001e; }
+  .tab-time { display: block; font-size: 10px; color: #aaa; font-weight: 500; margin-top: 1px; }
+  .tab.active .tab-time { color: #c8001e; }
+  /* Recent destinations */
+  .recents-section { padding: 12px 14px 0; }
+  .recents-head {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+  .recent-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f4f4f6;
+  }
+  .recent-item:last-child { border-bottom: none; }
+  .recent-icon {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f1f1f4;
+    display: grid;
+    place-items: center;
+    color: #999;
+    flex-shrink: 0;
+  }
+  .recent-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1c1c1e;
+    flex: 1;
+  }
+  .recent-sub { font-size: 11px; color: #888; }
+  /* Cursor blink */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: #1d7df2;
+    margin-left: 1px;
+    vertical-align: middle;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  /* Notes block */
+  .notes {
+    max-width: 980px;
+    margin: 50px auto 0;
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .notes h2 { font-size: 16px; margin-bottom: 12px; }
+  .notes ul { padding-left: 20px; color: #333; }
+  .notes li { margin-bottom: 6px; }
+  .icons-row { display: flex; gap: 24px; margin: 16px 0; align-items: center; }
+  .icons-row .icon-cell {
+    text-align: center; font-size: 11px; color: #555;
+  }
+  .icons-row .icon-cell .swatch {
+    width: 48px; height: 48px;
+    background: #c8001e;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    color: white;
+    margin: 0 auto 6px;
+  }
+</style>
+</head>
+<body>
+<h1>Mockup · Route Planner</h1>
+<div class="subtitle">Tu et Mous Bé · 3 estats clau + icones noves dels modes</div>
+
+<div class="frames">
+
+<!-- ==================== FRAME A: Form buit + history ==================== -->
+<div>
+<div class="frame">
+  <div class="header">
+    <div class="header-logo"><span>Tu et<br/>Mous Bé</span></div>
+    <div class="header-title">Tu et Mous Bé</div>
+    <div class="mode-toggle">
+      <!-- Ruta: navigation arrow -->
+      <button class="mode-btn active" title="Ruta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11l18-8-8 18-2-8z"/>
+        </svg>
+      </button>
+      <!-- Línies: bus+metro combo -->
+      <button class="mode-btn" title="Línies">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="3" width="16" height="14" rx="3"/>
+          <line x1="4" y1="11" x2="20" y2="11"/>
+          <circle cx="8" cy="19" r="1.5"/>
+          <circle cx="16" cy="19" r="1.5"/>
+        </svg>
+      </button>
+      <!-- Aprop meu: radar -->
+      <button class="mode-btn" title="Aprop meu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="5"/>
+          <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
+          <line x1="12" y1="3" x2="12" y2="12"/>
+        </svg>
+      </button>
+      <!-- Favorits: star -->
+      <button class="mode-btn" title="Favorits">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15 8.5 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 9 8.5 12 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="planner-form">
+    <div class="field-row">
+      <div class="field-icon-col">
+        <span class="field-dot origin"></span>
+        <span class="field-line"></span>
+        <span class="field-dot dest"></span>
+      </div>
+      <div class="field-stack">
+        <div class="field">
+          <span class="field-input muted">📍 La meva ubicació</span>
+        </div>
+        <div class="field focused">
+          <span class="field-placeholder">A on vols anar?</span>
+          <span class="cursor"></span>
+        </div>
+      </div>
+      <button class="swap-btn" title="Intercanvia origen i destí">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 3v18M3 7l4-4 4 4"/>
+          <path d="M17 21V3M21 17l-4 4-4-4"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modes-row">
+      <span class="mode-pill active">
+        <svg width="12" height="9" viewBox="0 0 36 22" fill="none">
+          <path d="M2 4 Q2 2 4 2 L28 2 Q34 2 34 9 Q34 16 28 16 L4 16 Q2 16 2 14 Z" fill="currentColor"/>
+        </svg>
+        Metro
+      </span>
+      <span class="mode-pill active">
+        <svg width="12" height="9" viewBox="0 0 36 22" fill="none">
+          <rect x="2" y="3" width="32" height="14" rx="3" fill="currentColor"/>
+        </svg>
+        Bus
+      </span>
+    </div>
+  </div>
+
+  <div class="recents-section">
+    <div class="recents-head">Recents</div>
+    <div class="recent-item">
+      <div class="recent-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21s-7-7.5-7-13a7 7 0 0114 0c0 5.5-7 13-7 13z"/>
+          <circle cx="12" cy="8" r="2.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="recent-name">Mercat de Sant Antoni</div>
+        <div class="recent-sub">Comte d'Urgell, 1 · l'Antiga Esquerra de l'Eixample</div>
+      </div>
+    </div>
+    <div class="recent-item">
+      <div class="recent-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/>
+        </svg>
+      </div>
+      <div>
+        <div class="recent-name">Pl. Catalunya</div>
+        <div class="recent-sub">Ciutat Vella · ahir</div>
+      </div>
+    </div>
+    <div class="recent-item">
+      <div class="recent-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/>
+        </svg>
+      </div>
+      <div>
+        <div class="recent-name">Estació de Sants</div>
+        <div class="recent-sub">Sants-Montjuïc · dimarts</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="frame-label">A · Empty + history</div>
+</div>
+
+<!-- ==================== FRAME B: Autocomplete actiu ==================== -->
+<div>
+<div class="frame">
+  <div class="header">
+    <div class="header-logo"><span>Tu et<br/>Mous Bé</span></div>
+    <div class="header-title">Tu et Mous Bé</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>
+      </button>
+      <button class="mode-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="3"/><line x1="4" y1="11" x2="20" y2="11"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/></svg>
+      </button>
+      <button class="mode-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><line x1="12" y1="3" x2="12" y2="12"/></svg>
+      </button>
+      <button class="mode-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 9 8.5 12 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="planner-form">
+    <div class="field-row">
+      <div class="field-icon-col">
+        <span class="field-dot origin"></span>
+        <span class="field-line"></span>
+        <span class="field-dot dest"></span>
+      </div>
+      <div class="field-stack">
+        <div class="field">
+          <span class="field-input muted">📍 La meva ubicació</span>
+        </div>
+        <div class="field focused">
+          <span class="field-input">Sant Antoni</span>
+          <span class="cursor"></span>
+        </div>
+      </div>
+      <button class="swap-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v18M3 7l4-4 4 4"/><path d="M17 21V3M21 17l-4 4-4-4"/></svg>
+      </button>
+    </div>
+
+    <div class="dropdown">
+      <div class="drop-item">
+        <div class="drop-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-7.5-7-13a7 7 0 0114 0c0 5.5-7 13-7 13z"/><circle cx="12" cy="8" r="2.5"/></svg>
+        </div>
+        <div class="drop-text">
+          <div class="drop-name"><strong>Mercat de Sant Antoni</strong></div>
+          <div class="drop-sub">l'Antiga Esquerra de l'Eixample · Barcelona</div>
+        </div>
+      </div>
+      <div class="drop-item">
+        <div class="drop-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>
+        </div>
+        <div class="drop-text">
+          <div class="drop-name"><strong>Sant Antoni</strong> · L2 Metro</div>
+          <div class="drop-sub">Parada de metro · 08015</div>
+        </div>
+      </div>
+      <div class="drop-item">
+        <div class="drop-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg>
+        </div>
+        <div class="drop-text">
+          <div class="drop-name">Carrer de <strong>Sant Antoni</strong> Maria Claret</div>
+          <div class="drop-sub">la Sagrada Família · Barcelona</div>
+        </div>
+      </div>
+      <div class="drop-item">
+        <div class="drop-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-7.5-7-13a7 7 0 0114 0c0 5.5-7 13-7 13z"/><circle cx="12" cy="8" r="2.5"/></svg>
+        </div>
+        <div class="drop-text">
+          <div class="drop-name">Plaça de <strong>Sant Antoni</strong> Maria Claret</div>
+          <div class="drop-sub">la Sagrera · Barcelona</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="frame-label">B · Autocomplete</div>
+</div>
+
+<!-- ==================== FRAME C: Resultat amb mapa + tabs ==================== -->
+<div>
+<div class="frame">
+  <div class="header">
+    <div class="header-logo"><span>Tu et<br/>Mous Bé</span></div>
+    <div class="header-title">Tu et Mous Bé</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>
+      </button>
+      <button class="mode-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="3"/><line x1="4" y1="11" x2="20" y2="11"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/></svg>
+      </button>
+      <button class="mode-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><line x1="12" y1="3" x2="12" y2="12"/></svg>
+      </button>
+      <button class="mode-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 9 8.5 12 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Compact form (collapsed) -->
+  <div style="padding: 10px 14px 8px; background: white; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0;">
+      <div style="font-size: 11px; color: #888; display: flex; gap: 4px; align-items: center;">
+        <span class="field-dot origin" style="width: 6px; height: 6px; box-shadow: none;"></span>
+        <span style="white-space:nowrap; overflow:hidden; text-overflow: ellipsis;">La meva ubicació</span>
+      </div>
+      <div style="font-size: 13px; font-weight: 600; display: flex; gap: 6px; align-items: center;">
+        <span class="field-dot dest" style="width: 8px; height: 8px; box-shadow: none; flex-shrink: 0;"></span>
+        <span style="white-space:nowrap; overflow:hidden; text-overflow: ellipsis;">Mercat de Sant Antoni</span>
+      </div>
+    </div>
+    <button class="swap-btn" style="width: 28px; height: 28px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active">
+      Més ràpida<span class="tab-time">32 min</span>
+    </div>
+    <div class="tab">
+      Menys transbords<span class="tab-time">38 min</span>
+    </div>
+    <div class="tab">
+      Menys camí<span class="tab-time">35 min</span>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="map">
+    <div class="summary-chip">
+      <div class="duration">32′</div>
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75);">Arribada 09:45</div>
+        <div class="summary-meta">
+          <span>1 transbord</span>
+          <span class="summary-meta-dot">480m a peu</span>
+        </div>
+      </div>
+    </div>
+    <div class="map-roads">
+      <div class="route-walk-1"></div>
+      <div class="route-bus-1"></div>
+      <div class="route-walk-2"></div>
+      <div class="route-metro"></div>
+    </div>
+    <!-- Origin -->
+    <div class="map-dot origin" style="top: 268px; left: 40px;"></div>
+    <!-- Boarding (V15) -->
+    <div class="map-dot board" style="top: 250px; left: 84px;"></div>
+    <div class="map-popup" style="top: 240px; left: 84px;">
+      <span class="badge bus">V15</span>Puja
+    </div>
+    <!-- Transfer marker -->
+    <div class="map-dot transfer" style="top: 110px; left: 240px;"></div>
+    <div class="map-popup" style="top: 100px; left: 240px;">Transbord</div>
+    <!-- Destination pin -->
+    <div class="map-pin" style="top: 76px; left: 282px;"></div>
+    <div class="map-popup" style="top: 50px; left: 282px;">
+      Arribada
+    </div>
+  </div>
+</div>
+<div class="frame-label">C · Resultat (tab "Més ràpida" activa)</div>
+</div>
+
+</div>
+
+<div class="notes">
+<h2>Decisions a validar</h2>
+<ul>
+<li><strong>4 icones del header</strong> — Ruta (fletxa de navegació), Línies (bus+rectangle), Aprop meu (radar concèntric), Favorits (estrella). El text es treu del toggle per estalvi d'espai mòbil. <em>Si el text fa falta per accessibilitat, podríem mantenir-lo només al primer mode actiu o sota la icona.</em></li>
+<li><strong>Camps A → B amb dot + línia discontínua</strong> entre els dos camps (estil Citymapper / Google Maps).</li>
+<li><strong>Filtres Metro/Bus com a pills</strong> sota el formulari. Activats per defecte (visualment vermell TMB), tap per desactivar.</li>
+<li><strong>Recents sota el formulari</strong> quan el camp "Cap a on" està buit. Es desa l'últim destí seleccionat (no l'string que escrius), amb lloc + sub-text (districte / data).</li>
+<li><strong>Resultat:</strong> tabs amb la durada de cada alternativa al sub-label. La fitxa fa de "vista expandida" al collapse el formulari a només 2 línies (origen / destí).</li>
+<li><strong>Mapa amb popups només a parades clau</strong> (puja / transbord / arribada), no a totes les intermèdies. Ruta dibuixada amb colors TMB per cada tram, walking en gris discontinu.</li>
+<li><strong>Summary chip flotant</strong> sobre el mapa: durada gran a l'esquerra, transbords + m caminant + hora d'arribada a la dreta.</li>
+</ul>
+<h2>Preguntes encara obertes</h2>
+<ul>
+<li>El text de cada mode al header s'elimina del tot, o es manté com a label sota la icona en versió tablet/desktop?</li>
+<li>Volem un botó "Tornar a planificar" o l'usuari ha de tocar els camps un altre cop?</li>
+<li>L'origen "La meva ubicació" pot ser editable per a una adreça arbitrària, o quedem que és sempre GPS i si vols un altre origen has de tocar el ↕?</li>
+<li>Hi ha d'haver un botó "Centrar al meu trajecte" al mapa (recenter)?</li>
+</ul>
+</div>
+</body>
+</html>
