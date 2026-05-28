@@ -282,6 +282,8 @@ function AproperMeuStopMarker({
   }, [autoOpen]);
 
   const baseRadius = isTop ? 10 : 5;
+  const popupRef = useRef<L.Popup>(null);
+  const rePan = () => popupRef.current?.update();
   return (
     <CircleMarker
       ref={markerRef}
@@ -302,8 +304,8 @@ function AproperMeuStopMarker({
         {isTop && <span className="rank-mini">{rank}</span>}
         <span className="tooltip-name">{parada.nom}</span>
       </Tooltip>
-      <Popup>
-        <AproperMeuStopPopup parada={parada} enabled={open} />
+      <Popup ref={popupRef} autoPanPaddingTopLeft={[10, 90]}>
+        <AproperMeuStopPopup parada={parada} enabled={open} onContentResize={rePan} />
       </Popup>
     </CircleMarker>
   );
