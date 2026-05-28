@@ -36,11 +36,19 @@ function readPlannerSeed(): SeedDestination | null {
   }
 }
 
+interface SearchSnapshot {
+  originId: string;
+  destinationId: string;
+  metro: boolean;
+  bus: boolean;
+}
+
 export function RoutePlannerView() {
   const { position, status: geoStatus } = useGeolocation(true);
   const [origin, setOrigin] = useState<GeocodeResult | null>(null);
   const [destination, setDestination] = useState<GeocodeResult | null>(null);
   const [activeItineraryIdx, setActiveItineraryIdx] = useState(0);
+  const [lastSearch, setLastSearch] = useState<SearchSnapshot | null>(null);
 
   const history = usePlannerHistory();
   const modes = usePlannerModes();
@@ -96,6 +104,12 @@ export function RoutePlannerView() {
       lng: destination.lng,
     });
     setActiveItineraryIdx(0);
+    setLastSearch({
+      originId: origin.id,
+      destinationId: destination.id,
+      metro: modes.metro,
+      bus: modes.bus,
+    });
     plan.trigger({
       fromLat: origin.lat,
       fromLon: origin.lng,
@@ -107,6 +121,19 @@ export function RoutePlannerView() {
       ],
     });
   };
+
+  // Hide the Search button while the currently-shown result still matches the
+  // form. The moment the user edits anything, the button reappears so they
+  // can re-run the search.
+  const resultFresh = useMemo(() => {
+    if (!lastSearch || !plan.data || !origin || !destination) return false;
+    return (
+      lastSearch.originId === origin.id &&
+      lastSearch.destinationId === destination.id &&
+      lastSearch.metro === modes.metro &&
+      lastSearch.bus === modes.bus
+    );
+  }, [lastSearch, plan.data, origin, destination, modes.metro, modes.bus]);
 
   // Auto-search when both endpoints are populated via seed and GPS arrives
   useEffect(() => {
@@ -156,6 +183,7 @@ export function RoutePlannerView() {
           canSearch={canSearch}
           noGps={noGps}
           samePlace={samePlace}
+          hideSearchButton={resultFresh}
         />
         {itineraries.length > 0 && (
           <RoutePlanTabs

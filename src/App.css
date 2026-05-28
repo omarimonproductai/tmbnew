@@ -1958,13 +1958,16 @@ body {
   max-height: 100%;
 }
 @media (max-width: 640px) {
+  .planner-main { flex-direction: column; }
   .planner-panel {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #e0e0e0;
-    max-height: 50vh;
+    flex: 0 0 auto;
+    max-height: 55vh;
   }
-  .planner-main { flex-direction: column; }
+  .planner-form { padding: 12px; gap: 8px; }
+  .planner-search-btn { padding: 9px 12px; font-size: 13px; }
 }
 
 .planner-form {
@@ -2003,12 +2006,16 @@ body {
   border: 1px solid #e5e5ea;
   border-radius: 10px;
   padding: 10px 12px;
-  font-size: 14px;
+  /* iOS Safari auto-zooms inputs with font-size < 16px on focus, so keep this at 16px on mobile. */
+  font-size: 16px;
   background: white;
   font-family: inherit;
   color: #1c1c1e;
   outline: none;
   width: 100%;
+}
+@media (min-width: 641px) {
+  .planner-field { font-size: 14px; }
 }
 .planner-field::placeholder { color: #aaa; }
 .planner-field.focused, .planner-field:focus {
@@ -2164,6 +2171,8 @@ body {
   font-weight: 500;
 }
 .planner-tab.active .planner-tab__time { color: #c8001e; }
+.planner-tabs--single .planner-tab { cursor: default; border-color: #c8001e; color: #c8001e; }
+.planner-tabs--single .planner-tab__time { color: #c8001e; }
 
 .planner-empty {
   position: absolute;

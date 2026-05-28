@@ -65,9 +65,13 @@ function formatMinutes(seconds: number): string {
 
 export function RoutePlanTabs({ itineraries, activeIdx, onSelect }: Props) {
   const tabs = useMemo(() => buildTabs(itineraries), [itineraries]);
+  // When all criteria collapse onto the same itinerary there is nothing to
+  // choose between — drop the marketing copy and just show the duration so
+  // the row reads as a result header, not a fake selector.
+  const singleTab = tabs.length === 1;
 
   return (
-    <div className="planner-tabs" role="tablist">
+    <div className={`planner-tabs${singleTab ? ' planner-tabs--single' : ''}`} role="tablist">
       {tabs.map((tab) => (
         <button
           key={tab.idx}
@@ -76,8 +80,9 @@ export function RoutePlanTabs({ itineraries, activeIdx, onSelect }: Props) {
           aria-selected={activeIdx === tab.idx}
           className={`planner-tab${activeIdx === tab.idx ? ' active' : ''}`}
           onClick={() => onSelect(tab.idx)}
+          disabled={singleTab}
         >
-          <span>{tab.primary}</span>
+          <span>{singleTab ? 'Ruta' : tab.primary}</span>
           <span className="planner-tab__time">{formatMinutes(itineraries[tab.idx].duration)}</span>
         </button>
       ))}
