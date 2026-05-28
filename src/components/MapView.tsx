@@ -169,13 +169,12 @@ function AutoFit({
 function InvalidateOnResize() {
   const map = useMap();
   useEffect(() => {
-    const handler = () => map.invalidateSize();
-    window.addEventListener('resize', handler);
-    const t = window.setTimeout(handler, 100);
-    return () => {
-      window.removeEventListener('resize', handler);
-      window.clearTimeout(t);
-    };
+    map.invalidateSize();
+    if (typeof ResizeObserver === 'undefined') return;
+    const container = map.getContainer();
+    const ro = new ResizeObserver(() => map.invalidateSize());
+    ro.observe(container);
+    return () => ro.disconnect();
   }, [map]);
   return null;
 }
