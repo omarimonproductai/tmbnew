@@ -1850,37 +1850,22 @@ body {
 }
 
 /* --- Cooltra layer & toggle --- */
-.cooltra-toggle-row {
-  margin: 8px 0 4px;
-  display: flex;
-  justify-content: flex-start;
-}
-.cooltra-toggle {
+.filter-btn--cooltra {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1.5px solid #d6d6dc;
-  background: #fff;
-  color: #444;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  gap: 6px;
 }
-.cooltra-toggle:hover { border-color: #b9b9c1; }
-.cooltra-toggle.on {
+.filter-btn--cooltra:hover { border-color: #00a651; color: #00a651; }
+.filter-btn--cooltra.active {
   background: #00a651;
   border-color: #00a651;
   color: #fff;
 }
-.cooltra-toggle__emoji { font-size: 16px; line-height: 1; }
-.cooltra-toggle__count {
+.filter-btn__count {
   background: rgba(255, 255, 255, 0.25);
   border-radius: 999px;
-  padding: 1px 8px;
-  font-size: 12px;
+  padding: 0 6px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 
