@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mockup · Mides de marcadors al mapa</title>
+<style>
+  :root { --red:#c8001e; --green:#28922F; --blue:#0072BB; --purple:#7E2D8E; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px 16px 60px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background:#eceff3; color:#1c1c1e; }
+  h1 { font-size:18px; margin:0 0 4px; }
+  .sub { color:#6b7280; font-size:13px; margin:0 0 20px; }
+  .row { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+  .col { flex:1; min-width:320px; max-width:360px; }
+  .col h2 { font-size:13px; text-transform:uppercase; letter-spacing:.5px; color:#6b7280; margin:0 0 8px; text-align:center; }
+  .phone { background:#fff; border-radius:24px; box-shadow:0 8px 30px rgba(0,0,0,.12); overflow:hidden; min-height:520px; position:relative; }
+  /* fake map background */
+  .map {
+    height:420px; position:relative; overflow:hidden;
+    background:
+      linear-gradient(135deg, transparent 49.5%, #d6dde6 49.5%, #d6dde6 50.5%, transparent 50.5%) 0 0/120px 120px,
+      linear-gradient(45deg,  transparent 49.5%, #d6dde6 49.5%, #d6dde6 50.5%, transparent 50.5%) 0 0/120px 120px,
+      #eef2f6;
+  }
+  /* circle markers (current) */
+  .m {
+    position:absolute; transform:translate(-50%,-50%);
+    border-radius:50%; background:var(--red); border:1.5px solid #fff;
+  }
+  .m.mini { width:10px; height:10px; }
+  .m.top  { width:20px; height:20px; border-width:3px; }
+  /* color variants */
+  .m.green  { background:var(--green); }
+  .m.blue   { background:var(--blue); }
+  .m.purple { background:var(--purple); }
+  /* proposed pins */
+  .pin-mini {
+    position:absolute; transform:translate(-50%,-50%);
+    width:22px; height:22px; border-radius:50%;
+    background:var(--red); border:1.5px solid #fff;
+  }
+  .pin-sel {
+    position:absolute; transform:translate(-50%,-100%);
+    width:48px; height:48px; border-radius:50%;
+    background:var(--red); border:3px solid #fff;
+    display:grid; place-items:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.18);
+  }
+  .pin-sel::after {
+    content:""; position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
+    border-left:8px solid transparent; border-right:8px solid transparent;
+    border-top:10px solid var(--red);
+  }
+  .pin-sel.green        { background:var(--green); }
+  .pin-sel.green::after { border-top-color:var(--green); }
+  .pin-sel svg { color:#fff; }
+  .tu {
+    position:absolute; transform:translate(-50%,-50%);
+    width:16px; height:16px; border-radius:50%;
+    background:#1d7df2; border:3px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.18);
+  }
+  .tu::after {
+    content:"Tu"; position:absolute; left:50%; top:-22px; transform:translateX(-50%);
+    background:#1d7df2; color:#fff; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:700;
+  }
+  /* size labels */
+  .label {
+    position:absolute; transform:translate(-50%,0);
+    font-size:11px; font-weight:700; color:#1c1c1e;
+    background:#fff; padding:2px 6px; border-radius:6px;
+    box-shadow:0 1px 4px rgba(0,0,0,.15);
+    white-space:nowrap;
+  }
+  .legend { padding:14px 16px 18px; font-size:12.5px; color:#444; line-height:1.55; }
+  .legend strong { color:#1c1c1e; }
+  .legend ul { margin:6px 0 0; padding-left:18px; }
+  .note { max-width:740px; margin:18px auto 0; color:#6b7280; font-size:12.5px; line-height:1.55; text-align:center; }
+</style>
+</head>
+<body>
+
+  <h1 style="text-align:center;">Mides de marcadors al mapa</h1>
+  <p class="sub" style="text-align:center;">Comparació entre l'estat actual de "Tu et Mous Bé" i una proposta inspirada en Cooltra</p>
+
+  <div class="row">
+
+    <!-- =================== ACTUAL =================== -->
+    <div class="col">
+      <h2>Actual</h2>
+      <div class="phone">
+        <div class="map">
+          <!-- mini markers (Ø10) -->
+          <span class="m mini" style="left:18%; top:30%;"></span>
+          <span class="m mini green"  style="left:42%; top:22%;"></span>
+          <span class="m mini blue"   style="left:68%; top:32%;"></span>
+          <span class="m mini purple" style="left:80%; top:55%;"></span>
+          <span class="m mini green"  style="left:30%; top:68%;"></span>
+          <span class="m mini"        style="left:58%; top:72%;"></span>
+          <!-- top-N markers (Ø20) -->
+          <span class="m top"       style="left:50%; top:50%;"></span>
+          <span class="m top green" style="left:36%; top:42%;"></span>
+          <!-- size labels -->
+          <span class="label" style="left:50%; top:calc(50% + 18px);">Ø 20 px · top-N</span>
+          <span class="label" style="left:18%; top:calc(30% + 14px);">Ø 10 px · mini</span>
+          <!-- Tu -->
+          <span class="tu" style="left:55%; top:60%;"></span>
+        </div>
+        <div class="legend">
+          <strong>Mides actuals</strong>
+          <ul>
+            <li><strong>Mini</strong> (parada normal): <strong>Ø 10 px</strong>, vora blanca 1.5 px.</li>
+            <li><strong>Top-N</strong> (top 5 més properes): <strong>Ø 20 px</strong>, vora blanca 3 px.</li>
+            <li><strong>Guinyo</strong> (en tocar una parada de la llista): puja a <strong>Ø 26 px</strong> durant 0.5 s.</li>
+            <li>Tots de color sòlid (color de la línia), sense icona del tipus de transport a dins.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== PROPOSADA =================== -->
+    <div class="col">
+      <h2>Proposada (estil Cooltra)</h2>
+      <div class="phone">
+        <div class="map">
+          <!-- mini markers (Ø22) -->
+          <span class="pin-mini" style="left:18%; top:30%;"></span>
+          <span class="pin-mini" style="background:var(--green);" style2="left:42%; top:22%;"></span>
+          <span class="pin-mini" style="left:42%; top:22%; background:var(--green);"></span>
+          <span class="pin-mini" style="left:68%; top:32%; background:var(--blue);"></span>
+          <span class="pin-mini" style="left:80%; top:55%; background:var(--purple);"></span>
+          <span class="pin-mini" style="left:30%; top:68%; background:var(--green);"></span>
+          <span class="pin-mini" style="left:58%; top:72%;"></span>
+          <!-- selected pin Ø48 with icon + tail -->
+          <span class="pin-sel" style="left:50%; top:55%;">
+            <!-- bus icon -->
+            <svg width="26" height="18" viewBox="0 0 36 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="30" height="14" rx="3" fill="currentColor" stroke="none"/>
+              <rect x="5" y="6" width="26" height="4" rx="1" fill="rgba(255,255,255,.85)" stroke="none"/>
+              <circle cx="9" cy="19" r="2.4" fill="#1c1c1c" stroke="none"/>
+              <circle cx="27" cy="19" r="2.4" fill="#1c1c1c" stroke="none"/>
+            </svg>
+          </span>
+          <span class="pin-sel green" style="left:36%; top:33%;">
+            <!-- metro icon -->
+            <svg width="22" height="14" viewBox="0 0 36 18" fill="none">
+              <path d="M2 4 Q2 2 4 2 L28 2 Q34 2 34 9 Q34 16 28 16 L4 16 Q2 16 2 14 Z" fill="currentColor"/>
+              <rect x="5" y="5" width="5" height="4" rx="1" fill="rgba(255,255,255,.9)"/>
+              <rect x="12" y="5" width="5" height="4" rx="1" fill="rgba(255,255,255,.9)"/>
+              <rect x="19" y="5" width="5" height="4" rx="1" fill="rgba(255,255,255,.9)"/>
+            </svg>
+          </span>
+          <!-- size labels -->
+          <span class="label" style="left:50%; top:calc(55% + 10px);">Ø 48 px · seleccionat</span>
+          <span class="label" style="left:18%; top:calc(30% + 18px);">Ø 22 px · mini</span>
+          <!-- Tu -->
+          <span class="tu" style="left:55%; top:75%;"></span>
+        </div>
+        <div class="legend">
+          <strong>Mides proposades</strong>
+          <ul>
+            <li><strong>Mini</strong>: <strong>Ø 22 px</strong> (Cooltra). Còmodes de tocar (mínim recomanat Apple 44 px d'àrea sumant l'hitbox).</li>
+            <li><strong>Seleccionat/top</strong>: <strong>Ø 48 px</strong> amb <strong>icona del transport</strong> a dins (metro/bus) i petita gota apuntant al punt.</li>
+            <li>Mateix mapa de colors per línia/família que ara, però amb jerarquia visual molt més clara.</li>
+            <li>El "guinyo" passa de Ø48 a Ø56 durant 0.5 s.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    Ratios resultants: mini → +120 % d'àrea visual (Ø10 → Ø22) · seleccionat → +475 % (Ø20 → Ø48). La densitat percebuda del mapa serà més alta; potser caldrà aplicar agrupament/clúster quan hi hagi moltes parades juntes (com fa Cooltra amb les etiquetes "23x"), però això és una iteració posterior.
+  </p>
+
+</body>
+</html>
