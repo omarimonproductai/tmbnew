@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CooltraToggle } from './CooltraToggle';
+import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LineHeaderBanner } from './LineHeaderBanner';
 import { LineList } from './LineList';
@@ -241,17 +241,7 @@ export function LiniesView({
       )}
       <aside className={`panel${panelOpen ? ' panel--open' : ''}`}>
         <div className="filters-row">
-          <FilterBar
-            value={filtre}
-            onChange={setFiltre}
-            extra={
-              <CooltraToggle
-                value={cooltraOn}
-                onChange={setCooltraOn}
-                count={cooltraOn ? cooltraVehicles.length : null}
-              />
-            }
-          />
+          <FilterBar value={filtre} onChange={setFiltre} />
           <SortControls
             value={sortMode}
             onChange={setSortMode}
@@ -322,11 +312,25 @@ export function LiniesView({
         )}
         {seleccio && (
           <div className="map-controls-stack">
+            <CooltraMapButton
+              value={cooltraOn}
+              onChange={setCooltraOn}
+              count={cooltraOn ? cooltraVehicles.length : null}
+            />
             <RefreshControl onRefresh={refreshVehicles} />
             <VehicleVisibilityToggle
               value={showVehicles}
               onChange={setShowVehicles}
               tipus={seleccio.tipus}
+            />
+          </div>
+        )}
+        {!seleccio && (
+          <div className="map-controls-stack">
+            <CooltraMapButton
+              value={cooltraOn}
+              onChange={setCooltraOn}
+              count={cooltraOn ? cooltraVehicles.length : null}
             />
           </div>
         )}

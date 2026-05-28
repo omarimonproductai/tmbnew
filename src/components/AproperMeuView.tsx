@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
-import { CooltraToggle } from './CooltraToggle';
+import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
 import { ParadesAprop } from './ParadesAprop';
@@ -268,17 +268,7 @@ export function AproperMeuView({
           )}
           {parades.length > 0 && (
             <>
-              <FilterBar
-                value={filtre}
-                onChange={setFiltre}
-                extra={
-                  <CooltraToggle
-                    value={cooltraOn}
-                    onChange={setCooltraOn}
-                    count={cooltraOn ? cooltraVehicles.length : null}
-                  />
-                }
-              />
+              <FilterBar value={filtre} onChange={setFiltre} />
               <ParadesAprop
                 parades={paradesFiltrades}
                 topN={TOP_N}
@@ -302,6 +292,13 @@ export function AproperMeuView({
           onRefresh={refresh}
           cooltraVehicles={cooltraOn ? cooltraVehicles : []}
         />
+        <div className="cooltra-map-control">
+          <CooltraMapButton
+            value={cooltraOn}
+            onChange={setCooltraOn}
+            count={cooltraOn ? cooltraVehicles.length : null}
+          />
+        </div>
         {!position && status !== 'requesting' && (
           <div className="map-hint">
             {status === 'denied'
