@@ -21,4 +21,11 @@ describe('ModeToggle', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Aprop meu' }));
     expect(onChange).toHaveBeenCalledWith('aprop-meu');
   });
+
+  it('exposes the Ruta mode and fires it', () => {
+    const onChange = vi.fn();
+    render(<ModeToggle value="aprop-meu" onChange={onChange} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Ruta' }));
+    expect(onChange).toHaveBeenCalledWith('route');
+  });
 });

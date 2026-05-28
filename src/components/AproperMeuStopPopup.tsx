@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { DirectionsButton } from './DirectionsButton';
+import { RouteHereButton } from './RouteHereButton';
 import { FavStar } from './FavStar';
 import { ShareButton } from './ShareButton';
 import { useFavorits } from '../hooks/useFavorits';
@@ -87,6 +88,12 @@ export function AproperMeuStopPopup({ parada, enabled, onContentResize }: Props)
         liniesQueParen={parada.liniesQueParen}
       />
       <div className="aprop-popup-actions">
+        <RouteHereButton
+          name={parada.nom}
+          lat={parada.lat}
+          lng={parada.lng}
+          variant="block"
+        />
         <DirectionsButton
           lat={parada.lat}
           lng={parada.lng}
