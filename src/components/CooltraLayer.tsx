@@ -43,7 +43,7 @@ export function CooltraLayer({ vehicles }: Props) {
         const kind = inferKind(v.model_id);
         const [lng, lat] = v.position;
         const dot = L.circleMarker([lat, lng], {
-          radius: 10,
+          radius: 7,
           color: '#fff',
           weight: 2,
           fillColor: COLORS[kind],
