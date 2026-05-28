@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CooltraToggle } from './CooltraToggle';
 import { DirectionsButton } from './DirectionsButton';
 import { FavMap } from './FavMap';
 import { FavStar } from './FavStar';
+import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useFavorits } from '../hooks/useFavorits';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useTempsReal } from '../hooks/useTempsReal';
@@ -15,6 +17,7 @@ type FavView = 'list' | 'map';
 type OpenLine = (id: string, focus?: Coordinate) => void;
 
 const SORT_STORAGE_KEY = 'tmb-fav-sort';
+const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
 
 function loadStoredSort(): FavSort {
   if (typeof window === 'undefined') return 'proximity';
@@ -27,6 +30,15 @@ function loadStoredSort(): FavSort {
   return 'proximity';
 }
 
+function loadStoredCooltra(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(COOLTRA_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 interface Props {
   onOpenLine: OpenLine;
 }
@@ -36,6 +48,16 @@ export function FavoritsView({ onOpenLine }: Props) {
   const { position } = useGeolocation(true);
   const [sort, setSort] = useState<FavSort>(loadStoredSort);
   const [view, setView] = useState<FavView>('list');
+  const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
+  const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(COOLTRA_STORAGE_KEY, cooltraOn ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [cooltraOn]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -142,7 +164,18 @@ export function FavoritsView({ onOpenLine }: Props) {
 
       {view === 'map' && favParades.length > 0 ? (
         <div className="favorits-map">
-          <FavMap parades={orderedParades} userPosition={position} />
+          <div className="favorits-map-controls">
+            <CooltraToggle
+              value={cooltraOn}
+              onChange={setCooltraOn}
+              count={cooltraOn ? cooltraVehicles.length : null}
+            />
+          </div>
+          <FavMap
+            parades={orderedParades}
+            userPosition={position}
+            cooltraVehicles={cooltraOn ? cooltraVehicles : []}
+          />
         </div>
       ) : (
         <div className="favorits-scroll">

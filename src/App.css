@@ -1744,7 +1744,15 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
 }
-.favorits-map { flex: 1; min-height: 0; position: relative; }
+.favorits-map { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
+.favorits-map-controls {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
 
 /* PWA install invitation */
 .install-banner {

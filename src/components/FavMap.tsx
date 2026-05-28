@@ -9,8 +9,10 @@ import {
   useMap,
 } from 'react-leaflet';
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
+import { CooltraLayer } from './CooltraLayer';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
+import type { CooltraVehicle } from '../types/cooltra';
 import type { Coordinate, FavParada } from '../types/tmb';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
@@ -18,9 +20,10 @@ const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
 interface Props {
   parades: FavParada[];
   userPosition?: Coordinate | null;
+  cooltraVehicles?: CooltraVehicle[];
 }
 
-export function FavMap({ parades, userPosition }: Props) {
+export function FavMap({ parades, userPosition, cooltraVehicles = [] }: Props) {
   return (
     <MapContainer
       center={FALLBACK_CENTER}
@@ -46,6 +49,7 @@ export function FavMap({ parades, userPosition }: Props) {
           </Tooltip>
         </CircleMarker>
       )}
+      {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
       {parades.map((p) => (
         <FavMarker key={p.id} parada={p} />
       ))}
@@ -62,7 +66,7 @@ function FavMarker({ parada }: { parada: FavParada }) {
   return (
     <CircleMarker
       center={[parada.lat, parada.lng]}
-      radius={15}
+      radius={18}
       pathOptions={{ color: '#ffffff', weight: 3, fillColor: color, fillOpacity: 1 }}
       eventHandlers={{
         popupopen: () => setOpen(true),
