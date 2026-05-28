@@ -14,7 +14,7 @@ export function CooltraMapButton({ value, onChange, count = null }: Props) {
       title={value ? 'Amaga la flota Cooltra' : 'Mostra la flota Cooltra'}
     >
       <img
-        src="/cooltra-logo.png"
+        src="/cooltra-logo.jpg"
         alt=""
         className="cooltra-map-btn__logo"
         draggable={false}
