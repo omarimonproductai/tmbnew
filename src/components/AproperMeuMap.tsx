@@ -295,14 +295,14 @@ function AproperMeuStopMarker({
     return () => window.clearTimeout(t);
   }, [autoOpen]);
 
-  const baseRadius = isTop ? 10 : 5;
+  const baseRadius = isTop ? 15 : 9;
   const popupRef = useRef<L.Popup>(null);
   const rePan = () => popupRef.current?.update();
   return (
     <CircleMarker
       ref={markerRef}
       center={[parada.lat, parada.lng]}
-      radius={winking ? baseRadius + 8 : baseRadius}
+      radius={winking ? baseRadius + 5 : baseRadius}
       pathOptions={{
         color: '#ffffff',
         weight: winking ? 4 : isTop ? 3 : 1.5,
