@@ -56,8 +56,10 @@ export function useGeolocation(autoRequest = true): UseGeolocationResult {
     );
   }, []);
 
-  // Continuously watch the position so the user dot tracks movement
-  // without needing to tap "Actualitzar".
+  // Poll the position every few seconds so the user dot tracks movement
+  // without needing to tap "Actualitzar". We poll instead of using
+  // watchPosition because iOS Safari (especially as an installed PWA)
+  // sometimes stops firing watch updates silently.
   useEffect(() => {
     if (!autoRequest) return;
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -66,31 +68,41 @@ export function useGeolocation(autoRequest = true): UseGeolocationResult {
       return;
     }
     setStatus('requesting');
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setAccuracy(pos.coords.accuracy);
-        setStatus('granted');
-        setError(null);
-      },
-      (err) => {
-        if (err.code === err.PERMISSION_DENIED) {
-          setStatus('denied');
-          setError("Cal permís d'ubicació per a aquest mode.");
-        } else if (err.code === err.POSITION_UNAVAILABLE) {
-          setStatus('unavailable');
-          setError('No s’ha pogut obtenir la posició.');
-        } else if (err.code === err.TIMEOUT) {
-          setStatus('unavailable');
-          setError('S’ha esgotat el temps per obtenir la posició.');
-        } else {
-          setStatus('unavailable');
-          setError(err.message);
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
-    );
-    return () => navigator.geolocation.clearWatch(watchId);
+    let cancelled = false;
+    const fetchPos = () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (cancelled) return;
+          setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          setAccuracy(pos.coords.accuracy);
+          setStatus('granted');
+          setError(null);
+        },
+        (err) => {
+          if (cancelled) return;
+          if (err.code === err.PERMISSION_DENIED) {
+            setStatus('denied');
+            setError("Cal permís d'ubicació per a aquest mode.");
+          } else if (err.code === err.POSITION_UNAVAILABLE) {
+            setStatus('unavailable');
+            setError('No s’ha pogut obtenir la posició.');
+          } else if (err.code === err.TIMEOUT) {
+            // Don't blow up the status on a transient timeout — the next
+            // poll may succeed.
+          } else {
+            setStatus('unavailable');
+            setError(err.message);
+          }
+        },
+        { enableHighAccuracy: true, timeout: 10_000, maximumAge: 5_000 },
+      );
+    };
+    fetchPos();
+    const interval = window.setInterval(fetchPos, 5_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
   }, [autoRequest]);
 
   return { position, accuracy, status, error, refresh };
