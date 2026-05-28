@@ -43,11 +43,11 @@ export function CooltraLayer({ vehicles }: Props) {
         const kind = inferKind(v.model_id);
         const [lng, lat] = v.position;
         const dot = L.circleMarker([lat, lng], {
-          radius: 4,
+          radius: 10,
           color: '#fff',
-          weight: 1.2,
+          weight: 2,
           fillColor: COLORS[kind],
-          fillOpacity: 0.95,
+          fillOpacity: 1,
         });
         dot.bindPopup(
           renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
