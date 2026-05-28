@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
+import { CooltraToggle } from './CooltraToggle';
 import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
 import { ParadesAprop } from './ParadesAprop';
 import { Toast } from './Toast';
+import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
@@ -20,6 +22,7 @@ const RADIUS_STORAGE_KEY = 'tmb-aprop-meu-radius';
 const RADIUS_MIN = 100;
 const RADIUS_MAX = 1500;
 const RADIUS_DEFAULT = 300;
+const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
 
 function loadStoredRadius(): number {
   if (typeof window === 'undefined') return RADIUS_DEFAULT;
@@ -31,6 +34,15 @@ function loadStoredRadius(): number {
     // localStorage may throw in private browsing; fall through to default.
   }
   return RADIUS_DEFAULT;
+}
+
+function loadStoredCooltra(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(COOLTRA_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
 }
 
 function getViewportHeight(): number {
@@ -59,6 +71,8 @@ export function AproperMeuView({
 } = {}) {
   const [radius, setRadius] = useState<number>(loadStoredRadius);
   const [filtre, setFiltre] = useState<FilterType>('tots');
+  const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
+  const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
   // A list tap "winks" the matching map marker. The nonce lets the same
   // stop re-trigger the animation on repeated taps.
   const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
@@ -93,6 +107,15 @@ export function AproperMeuView({
       // ignore quota / private-mode errors
     }
   }, [radius]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(COOLTRA_STORAGE_KEY, cooltraOn ? '1' : '0');
+    } catch {
+      // ignore quota / private-mode errors
+    }
+  }, [cooltraOn]);
   const dragRef = useRef<{
     startY: number;
     startHeight: number;
@@ -246,6 +269,13 @@ export function AproperMeuView({
           {parades.length > 0 && (
             <>
               <FilterBar value={filtre} onChange={setFiltre} />
+              <div className="cooltra-toggle-row">
+                <CooltraToggle
+                  value={cooltraOn}
+                  onChange={setCooltraOn}
+                  count={cooltraOn ? cooltraVehicles.length : null}
+                />
+              </div>
               <ParadesAprop
                 parades={paradesFiltrades}
                 topN={TOP_N}
@@ -267,6 +297,7 @@ export function AproperMeuView({
           focusStopId={focusStop?.id ?? null}
           bottomInset={isMobile ? sheetHeight : 0}
           onRefresh={refresh}
+          cooltraVehicles={cooltraOn ? cooltraVehicles : []}
         />
         {!position && status !== 'requesting' && (
           <div className="map-hint">

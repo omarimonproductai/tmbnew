@@ -1848,3 +1848,120 @@ body {
   color: #1c1c1e;
   cursor: pointer;
 }
+
+/* --- Cooltra layer & toggle --- */
+.cooltra-toggle-row {
+  margin: 8px 0 4px;
+  display: flex;
+  justify-content: flex-start;
+}
+.cooltra-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #d6d6dc;
+  background: #fff;
+  color: #444;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.cooltra-toggle:hover { border-color: #b9b9c1; }
+.cooltra-toggle.on {
+  background: #00a651;
+  border-color: #00a651;
+  color: #fff;
+}
+.cooltra-toggle__emoji { font-size: 16px; line-height: 1; }
+.cooltra-toggle__count {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cooltra-marker {
+  background: transparent;
+  border: none;
+}
+.cooltra-marker__bubble {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #00a651;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 2px solid #fff;
+}
+
+.cooltra-cluster {
+  background: transparent;
+  border: none;
+}
+.cooltra-cluster__bubble {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #00a651;
+  color: #fff;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+.cooltra-cluster--sm .cooltra-cluster__bubble { font-size: 12px; }
+.cooltra-cluster--md .cooltra-cluster__bubble { font-size: 13px; }
+.cooltra-cluster--lg .cooltra-cluster__bubble { font-size: 14px; background: #008542; }
+
+.cooltra-popup {
+  min-width: 180px;
+  font-family: inherit;
+}
+.cooltra-popup__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.cooltra-popup__kind { font-weight: 700; font-size: 14px; }
+.cooltra-popup__plate {
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+  background: #f1f1f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.cooltra-popup__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 10px;
+}
+.cooltra-popup__model { font-size: 11px; color: #888; }
+.cooltra-popup__dir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #00a651;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  width: 100%;
+}
+.cooltra-popup__dir:hover { background: #008542; }
