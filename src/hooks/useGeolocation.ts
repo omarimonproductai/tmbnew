@@ -51,13 +51,47 @@ export function useGeolocation(autoRequest = true): UseGeolocationResult {
           setError(err.message);
         }
       },
-      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
+      // Force a fresh fix when the user explicitly asks for it.
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 },
     );
   }, []);
 
+  // Continuously watch the position so the user dot tracks movement
+  // without needing to tap "Actualitzar".
   useEffect(() => {
-    if (autoRequest) refresh();
-  }, [autoRequest, refresh]);
+    if (!autoRequest) return;
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setStatus('unavailable');
+      setError('Geolocalització no disponible al navegador.');
+      return;
+    }
+    setStatus('requesting');
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setAccuracy(pos.coords.accuracy);
+        setStatus('granted');
+        setError(null);
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setStatus('denied');
+          setError("Cal permís d'ubicació per a aquest mode.");
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setStatus('unavailable');
+          setError('No s’ha pogut obtenir la posició.');
+        } else if (err.code === err.TIMEOUT) {
+          setStatus('unavailable');
+          setError('S’ha esgotat el temps per obtenir la posició.');
+        } else {
+          setStatus('unavailable');
+          setError(err.message);
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [autoRequest]);
 
   return { position, accuracy, status, error, refresh };
 }
