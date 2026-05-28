@@ -3,9 +3,7 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { CooltraVehiclePopup } from './CooltraVehiclePopup';
-import { inferKind, type CooltraVehicle } from '../types/cooltra';
+import { inferKind, type CooltraKind, type CooltraVehicle } from '../types/cooltra';
 
 const BIKE_SVG = `
 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -25,7 +23,7 @@ const SCOOTER_SVG = `
   <path d="M11.5 12.5l2-4"/>
 </svg>`;
 
-function vehicleIcon(kind: 'scooter' | 'bike'): L.DivIcon {
+function vehicleIcon(kind: CooltraKind): L.DivIcon {
   const svg = kind === 'bike' ? BIKE_SVG : SCOOTER_SVG;
   return L.divIcon({
     className: `cooltra-marker cooltra-marker--${kind}`,
@@ -46,6 +44,36 @@ function clusterIcon(cluster: L.MarkerCluster): L.DivIcon {
     html: `<span class="cooltra-cluster__bubble">${count}</span>`,
     iconSize: size === 'lg' ? [44, 44] : size === 'md' ? [38, 38] : [32, 32],
   });
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function popupHtml(v: CooltraVehicle, kind: CooltraKind): string {
+  const label = kind === 'bike' ? '🚲 Bici Cooltra' : '🛵 Moto Cooltra';
+  const plate = escapeHtml(v.license_plate ?? '');
+  const model = escapeHtml(v.model_id ?? '');
+  const km = Math.round(v.range ?? 0);
+  const href = `https://www.google.com/maps/dir/?api=1&destination=${v.position.lat},${v.position.lon}`;
+  return (
+    `<div class="cooltra-popup">` +
+      `<div class="cooltra-popup__head">` +
+        `<span class="cooltra-popup__kind">${label}</span>` +
+        `<span class="cooltra-popup__plate">${plate}</span>` +
+      `</div>` +
+      `<div class="cooltra-popup__meta">` +
+        `<span>Autonomia: <strong>${km} km</strong></span>` +
+        `<span class="cooltra-popup__model">${model}</span>` +
+      `</div>` +
+      `<a class="cooltra-popup__dir" href="${href}" target="_blank" rel="noopener noreferrer">Com arribar-hi</a>` +
+    `</div>`
+  );
 }
 
 interface Props {
@@ -81,10 +109,7 @@ export function CooltraLayer({ vehicles }: Props) {
       const m = L.marker([v.position.lat, v.position.lon], {
         icon: vehicleIcon(kind),
       });
-      m.bindPopup(
-        renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
-        { autoPanPaddingTopLeft: [10, 90] },
-      );
+      m.bindPopup(() => popupHtml(v, kind), { autoPanPaddingTopLeft: [10, 90] });
       return m;
     });
     group.addLayers(markers);
