@@ -79,13 +79,14 @@ export function CooltraLayer({ vehicles }: Props) {
     const markers = vehicles
       .filter(
         (v) =>
-          v?.position &&
-          Number.isFinite(v.position.lat) &&
-          Number.isFinite(v.position.lon),
+          Array.isArray(v?.position) &&
+          Number.isFinite(v.position[0]) &&
+          Number.isFinite(v.position[1]),
       )
       .map((v) => {
         const kind = inferKind(v.model_id);
-        const m = L.marker([v.position.lat, v.position.lon], {
+        const [lng, lat] = v.position;
+        const m = L.marker([lat, lng], {
           icon: vehicleIcon(kind),
         });
         m.bindPopup(
