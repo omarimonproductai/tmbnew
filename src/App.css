@@ -1954,7 +1954,7 @@ body {
   display: flex;
   flex-direction: column;
   border-right: 1px solid #e0e0e0;
-  overflow: auto;
+  overflow-y: auto;
   max-height: 100%;
 }
 @media (max-width: 640px) {
@@ -1963,11 +1963,17 @@ body {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #e0e0e0;
+    /* Track the form's natural height so the map keeps the rest of the
+     * viewport. overflow stays visible so the dropdown can grow without
+     * inflating the panel itself. */
     flex: 0 0 auto;
-    max-height: 55vh;
+    max-height: none;
+    overflow: visible;
   }
   .planner-form { padding: 12px; gap: 8px; }
   .planner-search-btn { padding: 9px 12px; font-size: 13px; }
+  /* Cap the dropdown so a long list does not push the map off-screen. */
+  .planner-dropdown { max-height: 240px; }
 }
 
 .planner-form {
@@ -2214,21 +2220,32 @@ body {
   position: absolute;
   top: 12px;
   left: 12px;
-  right: 12px;
   background: rgba(28,28,30,0.92);
   color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  z-index: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: border-radius 0.15s;
+}
+.planner-summary-chip.open {
   border-radius: 12px;
   padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-  z-index: 500;
+  max-width: calc(100% - 24px);
 }
-.planner-summary-duration { font-size: 22px; font-weight: 800; line-height: 1; }
-.planner-summary-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
-.planner-summary-arrival { font-weight: 600; }
+.planner-summary-duration { font-size: 18px; font-weight: 800; line-height: 1; }
+.planner-summary-chip.open .planner-summary-duration { font-size: 22px; }
+.planner-summary-meta { display: inline-flex; flex-direction: column; gap: 1px; min-width: 0; }
+.planner-summary-arrival { font-weight: 600; font-size: 13px; }
 .planner-summary-line { font-size: 11px; color: rgba(255,255,255,0.75); }
+.planner-summary-chev { color: rgba(255,255,255,0.75); flex-shrink: 0; }
 
 .planner-recenter-btn {
   position: absolute;
