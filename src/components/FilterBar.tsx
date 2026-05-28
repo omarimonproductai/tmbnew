@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { FilterType } from '../hooks/useLinies';
 
 const FILTERS: { value: FilterType; label: string }[] = [
@@ -9,9 +10,10 @@ const FILTERS: { value: FilterType; label: string }[] = [
 interface Props {
   value: FilterType;
   onChange: (v: FilterType) => void;
+  extra?: ReactNode;
 }
 
-export function FilterBar({ value, onChange }: Props) {
+export function FilterBar({ value, onChange, extra }: Props) {
   return (
     <div className="filters" role="tablist" aria-label="Filtre per tipus de transport">
       {FILTERS.map((f) => (
@@ -26,6 +28,7 @@ export function FilterBar({ value, onChange }: Props) {
           {f.label}
         </button>
       ))}
+      {extra}
     </div>
   );
 }

@@ -268,14 +268,17 @@ export function AproperMeuView({
           )}
           {parades.length > 0 && (
             <>
-              <FilterBar value={filtre} onChange={setFiltre} />
-              <div className="cooltra-toggle-row">
-                <CooltraToggle
-                  value={cooltraOn}
-                  onChange={setCooltraOn}
-                  count={cooltraOn ? cooltraVehicles.length : null}
-                />
-              </div>
+              <FilterBar
+                value={filtre}
+                onChange={setFiltre}
+                extra={
+                  <CooltraToggle
+                    value={cooltraOn}
+                    onChange={setCooltraOn}
+                    count={cooltraOn ? cooltraVehicles.length : null}
+                  />
+                }
+              />
               <ParadesAprop
                 parades={paradesFiltrades}
                 topN={TOP_N}
