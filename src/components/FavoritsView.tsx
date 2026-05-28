@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CooltraToggle } from './CooltraToggle';
+import { CooltraMapButton } from './CooltraMapButton';
 import { DirectionsButton } from './DirectionsButton';
 import { FavMap } from './FavMap';
 import { FavStar } from './FavStar';
@@ -164,18 +164,18 @@ export function FavoritsView({ onOpenLine }: Props) {
 
       {view === 'map' && favParades.length > 0 ? (
         <div className="favorits-map">
-          <div className="favorits-map-controls">
-            <CooltraToggle
-              value={cooltraOn}
-              onChange={setCooltraOn}
-              count={cooltraOn ? cooltraVehicles.length : null}
-            />
-          </div>
           <FavMap
             parades={orderedParades}
             userPosition={position}
             cooltraVehicles={cooltraOn ? cooltraVehicles : []}
           />
+          <div className="cooltra-map-control">
+            <CooltraMapButton
+              value={cooltraOn}
+              onChange={setCooltraOn}
+              count={cooltraOn ? cooltraVehicles.length : null}
+            />
+          </div>
         </div>
       ) : (
         <div className="favorits-scroll">

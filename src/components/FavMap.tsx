@@ -30,7 +30,7 @@ export function FavMap({ parades, userPosition, cooltraVehicles = [] }: Props) {
       zoom={13}
       className="map-container"
       scrollWheelZoom
-      {...(rotateOptions() as Record<string, unknown>)}
+      {...(rotateOptions('bottomleft') as Record<string, unknown>)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

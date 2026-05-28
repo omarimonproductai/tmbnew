@@ -1744,14 +1744,43 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
 }
-.favorits-map { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
-.favorits-map-controls {
-  display: flex;
-  gap: 6px;
-  padding: 8px 12px;
+.favorits-map { flex: 1; min-height: 0; position: relative; }
+.cooltra-map-control {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 500;
+}
+.cooltra-map-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background: #fff;
-  border-bottom: 1px solid #eee;
-  flex-shrink: 0;
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #666;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.15s, color 0.15s;
+}
+.cooltra-map-btn:hover { color: #1098f0; }
+.cooltra-map-btn.active {
+  background: #1098f0;
+  color: #fff;
+}
+.cooltra-map-btn__count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #1c1c1e;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* PWA install invitation */
@@ -1857,26 +1886,7 @@ body {
   cursor: pointer;
 }
 
-/* --- Cooltra layer & toggle --- */
-.filter-btn--cooltra {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.filter-btn--cooltra:hover { border-color: #1098f0; color: #1098f0; }
-.filter-btn--cooltra.active {
-  background: #1098f0;
-  border-color: #1098f0;
-  color: #fff;
-}
-.filter-btn__count {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  padding: 0 6px;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-
+/* --- Cooltra layer popup --- */
 .cooltra-popup {
   min-width: 180px;
   font-family: inherit;
