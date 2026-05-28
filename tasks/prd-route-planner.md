@@ -50,19 +50,25 @@ ara mateix" sense haver de sortir de l'app a Google Maps.
    - **Línies** (existent)
    - **Aprop meu** (existent)
    - **Favorits** (existent)
-2. Es revisen les **icones dels 4 modes** per donar coherència visual
-   (proposta: Ruta = fletxa de navegació / via, Línies = icona metro+bus,
-   Aprop meu = radar 🎯, Favorits = estrella ⭐). El mock final es decideix
-   abans d'implementar.
-3. El mode "Ruta" arrenca obert sense destí, amb el camp "Des d'on"
+2. Es revisen les **icones dels 4 modes** per donar coherència visual:
+   - Ruta = fletxa de navegació
+   - Línies = bus+rectangle metro
+   - Aprop meu = radar concèntric 🎯
+   - Favorits = estrella ⭐
+3. **Mode labels al header**: a mòbil només es mostra la icona (estalvi
+   d'espai); a tablet/desktop es manté el text sota o al costat de la
+   icona.
+4. El mode "Ruta" arrenca obert sense destí, amb el camp "Des d'on"
    pre-emplenat automàticament amb la ubicació actual i el camp "Cap a on"
    buit i amb focus.
 
 ### 4.2 Entrada A → B
 
-4. **Camp "Des d'on"**: per defecte = "La meva ubicació" (icona blau, com a
-   `LocationBlock`). L'usuari pot tocar-lo per substituir-lo per una adreça
-   escrita igual que el destí.
+5. **Camp "Des d'on"**: per defecte = "La meva ubicació" (dot blau, com a
+   `LocationBlock`). **És editable**: l'usuari pot substituir-lo per una
+   adreça escrita o un suggeriment Photon, igual que el camp de destí. El
+   text "La meva ubicació" es manté com a placeholder fins que es comença
+   a escriure.
 5. **Camp "Cap a on"**: autocomplete que fa una petició a Photon (via proxy
    CF) per cada lletra escrita, amb **debounce de 300ms**, mínim **3
    caràcters** abans d'enviar.
@@ -141,6 +147,27 @@ ara mateix" sense haver de sortir de l'app a Google Maps.
     480m caminant". No més detall textual — la informació detallada viu
     als popups.
 21. El mapa fa fit-bounds sobre la ruta sencera al carregar el resultat.
+22. **Botó "Recentrar"** flotant al mapa (cantonada inferior dreta del
+    contenidor) que torna a fer fit-bounds sobre la ruta sencera quan
+    l'usuari ha mogut o ampliat el mapa.
+
+### 4.6.bis Flota Cooltra al voltant del destí
+
+23. Al carregar un resultat, es mostren automàticament al mapa els
+    vehicles Cooltra (motos blaves, bicis verdes — mateix patró que
+    `CooltraLayer`) que estiguin **dins d'un radi de 200m del destí**.
+24. Es reutilitza el hook `useCooltraVehicles` ja existent (sense necessitat
+    de toggle aquí; sempre actiu al planner). El filtre per distància es fa
+    al client amb `haversine()`.
+25. Aquests vehicles es renderitzen com a punts mini (Ø14, com a la resta
+    de l'app) i, en fer-hi clic, mostren el popup Cooltra estàndard amb
+    "Reserva gratis".
+26. La idea és oferir-li a l'usuari una alternativa de "last-mile" en
+    arribar: després de baixar del transport públic, potser pot agafar una
+    moto/bici Cooltra per acabar el trajecte.
+27. El toggle global Cooltra (de les altres vistes) **no apareix** al mode
+    "Ruta". L'única manera de fer aparèixer Cooltra al planner és tenir
+    un destí amb vehicles a la rodona — apareixen sense intervenció.
 
 ### 4.7 Estats i errors
 
@@ -173,8 +200,9 @@ ara mateix" sense haver de sortir de l'app a Google Maps.
 - **Suggeriments de ruta múltiples vs una sola** — no s'inclou una segona
   opció diferent del set de 3 tabs. No hi haurà una llista scrollable de
   tots els itineraris que tornaria OTP.
-- **Bici / patinet** — ni com a mode propi ni com a integració amb Cooltra
-  (això podria ser una iteració futura).
+- **Bici / patinet** com a mode propi del càlcul (TMB Planner no en disposa).
+  La integració amb Cooltra es limita a mostrar-ne els vehicles a 200m del
+  destí (veure 4.6.bis); no s'integra al càlcul de la ruta.
 - **Cotxe / taxi** — fora del propòsit de l'app.
 - **Compra d'entrades / preus de trajecte**.
 - **Notificacions push** ("ara mateix arriba el teu V15") — fora d'aquest
@@ -254,7 +282,19 @@ ara mateix" sense haver de sortir de l'app a Google Maps.
 - **Tests**: cobertura mínima per als components `RouteSearchForm`,
   `RoutePlanTabs`, el hook `useRoutePlan` (mockejant fetch).
 
-## 9. Open Questions
+## 9. Decisions tancades
+
+- **Icones dels 4 modes**: fletxa de navegació / bus+rectangle / radar
+  concèntric / estrella. Validades al mockup `mockup-route-planner.html`.
+- **Mode labels al header**: només icona a mòbil, icona+text a tablet/desktop.
+- **Tornar a planificar**: no hi ha botó dedicat. L'usuari edita els camps
+  per refer la cerca.
+- **Origen "La meva ubicació"** és editable per a una adreça arbitrària.
+- **Botó "Recentrar"** al mapa: SÍ (cantonada inferior dreta).
+- **Cooltra al planner**: NO toggle, però SÍ visualització automàtica de
+  vehicles a 200m del destí com a opció de last-mile.
+
+## 10. Open Questions
 
 1. **Última ruta**: persistim entre sessions o només dins la mateixa sessió?
    Proposta: només sessió (es perd si tanques pestanya), per no obrir
@@ -262,17 +302,16 @@ ara mateix" sense haver de sortir de l'app a Google Maps.
 2. **3a tab "Menys camí"**: és realment útil si la diferència de caminar
    amb la més ràpida és <100m? Heurística: si el delta de caminar entre
    les 3 alternatives és <100m, només mostrem 2 tabs.
-3. **Cooltra dins el planner**: la v2 podria incloure "agafa una moto
-   Cooltra fins aquí en lloc del bus", però per la v1 queda fora.
-4. **Indicacions pas a pas** del tram WALK: el frontend rep `steps[]` però
+3. **Indicacions pas a pas** del tram WALK: el frontend rep `steps[]` però
    no els pinta. ¿Cal aprofundir en una versió posterior?
-5. **Icones noves dels modes** (Ruta, Línies, Aprop meu): cal una passada
-   de disseny abans de tocar codi. Es genera un mockup HTML primer.
-6. **Filtres més fins**: només Metro i Bus a l'MVP. Tram, FGC, Rodalies,
+4. **Filtres més fins**: només Metro i Bus a l'MVP. Tram, FGC, Rodalies,
    Bus turístic… ¿s'inclouen en una futura iteració?
-7. **Història com a chips ràpids** vs dropdown: a la v1 fem dropdown quan
+5. **Història com a chips ràpids** vs dropdown: a la v1 fem dropdown quan
    el camp està buit. Es podria evolucionar a chips de "destins
    freqüents" sobre el form.
-8. **A → A**: que passa si l'usuari posa origen i destí iguals (o molt
+6. **A → A**: què passa si l'usuari posa origen i destí iguals (o molt
    propers, p.ex. mateixa parada)? Mostrar missatge "Ja estàs aquí" sense
    anar a TMB.
+7. **Radi Cooltra de 200m**: és el valor inicial. Si l'experiència indica
+   que cal ampliar (zona residencial sense vehicles) o reduir (zona
+   plena), parametritzem.
