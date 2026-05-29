@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LineHeaderBanner } from './LineHeaderBanner';
@@ -10,7 +11,9 @@ import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
 import { ViewToggle, type ViewMode } from './ViewToggle';
+import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
+import { inferKind } from '../types/cooltra';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useLinies } from '../hooks/useLinies';
 import { useParades } from '../hooks/useParades';
@@ -73,6 +76,7 @@ export function LiniesView({
   const [sortMode, setSortMode] = useState<SortMode>('proximity');
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
   const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
+  const cooltraKinds = useCooltraKindFilters();
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -226,6 +230,14 @@ export function LiniesView({
     return out;
   }, [seleccio, vehiclesData, parades]);
 
+  const visibleCooltra = useMemo(() => {
+    if (!cooltraOn) return [];
+    return cooltraVehicles.filter((v) => {
+      const kind = inferKind(v.model_id);
+      return kind === 'scooter' ? cooltraKinds.motos : cooltraKinds.bikes;
+    });
+  }, [cooltraOn, cooltraVehicles, cooltraKinds.motos, cooltraKinds.bikes]);
+
   const liniaAmbParades: Linia | null = seleccio
     ? { ...seleccio, numParades: parades.length || seleccio.numParades }
     : null;
@@ -297,7 +309,7 @@ export function LiniesView({
             correspondencesPerParada={metroCorrespondencesPerParada}
             userPosition={userPosition}
             focusPoint={mapFocus}
-            cooltraVehicles={cooltraOn ? cooltraVehicles : []}
+            cooltraVehicles={visibleCooltra}
           />
         ) : (
           <LineListView
@@ -313,10 +325,20 @@ export function LiniesView({
         {seleccio && (
           <div className="map-controls-stack">
             {viewMode === 'map' && (
-              <CooltraMapButton
-                value={cooltraOn}
-                onChange={setCooltraOn}
-              />
+              <>
+                <CooltraMapButton
+                  value={cooltraOn}
+                  onChange={setCooltraOn}
+                />
+                {cooltraOn && (
+                  <CooltraKindFilters
+                    motos={cooltraKinds.motos}
+                    bikes={cooltraKinds.bikes}
+                    onMotosChange={cooltraKinds.setMotos}
+                    onBikesChange={cooltraKinds.setBikes}
+                  />
+                )}
+              </>
             )}
             <RefreshControl onRefresh={refreshVehicles} />
             <VehicleVisibilityToggle
@@ -332,6 +354,14 @@ export function LiniesView({
               value={cooltraOn}
               onChange={setCooltraOn}
             />
+            {cooltraOn && (
+              <CooltraKindFilters
+                motos={cooltraKinds.motos}
+                bikes={cooltraKinds.bikes}
+                onMotosChange={cooltraKinds.setMotos}
+                onBikesChange={cooltraKinds.setBikes}
+              />
+            )}
           </div>
         )}
         {seleccio && paradesLoading && (

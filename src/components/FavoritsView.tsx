@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { DirectionsButton } from './DirectionsButton';
 import { FavMap } from './FavMap';
 import { FavStar } from './FavStar';
+import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
+import { inferKind } from '../types/cooltra';
 import { useFavorits } from '../hooks/useFavorits';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useTempsReal } from '../hooks/useTempsReal';
@@ -50,6 +53,14 @@ export function FavoritsView({ onOpenLine }: Props) {
   const [view, setView] = useState<FavView>('list');
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
   const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
+  const cooltraKinds = useCooltraKindFilters();
+  const visibleCooltra = useMemo(() => {
+    if (!cooltraOn) return [];
+    return cooltraVehicles.filter((v) => {
+      const kind = inferKind(v.model_id);
+      return kind === 'scooter' ? cooltraKinds.motos : cooltraKinds.bikes;
+    });
+  }, [cooltraOn, cooltraVehicles, cooltraKinds.motos, cooltraKinds.bikes]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -167,13 +178,21 @@ export function FavoritsView({ onOpenLine }: Props) {
           <FavMap
             parades={orderedParades}
             userPosition={position}
-            cooltraVehicles={cooltraOn ? cooltraVehicles : []}
+            cooltraVehicles={visibleCooltra}
           />
           <div className="cooltra-map-control">
             <CooltraMapButton
               value={cooltraOn}
               onChange={setCooltraOn}
             />
+            {cooltraOn && (
+              <CooltraKindFilters
+                motos={cooltraKinds.motos}
+                bikes={cooltraKinds.bikes}
+                onMotosChange={cooltraKinds.setMotos}
+                onBikesChange={cooltraKinds.setBikes}
+              />
+            )}
           </div>
         </div>
       ) : (

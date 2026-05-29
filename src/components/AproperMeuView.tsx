@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
+import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
 import { ParadesAprop } from './ParadesAprop';
 import { Toast } from './Toast';
+import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { inferKind } from '../types/cooltra';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
@@ -73,6 +76,14 @@ export function AproperMeuView({
   const [filtre, setFiltre] = useState<FilterType>('tots');
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
   const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
+  const cooltraKinds = useCooltraKindFilters();
+  const visibleCooltra = useMemo(() => {
+    if (!cooltraOn) return [];
+    return cooltraVehicles.filter((v) => {
+      const kind = inferKind(v.model_id);
+      return kind === 'scooter' ? cooltraKinds.motos : cooltraKinds.bikes;
+    });
+  }, [cooltraOn, cooltraVehicles, cooltraKinds.motos, cooltraKinds.bikes]);
   // A list tap "winks" the matching map marker. The nonce lets the same
   // stop re-trigger the animation on repeated taps.
   const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
@@ -290,13 +301,21 @@ export function AproperMeuView({
           focusStopId={focusStop?.id ?? null}
           bottomInset={isMobile ? sheetHeight : 0}
           onRefresh={refresh}
-          cooltraVehicles={cooltraOn ? cooltraVehicles : []}
+          cooltraVehicles={visibleCooltra}
         />
         <div className="cooltra-map-control">
           <CooltraMapButton
             value={cooltraOn}
             onChange={setCooltraOn}
           />
+          {cooltraOn && (
+            <CooltraKindFilters
+              motos={cooltraKinds.motos}
+              bikes={cooltraKinds.bikes}
+              onMotosChange={cooltraKinds.setMotos}
+              onBikesChange={cooltraKinds.setBikes}
+            />
+          )}
         </div>
         {!position && status !== 'requesting' && (
           <div className="map-hint">
