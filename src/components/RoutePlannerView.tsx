@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PlannerEmptyState } from './PlannerEmptyState';
+import { RouteCompactSummary } from './RouteCompactSummary';
+import { RoutePlanListView } from './RoutePlanListView';
 import { RoutePlanMap } from './RoutePlanMap';
 import { RoutePlanTabs } from './RoutePlanTabs';
 import { RouteSearchForm } from './RouteSearchForm';
@@ -13,8 +15,10 @@ import type { GeocodeResult } from '../types/geocode';
 import type { Itinerary } from '../types/planner';
 
 const SAME_PLACE_METERS = 50;
-const COOLTRA_RADIUS_METERS = 200;
+const COOLTRA_RADIUS_METERS = 300;
 const PLANNER_SEED_KEY = 'tmb-planner-seed-v1';
+
+type ResultView = 'map' | 'list';
 
 interface SeedDestination {
   name: string;
@@ -49,6 +53,8 @@ export function RoutePlannerView() {
   const [destination, setDestination] = useState<GeocodeResult | null>(null);
   const [activeItineraryIdx, setActiveItineraryIdx] = useState(0);
   const [lastSearch, setLastSearch] = useState<SearchSnapshot | null>(null);
+  const [resultView, setResultView] = useState<ResultView>('map');
+  const [formEditing, setFormEditing] = useState(false);
 
   const history = usePlannerHistory();
   const modes = usePlannerModes();
@@ -104,6 +110,7 @@ export function RoutePlannerView() {
       lng: destination.lng,
     });
     setActiveItineraryIdx(0);
+    setFormEditing(false);
     setLastSearch({
       originId: origin.id,
       destinationId: destination.id,
@@ -168,23 +175,34 @@ export function RoutePlannerView() {
 
   const noGps = geoStatus === 'denied' || geoStatus === 'unavailable';
 
+  const hasResult = itineraries.length > 0 && resultFresh;
+  const showCompactForm = hasResult && !formEditing;
+
   return (
     <main className="app-main planner-main">
       <aside className="panel planner-panel">
-        <RouteSearchForm
-          origin={origin}
-          destination={destination}
-          onOriginChange={setOrigin}
-          onDestinationChange={setDestination}
-          onSwap={handleSwap}
-          modes={modes}
-          history={history.list}
-          onSearch={handleSearch}
-          canSearch={canSearch}
-          noGps={noGps}
-          samePlace={samePlace}
-          hideSearchButton={resultFresh}
-        />
+        {showCompactForm ? (
+          <RouteCompactSummary
+            origin={origin}
+            destination={destination}
+            onEdit={() => setFormEditing(true)}
+          />
+        ) : (
+          <RouteSearchForm
+            origin={origin}
+            destination={destination}
+            onOriginChange={setOrigin}
+            onDestinationChange={setDestination}
+            onSwap={handleSwap}
+            modes={modes}
+            history={history.list}
+            onSearch={handleSearch}
+            canSearch={canSearch}
+            noGps={noGps}
+            samePlace={samePlace}
+            hideSearchButton={resultFresh}
+          />
+        )}
         {itineraries.length > 0 && (
           <RoutePlanTabs
             itineraries={itineraries}
@@ -193,7 +211,7 @@ export function RoutePlannerView() {
           />
         )}
       </aside>
-      <section className="map-area" aria-label="Mapa del trajecte">
+      <section className="map-area" aria-label="Resultat de la ruta">
         {plan.loading ? (
           <PlannerEmptyState kind="loading" />
         ) : plan.error ? (
@@ -201,12 +219,41 @@ export function RoutePlannerView() {
         ) : itineraries.length === 0 && plan.data ? (
           <PlannerEmptyState kind="no-route" />
         ) : activeItinerary ? (
-          <RoutePlanMap
-            origin={origin}
-            destination={destination}
-            itinerary={activeItinerary}
-            cooltraVehiclesNearDest={cooltraNearDest}
-          />
+          <>
+            {resultView === 'map' ? (
+              <RoutePlanMap
+                origin={origin}
+                destination={destination}
+                itinerary={activeItinerary}
+                cooltraVehiclesNearDest={cooltraNearDest}
+              />
+            ) : (
+              <div className="planner-list-scroll">
+                <RoutePlanListView itinerary={activeItinerary} />
+              </div>
+            )}
+            <button
+              type="button"
+              className="planner-view-toggle"
+              onClick={() => setResultView((v) => (v === 'map' ? 'list' : 'map'))}
+              aria-label={resultView === 'map' ? 'Veure la ruta com a llista' : 'Veure la ruta al mapa'}
+              title={resultView === 'map' ? 'Veure com a llista' : 'Veure al mapa'}
+            >
+              {resultView === 'map' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+                  <line x1="8" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="20" y2="12" /><line x1="8" y1="18" x2="20" y2="18" />
+                  <circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none" />
+                  <circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none" />
+                  <circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20 3 7" />
+                  <line x1="9" y1="4" x2="9" y2="17" /><line x1="15" y1="7" x2="15" y2="20" />
+                </svg>
+              )}
+            </button>
+          </>
         ) : (
           <PlannerEmptyState kind="idle" />
         )}

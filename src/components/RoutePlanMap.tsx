@@ -64,12 +64,6 @@ function legGeometryPoints(leg: Leg): [number, number][] {
   ];
 }
 
-function formatTime(epochMs: number): string {
-  if (!epochMs) return '';
-  const d = new Date(epochMs);
-  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-}
-
 function modeLabel(mode: LegMode): string {
   switch (mode) {
     case 'METRO':
@@ -193,9 +187,6 @@ export function RoutePlanMap({
                     {leg.headsign && <span> cap a {leg.headsign}</span>}
                   </div>
                 )}
-                <div className="leg-popup__time">
-                  Sortida {formatTime(leg.startTime)}
-                </div>
               </div>
             </Popup>
           </CircleMarker>
@@ -221,7 +212,6 @@ export function RoutePlanMap({
               <div className="leg-popup">
                 <div className="leg-popup__head">Baixa</div>
                 <div className="leg-popup__where">{last.to.name}</div>
-                <div className="leg-popup__time">{formatTime(last.endTime)}</div>
               </div>
             </Popup>
           </CircleMarker>
@@ -235,7 +225,6 @@ export function RoutePlanMap({
             <div className="leg-popup">
               <div className="leg-popup__head">Arribada</div>
               <div className="leg-popup__where">{destination.name}</div>
-              <div className="leg-popup__time">{formatTime(itinerary.endTime)}</div>
             </div>
           </Popup>
         </Marker>
@@ -253,7 +242,12 @@ function SummaryChip({ itinerary }: { itinerary: Itinerary }) {
   const [open, setOpen] = useState(false);
   const minutes = Math.round(itinerary.duration / 60);
   const walkM = Math.round(itinerary.walkDistance);
-  const arrival = formatTime(itinerary.endTime);
+  // Compute arrival from now+duration rather than trusting OTP's absolute
+  // endTime, which can drift when the upstream server's clock isn't aligned.
+  const arrival = (() => {
+    const eta = new Date(Date.now() + itinerary.duration * 1000);
+    return `${eta.getHours().toString().padStart(2, '0')}:${eta.getMinutes().toString().padStart(2, '0')}`;
+  })();
   return (
     <button
       type="button"
