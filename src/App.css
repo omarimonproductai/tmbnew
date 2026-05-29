@@ -1978,19 +1978,26 @@ body {
 @media (max-width: 640px) {
   .planner-main { flex-direction: column; }
   .planner-panel {
+    /* Override the inherited mobile .panel rule (height: 55vh + display: none)
+     * intended for the Aprop-meu bottom-sheet. The planner panel must track
+     * its content so the map keeps the rest of the viewport. */
+    height: auto;
     width: 100%;
     border-right: none;
+    border-top: none;
     border-bottom: 1px solid #e0e0e0;
-    /* Track the form's natural height so the map keeps the rest of the
-     * viewport. overflow stays visible so the dropdown can grow without
-     * inflating the panel itself. */
     flex: 0 0 auto;
     max-height: none;
     overflow: visible;
+    display: flex;
+  }
+  .planner-main .map-area {
+    /* Same mobile .panel rule also forces map-area height to 100% — drop it
+     * here so flex: 1 can distribute the leftover viewport. */
+    height: auto;
   }
   .planner-form { padding: 12px; gap: 8px; }
   .planner-search-btn { padding: 9px 12px; font-size: 13px; }
-  /* Cap the dropdown so a long list does not push the map off-screen. */
   .planner-dropdown { max-height: 240px; }
 }
 
