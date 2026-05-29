@@ -1944,7 +1944,7 @@ body {
   mask-size: contain;
   flex-shrink: 0;
 }
-.cooltra-glyph--moto {
+.cooltra-glyph--scooter {
   -webkit-mask-image: url('/cooltra-moto.png');
   mask-image: url('/cooltra-moto.png');
 }
