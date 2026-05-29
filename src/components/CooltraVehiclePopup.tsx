@@ -14,16 +14,18 @@ const BIKE_ICON = (
     viewBox="0 0 24 24"
     fill="none"
     stroke={ICON_COLOR}
-    strokeWidth={1.8}
+    strokeWidth={1.6}
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
   >
-    <circle cx="5.5" cy="17.5" r="3.5" />
-    <circle cx="18.5" cy="17.5" r="3.5" />
-    <path d="M5.5 17.5 10 9h5l3.5 8.5" />
-    <path d="M10 9l-2-3h2" />
-    <path d="M15 9V6h-1" />
+    <circle cx="5.5" cy="17" r="3" />
+    <circle cx="18.5" cy="17" r="3" />
+    <path d="M5.5 17 8 13.5l3 3.5" />
+    <path d="M11 17l3.5-6" />
+    <path d="M14.5 11l4 6" />
+    <rect x="14" y="8" width="5" height="3" rx="0.4" />
+    <path d="M16 8V6.5" />
   </svg>
 );
 
@@ -34,16 +36,16 @@ const SCOOTER_ICON = (
     viewBox="0 0 24 24"
     fill="none"
     stroke={ICON_COLOR}
-    strokeWidth={1.8}
+    strokeWidth={1.6}
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
   >
-    <circle cx="5.5" cy="17.5" r="3" />
-    <circle cx="18.5" cy="17.5" r="3" />
-    <path d="M5.5 17.5h6l2-5h4" />
-    <path d="M17.5 12.5l1-5h-3" />
-    <path d="M11.5 12.5l2-4" />
+    <circle cx="5" cy="17.5" r="2.5" />
+    <circle cx="19" cy="17.5" r="2.5" />
+    <path d="M5 17.5h4l3-3 3 1.5h4" />
+    <path d="M12 14.5l-2.5-4h-2" />
+    <path d="M16 10h3l-1.5 3" />
   </svg>
 );
 
