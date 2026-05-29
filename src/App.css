@@ -2274,7 +2274,7 @@ body {
 
 .planner-recenter-btn {
   position: absolute;
-  bottom: 16px;
+  bottom: 70px;
   right: 16px;
   z-index: 500;
 }
@@ -2284,11 +2284,11 @@ body {
   background: white;
   border: none;
   display: grid; place-items: center;
-  color: #555;
+  color: #1d7df2;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-.planner-recenter-btn button:hover { color: #1c1c1e; }
+.planner-recenter-btn button:hover { color: #0a6ed1; transform: scale(1.04); }
 
 .planner-dest-pin { background: transparent; border: none; }
 .planner-dest-pin__bubble {
@@ -2386,7 +2386,7 @@ body {
 .planner-view-toggle {
   position: absolute;
   bottom: 16px;
-  right: 70px;
+  right: 16px;
   width: 40px;
   height: 40px;
   border-radius: 50%;

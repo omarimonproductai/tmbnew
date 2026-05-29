@@ -109,7 +109,7 @@ export function RoutePlanMap({
       zoom={14}
       className="map-container"
       scrollWheelZoom
-      {...(rotateOptions('bottomleft') as Record<string, unknown>)}
+      {...(rotateOptions('topright') as Record<string, unknown>)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
