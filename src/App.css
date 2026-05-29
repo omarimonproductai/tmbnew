@@ -1796,7 +1796,7 @@ body {
   filter: grayscale(0.4);
   transition: opacity 0.15s, filter 0.15s;
 }
-.cooltra-map-btn.active { box-shadow: 0 0 0 2px #1098f0, 0 2px 6px rgba(0, 0, 0, 0.25); }
+.cooltra-map-btn.active { box-shadow: 0 0 0 2px #3080e0, 0 2px 6px rgba(0, 0, 0, 0.25); }
 .cooltra-map-btn.active .cooltra-map-btn__logo {
   opacity: 1;
   filter: none;
@@ -1938,7 +1938,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #1098f0;
+  background: #3080e0;
   color: #fff;
   text-decoration: none;
   padding: 8px 12px;
@@ -1947,7 +1947,7 @@ body {
   font-size: 13px;
   width: 100%;
 }
-.cooltra-popup__cta:hover { background: #0a7bc4; }
+.cooltra-popup__cta:hover { background: #2470c8; }
 .leaflet-popup-content .cooltra-popup__cta,
 .leaflet-popup-content .cooltra-popup__cta:visited,
 .leaflet-popup-content .cooltra-popup__cta:hover {

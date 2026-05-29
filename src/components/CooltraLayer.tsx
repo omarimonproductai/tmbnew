@@ -7,7 +7,7 @@ import { inferKind, type CooltraKind, type CooltraVehicle } from '../types/coolt
 
 const COLORS: Record<CooltraKind, string> = {
   bike: '#ffffff',
-  scooter: '#1098f0',
+  scooter: '#3080e0',
 };
 const BORDER = '#04fc04';
 

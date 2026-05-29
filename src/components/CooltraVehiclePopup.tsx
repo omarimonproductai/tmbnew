@@ -5,7 +5,7 @@ interface Props {
   kind: CooltraKind;
 }
 
-const ICON_COLOR = '#1098f0';
+const ICON_COLOR = '#3080e0';
 
 const BIKE_ICON = (
   <svg
