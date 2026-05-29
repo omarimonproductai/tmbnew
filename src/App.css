@@ -1930,6 +1930,32 @@ body {
   cursor: pointer;
 }
 
+/* --- Cooltra vehicle silhouette glyphs (mask-based, recolourable) --- */
+.cooltra-glyph {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  flex-shrink: 0;
+}
+.cooltra-glyph--moto {
+  -webkit-mask-image: url('/cooltra-moto.png');
+  mask-image: url('/cooltra-moto.png');
+}
+.cooltra-glyph--bike {
+  -webkit-mask-image: url('/cooltra-bike.png');
+  mask-image: url('/cooltra-bike.png');
+}
+.cooltra-glyph--white { color: #fff; }
+.cooltra-glyph--blue { color: #3080e0; }
+.cooltra-glyph--green { color: #00c853; }
+
 /* --- Cooltra map pin markers (DivIcon) --- */
 .cooltra-pin {
   background: transparent;
