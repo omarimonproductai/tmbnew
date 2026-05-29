@@ -5,44 +5,35 @@ interface Props {
   onChange: (m: ViewMode) => void;
 }
 
+// Single round button: shows the icon of the OTHER view. Tapping flips.
 export function ViewToggle({ value, onChange }: Props) {
+  const isMap = value === 'map';
+  const next: ViewMode = isMap ? 'list' : 'map';
   return (
-    <div className="view-toggle" role="tablist" aria-label="Vista de la línia">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'map'}
-        className={value === 'map' ? 'active' : ''}
-        onClick={() => onChange('map')}
-      >
-        <MapIcon />
-        <span>Mapa</span>
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'list'}
-        className={value === 'list' ? 'active' : ''}
-        onClick={() => onChange('list')}
-      >
-        <ListIcon />
-        <span>Llista</span>
-      </button>
-    </div>
+    <button
+      type="button"
+      className="view-toggle-btn"
+      onClick={() => onChange(next)}
+      aria-label={isMap ? 'Veure com a llista' : 'Veure al mapa'}
+      title={isMap ? 'Veure com a llista' : 'Veure al mapa'}
+    >
+      {isMap ? <ListIcon /> : <MapIcon />}
+    </button>
   );
 }
 
 function MapIcon() {
   return (
     <svg
-      width="14"
-      height="14"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M9 3 L3 6 L3 21 L9 18 L15 21 L21 18 L21 3 L15 6 Z" />
       <line x1="9" y1="3" x2="9" y2="18" />
@@ -54,14 +45,15 @@ function MapIcon() {
 function ListIcon() {
   return (
     <svg
-      width="14"
-      height="14"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <line x1="9" y1="6" x2="21" y2="6" />
       <line x1="9" y1="12" x2="21" y2="12" />

@@ -1135,34 +1135,22 @@ body {
   left: 60px;
   z-index: 500;
 }
-.view-toggle {
-  display: inline-flex;
+.view-toggle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   background: white;
-  border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  padding: 3px;
-  gap: 2px;
-  font-family: inherit;
-}
-.view-toggle button {
-  background: transparent;
   border: none;
   color: #555;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 999px;
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   font-family: inherit;
+  transition: transform 0.1s ease, color 0.15s ease;
 }
-.view-toggle button:hover:not(.active) { background: #fafafa; }
-.view-toggle button.active {
-  background: #fff8e1;
-  color: #c8001e;
-}
+.view-toggle-btn:hover { color: #1c1c1e; transform: scale(1.04); }
+.view-toggle-btn:active { transform: scale(0.96); }
 
 /* --- Line list view --- */
 .line-list-view {
@@ -1639,8 +1627,6 @@ body {
   .refresh-control { width: 40px; height: 40px; }
 
   .view-toggle-wrapper { top: 10px; left: 10px; }
-  .view-toggle button span { display: none; }
-  .view-toggle button { padding: 6px 8px; }
 
   .line-header-wrapper {
     top: 60px;
