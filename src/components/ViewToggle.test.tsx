@@ -3,22 +3,20 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ViewToggle } from './ViewToggle';
 
 describe('ViewToggle', () => {
-  it('marks the active mode', () => {
-    render(<ViewToggle value="list" onChange={() => {}} />);
-    expect(screen.getByRole('tab', { name: /llista/i })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
-    expect(screen.getByRole('tab', { name: /mapa/i })).toHaveAttribute(
-      'aria-selected',
-      'false',
-    );
+  it('shows the list icon (label) when in map mode', () => {
+    render(<ViewToggle value="map" onChange={() => {}} />);
+    expect(screen.getByRole('button', { name: /llista/i })).toBeInTheDocument();
   });
 
-  it('fires onChange with the selected mode', () => {
+  it('shows the map icon (label) when in list mode', () => {
+    render(<ViewToggle value="list" onChange={() => {}} />);
+    expect(screen.getByRole('button', { name: /mapa/i })).toBeInTheDocument();
+  });
+
+  it('flips to the opposite mode on click', () => {
     const onChange = vi.fn();
     render(<ViewToggle value="map" onChange={onChange} />);
-    fireEvent.click(screen.getByRole('tab', { name: /llista/i }));
+    fireEvent.click(screen.getByRole('button', { name: /llista/i }));
     expect(onChange).toHaveBeenCalledWith('list');
   });
 });
