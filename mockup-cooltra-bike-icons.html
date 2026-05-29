@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8" />
+<title>Mockup · Variants d'icona Bici Cooltra (v2)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #ececef;
+    padding: 30px 20px 60px;
+    color: #1c1c1e;
+  }
+  h1 { text-align: center; font-size: 22px; margin-bottom: 8px; }
+  .subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 28px;
+    font-size: 14px;
+  }
+  .row {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 800px) {
+    .row { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .row { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .label {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .label strong { color: #1c1c1e; font-weight: 700; }
+  .popup-preview {
+    background: white;
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #ececef;
+  }
+  .popup-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .popup-kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1c1c1e;
+  }
+  .popup-plate {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 11px;
+    background: #f1f1f4;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #1c1c1e;
+  }
+  .popup-meta {
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 10px;
+  }
+  .popup-cta {
+    display: block;
+    background: #1098f0;
+    color: white;
+    text-align: center;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .big-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+    padding: 14px 0;
+    background: linear-gradient(to bottom, #f7f7f9 0%, #f1f1f4 100%);
+    border-radius: 8px;
+  }
+  .icon { color: #1098f0; }
+  .footer-note {
+    max-width: 1100px;
+    margin: 40px auto 0;
+    background: white;
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #444;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  code { background: #f1f1f4; padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>🚲 Bici Cooltra · v2</h1>
+<p class="subtitle">6 variants noves · blau Cooltra <code>#1098f0</code></p>
+
+<div class="row">
+
+  <!-- V1: Step-through frame (typical bike-share / Bicing-style) -->
+  <div class="card">
+    <div class="label">Variant <strong>1</strong> · step-through (bike-share)</div>
+    <div class="big-preview">
+      <svg class="icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5.5" cy="17" r="3"/>
+        <circle cx="18.5" cy="17" r="3"/>
+        <path d="M5.5 17 9 11h7"/>
+        <path d="M9 11l3.5 6"/>
+        <path d="M16 11l2.5 6"/>
+        <path d="M15.5 11l1-2h-2"/>
+      </svg>
+    </div>
+    <div class="popup-preview">
+      <div class="popup-head">
+        <span class="popup-kind">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="17" r="3"/>
+            <circle cx="18.5" cy="17" r="3"/>
+            <path d="M5.5 17 9 11h7"/>
+            <path d="M9 11l3.5 6"/>
+            <path d="M16 11l2.5 6"/>
+            <path d="M15.5 11l1-2h-2"/>
+          </svg>
+          Bici Cooltra
+        </span>
+        <span class="popup-plate">1564</span>
+      </div>
+      <div class="popup-meta">Autonomia: <strong>47 km</strong></div>
+      <a class="popup-cta">Reserva gratis</a>
+    </div>
+  </div>
+
+  <!-- V2: City e-bike with rear battery rack -->
+  <div class="card">
+    <div class="label">Variant <strong>2</strong> · e-bike amb bateria al portaequipatges</div>
+    <div class="big-preview">
+      <svg class="icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5" cy="17.5" r="2.7"/>
+        <circle cx="19" cy="17.5" r="2.7"/>
+        <path d="M5 17.5l4.5-7h5"/>
+        <path d="M14.5 10.5l4.5 7"/>
+        <path d="M9.5 10.5h-2L6 8h2"/>
+        <rect x="13" y="8" width="6" height="2.5" rx="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="popup-preview">
+      <div class="popup-head">
+        <span class="popup-kind">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="17.5" r="2.7"/>
+            <circle cx="19" cy="17.5" r="2.7"/>
+            <path d="M5 17.5l4.5-7h5"/>
+            <path d="M14.5 10.5l4.5 7"/>
+            <path d="M9.5 10.5h-2L6 8h2"/>
+            <rect x="13" y="8" width="6" height="2.5" rx="0.5" fill="currentColor" stroke="none"/>
+          </svg>
+          Bici Cooltra
+        </span>
+        <span class="popup-plate">1564</span>
+      </div>
+      <div class="popup-meta">Autonomia: <strong>47 km</strong></div>
+      <a class="popup-cta">Reserva gratis</a>
+    </div>
+  </div>
+
+  <!-- V3: Diamond frame + simple chain ring detail -->
+  <div class="card">
+    <div class="label">Variant <strong>3</strong> · clàssic amb plat</div>
+    <div class="big-preview">
+      <svg class="icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5.5" cy="17" r="3"/>
+        <circle cx="18.5" cy="17" r="3"/>
+        <circle cx="12" cy="17" r="1.2"/>
+        <path d="M5.5 17l3.5-6 4.5 6"/>
+        <path d="M14 11l4.5 6"/>
+        <path d="M9 11l3 4"/>
+        <path d="M14 11h-1l-1-2h-2"/>
+      </svg>
+    </div>
+    <div class="popup-preview">
+      <div class="popup-head">
+        <span class="popup-kind">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="17" r="3"/>
+            <circle cx="18.5" cy="17" r="3"/>
+            <circle cx="12" cy="17" r="1.2"/>
+            <path d="M5.5 17l3.5-6 4.5 6"/>
+            <path d="M14 11l4.5 6"/>
+            <path d="M9 11l3 4"/>
+            <path d="M14 11h-1l-1-2h-2"/>
+          </svg>
+          Bici Cooltra
+        </span>
+        <span class="popup-plate">1564</span>
+      </div>
+      <div class="popup-meta">Autonomia: <strong>47 km</strong></div>
+      <a class="popup-cta">Reserva gratis</a>
+    </div>
+  </div>
+
+  <!-- V4: Filled silhouette -->
+  <div class="card">
+    <div class="label">Variant <strong>4</strong> · silueta plena</div>
+    <div class="big-preview">
+      <svg class="icon" width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M5.5 11.5a4.5 4.5 0 1 0 4.43 5.3l3 0 3.5-7h2.27a4.5 4.5 0 1 0-2.7 3l-3.6.07-2.7-5.4H7v1h2l1.6 3.2-1 .85a4.5 4.5 0 0 0-4.1-1.02zm0 7a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm10-3.5l2.5-5h.5l2.5 5.05a4.5 4.5 0 0 1-5.5-.05zm3 3.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+      </svg>
+    </div>
+    <div class="popup-preview">
+      <div class="popup-head">
+        <span class="popup-kind">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5.5 11.5a4.5 4.5 0 1 0 4.43 5.3l3 0 3.5-7h2.27a4.5 4.5 0 1 0-2.7 3l-3.6.07-2.7-5.4H7v1h2l1.6 3.2-1 .85a4.5 4.5 0 0 0-4.1-1.02zm0 7a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm10-3.5l2.5-5h.5l2.5 5.05a4.5 4.5 0 0 1-5.5-.05zm3 3.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+          </svg>
+          Bici Cooltra
+        </span>
+        <span class="popup-plate">1564</span>
+      </div>
+      <div class="popup-meta">Autonomia: <strong>47 km</strong></div>
+      <a class="popup-cta">Reserva gratis</a>
+    </div>
+  </div>
+
+  <!-- V5: Minimal "two circles + handlebar" -->
+  <div class="card">
+    <div class="label">Variant <strong>5</strong> · minimalista</div>
+    <div class="big-preview">
+      <svg class="icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6" cy="16" r="3.5"/>
+        <circle cx="18" cy="16" r="3.5"/>
+        <path d="M6 16h12"/>
+        <path d="M9 16l4-6"/>
+        <path d="M13 10h3"/>
+      </svg>
+    </div>
+    <div class="popup-preview">
+      <div class="popup-head">
+        <span class="popup-kind">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="16" r="3.5"/>
+            <circle cx="18" cy="16" r="3.5"/>
+            <path d="M6 16h12"/>
+            <path d="M9 16l4-6"/>
+            <path d="M13 10h3"/>
+          </svg>
+          Bici Cooltra
+        </span>
+        <span class="popup-plate">1564</span>
+      </div>
+      <div class="popup-meta">Autonomia: <strong>47 km</strong></div>
+      <a class="popup-cta">Reserva gratis</a>
+    </div>
+  </div>
+
+  <!-- V6: Cargo bike (front basket / box) -->
+  <div class="card">
+    <div class="label">Variant <strong>6</strong> · bici amb cistella</div>
+    <div class="big-preview">
+      <svg class="icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5.5" cy="17" r="3"/>
+        <circle cx="18.5" cy="17" r="3"/>
+        <path d="M5.5 17 8 13.5l3 3.5"/>
+        <path d="M11 17l3.5-6"/>
+        <path d="M14.5 11l4 6"/>
+        <rect x="14" y="8" width="5" height="3" rx="0.4"/>
+        <path d="M16 8V6.5"/>
+      </svg>
+    </div>
+    <div class="popup-preview">
+      <div class="popup-head">
+        <span class="popup-kind">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="17" r="3"/>
+            <circle cx="18.5" cy="17" r="3"/>
+            <path d="M5.5 17 8 13.5l3 3.5"/>
+            <path d="M11 17l3.5-6"/>
+            <path d="M14.5 11l4 6"/>
+            <rect x="14" y="8" width="5" height="3" rx="0.4"/>
+            <path d="M16 8V6.5"/>
+          </svg>
+          Bici Cooltra
+        </span>
+        <span class="popup-plate">1564</span>
+      </div>
+      <div class="popup-meta">Autonomia: <strong>47 km</strong></div>
+      <a class="popup-cta">Reserva gratis</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  <p>Quan en triïs un (p.ex. <code>bici 2</code>), m'ho dius i actualitzo <code>CooltraVehiclePopup.tsx</code> juntament amb la moto variant 2 que ja vas confirmar.</p>
+</div>
+
+</body>
+</html>
