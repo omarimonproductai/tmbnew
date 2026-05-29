@@ -5,42 +5,39 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CooltraVehiclePopup } from './CooltraVehiclePopup';
 import { inferKind, type CooltraKind, type CooltraVehicle } from '../types/cooltra';
 
-function vehicleIcon(kind: CooltraKind): L.DivIcon {
-  return L.divIcon({
-    className: `cooltra-pin cooltra-pin--${kind}`,
-    html: `
-      <span class="cooltra-pin__bubble" aria-hidden="true"></span>
-      <span class="cooltra-pin__tail" aria-hidden="true"></span>
-    `,
-    iconSize: [26, 32],
-    iconAnchor: [13, 30],
-    popupAnchor: [0, -26],
-  });
-}
+// Cooltra dots use the same double-colour scheme as the filter buttons:
+// outer ring is the accent colour, fill is the brand colour. No tail.
+const OUTER: Record<CooltraKind, string> = {
+  bike: '#04fc04',
+  scooter: '#1e5fa8',
+};
+const INNER: Record<CooltraKind, string> = {
+  bike: '#00c853',
+  scooter: '#3080e0',
+};
 
 interface Props {
   vehicles: CooltraVehicle[];
 }
 
-// Cooltra DivIcon markers live in the default markerPane; we explicitly push
-// each one to the back of that pane so TMB markers paint on top. (Custom
-// panes worked at first but broke after recent refactors — keep it simple.)
 export function CooltraLayer({ vehicles }: Props) {
   const map = useMap();
-  const markersRef = useRef<L.Marker[]>([]);
+  const groupRef = useRef<L.FeatureGroup | null>(null);
 
   useEffect(() => {
+    const group = L.featureGroup();
+    groupRef.current = group;
+    map.addLayer(group);
     return () => {
-      markersRef.current.forEach((m) => map.removeLayer(m));
-      markersRef.current = [];
+      map.removeLayer(group);
+      groupRef.current = null;
     };
   }, [map]);
 
   useEffect(() => {
-    // Replace the markers when the vehicle list changes
-    markersRef.current.forEach((m) => map.removeLayer(m));
-    markersRef.current = [];
-
+    const group = groupRef.current;
+    if (!group) return;
+    group.clearLayers();
     vehicles
       .filter(
         (v) =>
@@ -51,19 +48,23 @@ export function CooltraLayer({ vehicles }: Props) {
       .forEach((v) => {
         const kind = inferKind(v.model_id);
         const [lng, lat] = v.position;
-        const m = L.marker([lat, lng], { icon: vehicleIcon(kind) });
-        m.bindPopup(
+        const dot = L.circleMarker([lat, lng], {
+          radius: 5,
+          color: OUTER[kind],
+          weight: 2,
+          fillColor: INNER[kind],
+          fillOpacity: 1,
+        });
+        dot.bindPopup(
           renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
           { autoPanPaddingTopLeft: [10, 90] },
         );
-        m.addTo(map);
-        // DivIcon markers go to markerPane (z 600), above TMB CircleMarker
-        // (overlayPane z 400). Push z-index of each Cooltra marker so it
-        // paints below the other map markers without leaving its pane.
-        m.setZIndexOffset(-1000);
-        markersRef.current.push(m);
+        group.addLayer(dot);
+        // Same overlayPane as TMB CircleMarkers — push to the back so TMB
+        // dots paint on top.
+        dot.bringToBack();
       });
-  }, [vehicles, map]);
+  }, [vehicles]);
 
   return null;
 }
