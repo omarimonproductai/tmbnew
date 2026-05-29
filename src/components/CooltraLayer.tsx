@@ -11,12 +11,6 @@ const COLORS: Record<CooltraKind, string> = {
 };
 const BORDER = '#04fc04';
 
-// Cooltra dots live below TMB stops. Putting them in a dedicated pane with
-// a z-index between tilePane (200) and overlayPane (400) keeps them behind
-// every TMB CircleMarker / DivIcon without per-marker bringToBack() calls.
-const COOLTRA_PANE = 'cooltraPane';
-const COOLTRA_PANE_Z = 350;
-
 interface Props {
   vehicles: CooltraVehicle[];
 }
@@ -26,10 +20,6 @@ export function CooltraLayer({ vehicles }: Props) {
   const groupRef = useRef<L.FeatureGroup | null>(null);
 
   useEffect(() => {
-    if (!map.getPane(COOLTRA_PANE)) {
-      const pane = map.createPane(COOLTRA_PANE);
-      pane.style.zIndex = String(COOLTRA_PANE_Z);
-    }
     const group = L.featureGroup();
     groupRef.current = group;
     map.addLayer(group);
@@ -59,13 +49,15 @@ export function CooltraLayer({ vehicles }: Props) {
           weight: 2,
           fillColor: COLORS[kind],
           fillOpacity: 1,
-          pane: COOLTRA_PANE,
         });
         dot.bindPopup(
           renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
           { autoPanPaddingTopLeft: [10, 90] },
         );
         group.addLayer(dot);
+        // Push every Cooltra dot to the back of the shared overlayPane SVG
+        // so TMB stop markers (also CircleMarker / DivIcon) paint on top.
+        dot.bringToBack();
       });
   }, [vehicles]);
 
