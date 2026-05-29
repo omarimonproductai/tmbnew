@@ -654,8 +654,26 @@ body {
   border-radius: 10px;
 }
 .share-btn--block:active { transform: scale(0.98); }
-.aprop-popup-actions { display: flex; gap: 8px; margin-top: 8px; }
-.aprop-popup-actions .dir-btn--block { margin-top: 0; }
+.aprop-popup-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: stretch;
+}
+.aprop-popup-actions .route-here-btn { flex: 1; }
+.aprop-popup-actions .share-btn--icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #f1f1f4;
+  color: #555;
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.aprop-popup-actions .share-btn--icon:hover { background: #e4e4e8; color: #1c1c1e; }
 
 /* iOS-style action sheet shown when both Apple Maps and Google Maps are
    plausibly installed. */
