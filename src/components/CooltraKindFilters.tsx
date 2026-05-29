@@ -19,7 +19,7 @@ export function CooltraKindFilters({ motos, bikes, onMotosChange, onBikesChange 
         title={motos ? 'Amaga les motos' : 'Mostra les motos'}
         aria-label={motos ? 'Amaga les motos Cooltra' : 'Mostra les motos Cooltra'}
       >
-        <MotoIcon />
+        <span className="cooltra-glyph cooltra-glyph--moto cooltra-glyph--white" />
         {!motos && <Slash />}
       </button>
       <button
@@ -30,36 +30,10 @@ export function CooltraKindFilters({ motos, bikes, onMotosChange, onBikesChange 
         title={bikes ? 'Amaga les bicis' : 'Mostra les bicis'}
         aria-label={bikes ? 'Amaga les bicis Cooltra' : 'Mostra les bicis Cooltra'}
       >
-        <BikeIcon />
+        <span className="cooltra-glyph cooltra-glyph--bike cooltra-glyph--white" />
         {!bikes && <Slash />}
       </button>
     </>
-  );
-}
-
-function MotoIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="5" cy="17.5" r="2.5" />
-      <circle cx="19" cy="17.5" r="2.5" />
-      <path d="M5 17.5h4l3-3 3 1.5h4" />
-      <path d="M12 14.5l-2.5-4h-2" />
-      <path d="M16 10h3l-1.5 3" />
-    </svg>
-  );
-}
-
-function BikeIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="5.5" cy="17" r="3" />
-      <circle cx="18.5" cy="17" r="3" />
-      <path d="M5.5 17 8 13.5l3 3.5" />
-      <path d="M11 17l3.5-6" />
-      <path d="M14.5 11l4 6" />
-      <rect x="14" y="8" width="5" height="3" rx="0.4" />
-      <path d="M16 8V6.5" />
-    </svg>
   );
 }
 
