@@ -15,7 +15,7 @@ function isTouchDevice(): boolean {
 }
 
 export function rotateOptions(
-  position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft' = 'topright',
+  position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft' = 'topleft',
 ) {
   const touch = isTouchDevice();
   if (!touch) {
