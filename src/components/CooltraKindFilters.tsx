@@ -19,7 +19,7 @@ export function CooltraKindFilters({ motos, bikes, onMotosChange, onBikesChange 
         title={motos ? 'Amaga les motos' : 'Mostra les motos'}
         aria-label={motos ? 'Amaga les motos Cooltra' : 'Mostra les motos Cooltra'}
       >
-        <span className="cooltra-glyph cooltra-glyph--moto cooltra-glyph--white" />
+        <span className="cooltra-glyph cooltra-glyph--scooter cooltra-glyph--white" />
         {!motos && <Slash />}
       </button>
       <button
