@@ -74,6 +74,9 @@ export function AproperMeuMap({
           <Circle
             center={[centre.lat, centre.lng]}
             radius={radiM}
+            // Decoration only — never intercept clicks meant for the markers
+            // underneath (Cooltra dots, TMB stops).
+            interactive={false}
             pathOptions={{
               color: '#1d7df2',
               fillColor: '#1d7df2',
