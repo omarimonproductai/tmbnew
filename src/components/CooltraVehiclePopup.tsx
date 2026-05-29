@@ -5,15 +5,18 @@ interface Props {
   kind: CooltraKind;
 }
 
-const ICON_COLOR = '#3080e0';
+const ICON_STROKE: Record<CooltraKind, string> = {
+  bike: '#00c853',
+  scooter: '#3080e0',
+};
 
-const BIKE_ICON = (
+const BIKE_ICON = (color: string) => (
   <svg
     width="20"
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke={ICON_COLOR}
+    stroke={color}
     strokeWidth={1.6}
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -29,13 +32,13 @@ const BIKE_ICON = (
   </svg>
 );
 
-const SCOOTER_ICON = (
+const SCOOTER_ICON = (color: string) => (
   <svg
     width="20"
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke={ICON_COLOR}
+    stroke={color}
     strokeWidth={1.6}
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -53,11 +56,12 @@ export function CooltraVehiclePopup({ vehicle, kind }: Props) {
   const { id, license_plate, range } = vehicle;
   const km = Math.round((range ?? 0) / 1000);
   const reserveHref = `https://link.cooltra.com/reserve?vehicle_id=${encodeURIComponent(id)}`;
+  const stroke = ICON_STROKE[kind];
   return (
     <div className="cooltra-popup">
       <div className="cooltra-popup__head">
         <span className="cooltra-popup__kind">
-          {kind === 'bike' ? BIKE_ICON : SCOOTER_ICON}
+          {kind === 'bike' ? BIKE_ICON(stroke) : SCOOTER_ICON(stroke)}
           {kind === 'bike' ? 'Bici' : 'Moto'} Cooltra
         </span>
         <span className="cooltra-popup__plate">{license_plate}</span>

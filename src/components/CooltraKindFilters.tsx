@@ -5,9 +5,9 @@ interface Props {
   onBikesChange: (v: boolean) => void;
 }
 
-// Filter pills that appear under the main Cooltra button when Cooltra is on.
-// Each button mirrors its map marker's look: moto = blue fill, bici = white fill,
-// both ringed in Cooltra green. Off state dims + slashes the button.
+// Filter pills shown beneath the main Cooltra map button. Each one mirrors
+// the look of its map marker (outer accent ring + inner brand fill) and
+// holds the matching vehicle silhouette in white. Off state dims + slashes.
 export function CooltraKindFilters({ motos, bikes, onMotosChange, onBikesChange }: Props) {
   return (
     <>
@@ -39,7 +39,7 @@ export function CooltraKindFilters({ motos, bikes, onMotosChange, onBikesChange 
 
 function MotoIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="5" cy="17.5" r="2.5" />
       <circle cx="19" cy="17.5" r="2.5" />
       <path d="M5 17.5h4l3-3 3 1.5h4" />
@@ -51,7 +51,7 @@ function MotoIcon() {
 
 function BikeIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="5.5" cy="17" r="3" />
       <circle cx="18.5" cy="17" r="3" />
       <path d="M5.5 17 8 13.5l3 3.5" />
