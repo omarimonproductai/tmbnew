@@ -58,7 +58,7 @@ export function MapView({
       zoom={DEFAULT_ZOOM}
       className="map-container"
       scrollWheelZoom
-      {...(rotateOptions('bottomright') as Record<string, unknown>)}
+      {...(rotateOptions() as Record<string, unknown>)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
