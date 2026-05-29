@@ -5,11 +5,23 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CooltraVehiclePopup } from './CooltraVehiclePopup';
 import { inferKind, type CooltraKind, type CooltraVehicle } from '../types/cooltra';
 
-const COLORS: Record<CooltraKind, string> = {
-  bike: '#ffffff',
-  scooter: '#3080e0',
-};
-const BORDER = '#04fc04';
+// Pin under TMB markers; create a pane below overlayPane (400) so TMB
+// CircleMarkers / DivIcons paint on top without per-marker tweaks.
+const COOLTRA_PANE = 'cooltraPane';
+const COOLTRA_PANE_Z = 350;
+
+function vehicleIcon(kind: CooltraKind): L.DivIcon {
+  return L.divIcon({
+    className: `cooltra-pin cooltra-pin--${kind}`,
+    html: `
+      <span class="cooltra-pin__bubble" aria-hidden="true"></span>
+      <span class="cooltra-pin__tail" aria-hidden="true"></span>
+    `,
+    iconSize: [26, 34],
+    iconAnchor: [13, 32],
+    popupAnchor: [0, -28],
+  });
+}
 
 interface Props {
   vehicles: CooltraVehicle[];
@@ -20,6 +32,10 @@ export function CooltraLayer({ vehicles }: Props) {
   const groupRef = useRef<L.FeatureGroup | null>(null);
 
   useEffect(() => {
+    if (!map.getPane(COOLTRA_PANE)) {
+      const pane = map.createPane(COOLTRA_PANE);
+      pane.style.zIndex = String(COOLTRA_PANE_Z);
+    }
     const group = L.featureGroup();
     groupRef.current = group;
     map.addLayer(group);
@@ -43,21 +59,15 @@ export function CooltraLayer({ vehicles }: Props) {
       .forEach((v) => {
         const kind = inferKind(v.model_id);
         const [lng, lat] = v.position;
-        const dot = L.circleMarker([lat, lng], {
-          radius: 6,
-          color: BORDER,
-          weight: 2,
-          fillColor: COLORS[kind],
-          fillOpacity: 1,
+        const m = L.marker([lat, lng], {
+          icon: vehicleIcon(kind),
+          pane: COOLTRA_PANE,
         });
-        dot.bindPopup(
+        m.bindPopup(
           renderToStaticMarkup(<CooltraVehiclePopup vehicle={v} kind={kind} />),
           { autoPanPaddingTopLeft: [10, 90] },
         );
-        group.addLayer(dot);
-        // Push every Cooltra dot to the back of the shared overlayPane SVG
-        // so TMB stop markers (also CircleMarker / DivIcon) paint on top.
-        dot.bringToBack();
+        group.addLayer(m);
       });
   }, [vehicles]);
 
