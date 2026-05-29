@@ -6,7 +6,7 @@ import { CooltraVehiclePopup } from './CooltraVehiclePopup';
 import { inferKind, type CooltraKind, type CooltraVehicle } from '../types/cooltra';
 
 const COLORS: Record<CooltraKind, string> = {
-  bike: '#00a651',
+  bike: '#ffffff',
   scooter: '#1098f0',
 };
 const BORDER = '#04fc04';
