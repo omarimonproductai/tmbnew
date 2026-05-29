@@ -1,4 +1,3 @@
-import { DirectionsButton } from './DirectionsButton';
 import { RouteHereButton } from './RouteHereButton';
 import { FavStar } from './FavStar';
 import { useFavorits } from '../hooks/useFavorits';
@@ -76,7 +75,6 @@ export function StopPopup({ linia, parada, enabled, correspondences }: Props) {
         liniaCodi={linia.codi}
       />
       <RouteHereButton name={parada.nom} lat={parada.lat} lng={parada.lng} variant="block" />
-      <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} variant="block" />
     </div>
   );
 }
