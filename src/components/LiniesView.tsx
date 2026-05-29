@@ -312,10 +312,12 @@ export function LiniesView({
         )}
         {seleccio && (
           <div className="map-controls-stack">
-            <CooltraMapButton
-              value={cooltraOn}
-              onChange={setCooltraOn}
-            />
+            {viewMode === 'map' && (
+              <CooltraMapButton
+                value={cooltraOn}
+                onChange={setCooltraOn}
+              />
+            )}
             <RefreshControl onRefresh={refreshVehicles} />
             <VehicleVisibilityToggle
               value={showVehicles}
