@@ -444,7 +444,15 @@ body {
   color: #444;
 }
 .radius-row label { font-weight: 700; color: #222; min-width: 38px; }
-.radius-row input[type="range"] { flex: 1; accent-color: #c8001e; }
+/* Taller box = bigger finger target around the thumb. The native track/thumb
+   stay their default (small) size, centred — nothing is drawn larger. */
+.radius-row input[type="range"] {
+  flex: 1;
+  accent-color: #c8001e;
+  height: 40px;
+  cursor: pointer;
+  touch-action: pan-x;
+}
 .radius-value { font-weight: 700; color: #c8001e; min-width: 52px; text-align: right; }
 
 .section-title {
