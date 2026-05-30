@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AproperMeuView } from './components/AproperMeuView';
+import { BicingView } from './components/BicingView';
 import { FavoritsView } from './components/FavoritsView';
 import { InstallBanner } from './components/InstallBanner';
 import { LiniesView } from './components/LiniesView';
@@ -89,6 +90,7 @@ export default function App() {
           onRequestedLineConsumed={() => setRequestedLine(null)}
         />
       )}
+      {appMode === 'bicing' && <BicingView />}
       {appMode === 'aprop-meu' && <AproperMeuView focusStop={sharedStop} />}
       {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}
       <InstallBanner />

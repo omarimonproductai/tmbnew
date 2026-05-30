@@ -11,11 +11,13 @@ import {
   useMap,
 } from 'react-leaflet';
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
+import { BicingLayer } from './BicingLayer';
 import { CooltraLayer } from './CooltraLayer';
 import { useFavorits } from '../hooks/useFavorits';
 import { favStarIcon } from '../utils/favStarIcon';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
+import type { BicingStation } from '../types/bicing';
 import type { CooltraVehicle } from '../types/cooltra';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
@@ -31,6 +33,7 @@ interface Props {
   bottomInset?: number;
   onRefresh?: () => void;
   cooltraVehicles?: CooltraVehicle[];
+  bicingStations?: BicingStation[];
 }
 
 export function AproperMeuMap({
@@ -43,6 +46,7 @@ export function AproperMeuMap({
   bottomInset = 0,
   onRefresh,
   cooltraVehicles = [],
+  bicingStations = [],
 }: Props) {
   const focusStop = focusStopId
     ? parades.find((p) => p.id === focusStopId) ?? null
@@ -131,6 +135,7 @@ export function AproperMeuMap({
         );
       })}
       {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
+      {bicingStations.length > 0 && <BicingLayer stations={bicingStations} origin={centre} />}
       <InvalidateOnResize />
     </MapContainer>
   );

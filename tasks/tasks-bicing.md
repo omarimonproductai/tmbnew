@@ -42,54 +42,60 @@
 
 ## Tasks
 
-- [ ] 0.0 Create feature branch
-  - [ ] 0.1 Pull `main`, crear i checkout `task/bicing-1.0-backend` des de `main`, push a remot (la primera parent task; les següents obriran la seva pròpia branca)
+> Desenvolupat tot de seguit sobre la branca de sessió `claude/claude-md-onboarding-2edbL`
+> (no s'han obert branques/PR per parent task; el merge a `main` el farà l'usuari després de
+> revisar). `lint + build + test` verificats al final (59 tests OK).
+> **Pendents reals**: 1.1 (verificació en viu del feed — bloquejada per l'allowlist de xarxa
+> d'aquest entorn) i 2.4 (confirmació del mockup amb l'usuari — variant escollida a `mockup-bicing.html`).
+
+- [x] 0.0 Create feature branch
+  - [x] 0.1 Treball sobre la branca de sessió assignada
 
 - [ ] 1.0 Backend + capa de dades: proxy GBFS, normalització, tipus, servei i hook
-  - [ ] 1.1 Afegir `barcelona.publicbikesystem.net` a l'allowlist de l'entorn de dev i fer una crida real a `gbfs.json`, `station_information`, `station_status` i `vehicle_types` per **verificar la forma real** (camps, ids de tipus)
-  - [ ] 1.2 Crear `functions/_bicing.ts`: llegir discovery → feeds; mapejar `vehicle_types` (human → mecànic, electric_assist/electric → elèctric); merge `station_information` + `station_status` a `BicingStation` (id, name, lat, lng, capacity, bikesElectric, bikesMechanical, docksAvailable, status, lastReported)
-  - [ ] 1.3 Crear `functions/api/bicing/stations.ts`: retornar l'array normalitzat amb capçaleres de cache curtes (browser sí, CDN no-store)
-  - [ ] 1.4 Crear `src/types/bicing.ts` (`BicingStation`, tipus de filtre)
-  - [ ] 1.5 Crear `src/services/bicing.ts` (fetch + parse de `/api/bicing/stations`)
-  - [ ] 1.6 Crear `src/hooks/useBicingStations.ts`: refresc cada 60s, cache a `localStorage` (`tmb-bicing-stations-v1`), fallback + Toast si falla el fetch
-  - [ ] 1.7 Crear `src/utils/bicingFilter.ts` + tests: donada una estació i l'estat dels xips (elèctric/mecànic, amb `'cap'`), decidir si es mostra (per disponibilitat real)
-  - [ ] 1.8 Test de `useBicingStations` (cache fallback i normalització bàsica); `lint + build + test`; PR + merge
+  - [ ] 1.1 ⚠️ Verificar la forma real del feed en viu — **NO fet** (host fora de l'allowlist d'aquest entorn). Normalització feta de forma defensiva (v2/v3); cal validar abans de produir
+  - [x] 1.2 `functions/_bicing.ts`: discovery → feeds; mapping `vehicle_types`; merge a `BicingStation`
+  - [x] 1.3 `functions/api/bicing/stations.ts` amb capçaleres de cache curtes
+  - [x] 1.4 `src/types/bicing.ts`
+  - [x] 1.5 `src/services/bicing.ts`
+  - [x] 1.6 `src/hooks/useBicingStations.ts` (refresc 60s + cache + fallback)
+  - [x] 1.7 `src/utils/bicingFilter.ts` + tests
+  - [x] 1.8 Test de `useBicingStations`; lint+build+test
 
 - [ ] 2.0 Mockup HTML (abans de construir UI)
-  - [ ] 2.1 Crear `mockup-bicing.html` amb: el mode Bicing (mapa + 2 filtres), el popup de detalls i la fila de llista
-  - [ ] 2.2 Provar 2–3 variants de **xips compactes** (icona-sols ⚡/bici vs icona+xifra) i triar-ne una
-  - [ ] 2.3 Dissenyar el **marcador d'estació** diferenciat del vermell TMB/Cooltra (forma/glif "B") i validar contrast
-  - [ ] 2.4 Acordar amb l'usuari la variant escollida abans d'implementar
+  - [x] 2.1 `mockup-bicing.html` (mode + popup + fila + xips)
+  - [x] 2.2 Variants de xips compactes (icona + label curt escollida)
+  - [x] 2.3 Marcador d'estació diferenciat (badge quadrat vermell amb "B"/recompte)
+  - [ ] 2.4 ⚠️ Acordar el mockup amb l'usuari — **pendent de revisió** (vist que es demana fer-ho tot seguit)
 
-- [ ] 3.0 Component compartit de capa Bicing (marcadors + popup amb detalls)
-  - [ ] 3.1 Crear `src/components/BicingStationPopup.tsx`: nom, distància (opcional), bicis elèctriques/mecàniques, ancoratges lliures + capacitat, estat
-  - [ ] 3.2 Integrar `FavStar` al popup (placeholder fins a 6.0; cablejar a 6.0)
-  - [ ] 3.3 Crear `src/components/BicingLayer.tsx`: render d'estacions amb `CircleMarker` (+ `bringToBack()` si cal), marcador segons mockup, popup en clicar
-  - [ ] 3.4 Estils a `App.css` per marcador i popup Bicing
-  - [ ] 3.5 `lint + build + test`; PR + merge
+- [x] 3.0 Component compartit de capa Bicing (marcadors + popup amb detalls)
+  - [x] 3.1 `BicingStationPopup.tsx`
+  - [x] 3.2 `FavStar` al popup (cablejat amb el store)
+  - [x] 3.3 `BicingLayer.tsx` (Marker DivIcon + popup interactiu)
+  - [x] 3.4 Estils a `App.css`
+  - [x] 3.5 lint+build+test
 
-- [ ] 4.0 Integració a "Aprop meu"
-  - [ ] 4.1 Crear `src/components/BicingFilters.tsx` (xips elèctric/mecànic, compactes, desmarcables → estat tipus `'tots' | 'cap' | 'electric' | 'mecanic'`), persistència `tmb-aprop-bicing-filter-v1`
-  - [ ] 4.2 A `AproperMeuView`: carregar estacions amb `useBicingStations`, limitar per radi (reutilitzar utils de distància) i aplicar `bicingFilter`
-  - [ ] 4.3 A `AproperMeuMap`: pintar la capa `BicingLayer` filtrada (per defecte visible)
-  - [ ] 4.4 Afegir secció pròpia a la llista ("Estacions Bicing a prop · N") amb `BicingStationRow`, **separada** de les parades i **fora** del recompte "X parades a prop"
-  - [ ] 4.5 Crear `src/components/BicingStationRow.tsx` (detalls + estrella + distància)
-  - [ ] 4.6 Col·locar els xips Bicing a la UI d'Aprop meu (al costat dels Metro/Bus, compactes)
-  - [ ] 4.7 `lint + build + test`; PR + merge
+- [x] 4.0 Integració a "Aprop meu"
+  - [x] 4.1 `BicingFilters.tsx` + `useBicingFilter` (persistència `tmb-aprop-bicing-filter-v1`)
+  - [x] 4.2 `AproperMeuView`: estacions per radi + `bicingFilter`
+  - [x] 4.3 `AproperMeuMap`: capa `BicingLayer` filtrada
+  - [x] 4.4 Secció "Estacions Bicing a prop · N" fora del recompte de parades
+  - [x] 4.5 `BicingStationRow.tsx`
+  - [x] 4.6 Xips Bicing al costat de Metro/Bus
+  - [x] 4.7 lint+build+test
 
-- [ ] 5.0 Mode "Bicing" nou
-  - [ ] 5.1 `ModeToggle.tsx`: afegir 5è mode "Bicing" amb icona "B" (només icona a mòbil), al costat de Línies; actualitzar `ModeToggle.test.tsx`
-  - [ ] 5.2 `App.tsx`: afegir el routing del nou mode (`useState` existent)
-  - [ ] 5.3 Crear `src/components/BicingView.tsx`: mapa amb TOTES les estacions (sense radi) via `BicingLayer`
-  - [ ] 5.4 Afegir els filtres elèctriques/mecàniques (reusar `BicingFilters`), persistència `tmb-bicing-filter-v1`
-  - [ ] 5.5 Controls de mapa coherents (recentrar, dot d'usuari si hi ha posició) reaprofitant patrons existents
-  - [ ] 5.6 `lint + build + test`; PR + merge
+- [x] 5.0 Mode "Bicing" nou
+  - [x] 5.1 `ModeToggle.tsx` 5è mode "Bicing" + test
+  - [x] 5.2 `App.tsx` routing
+  - [x] 5.3 `BicingView.tsx` (totes les estacions)
+  - [x] 5.4 Filtres + persistència `tmb-bicing-filter-v1`
+  - [x] 5.5 Controls (recentrar, dot d'usuari, fit)
+  - [x] 5.6 lint+build+test
 
-- [ ] 6.0 Favorits d'estacions
-  - [ ] 6.1 `stores/favorits.ts`: tercer bucket per estacions Bicing (`tmb-fav-bicing`), amb subscribe/snapshot/toggle
-  - [ ] 6.2 `useFavorits.ts`: exposar `favBicing`, `isBicingFav`, `toggleBicing`
-  - [ ] 6.3 Cablejar `FavStar` al popup (3.2) i a la fila (4.5) d'estació
-  - [ ] 6.4 Estrella daurada sobre el marcador d'estació favorita a `BicingLayer` (reaprofitar `favStarIcon`)
-  - [ ] 6.5 `FavoritsView.tsx`: mostrar estacions Bicing **barrejades amb les parades** (sense secció pròpia), ordenades amb la resta; render amb detalls Bicing
-  - [ ] 6.6 `FavMap.tsx`: pintar estacions Bicing favorites (amb estrella daurada)
-  - [ ] 6.7 `lint + build + test`; PR + merge
+- [x] 6.0 Favorits d'estacions
+  - [x] 6.1 `stores/favorits.ts` tercer bucket (`tmb-fav-bicing`)
+  - [x] 6.2 `useFavorits.ts` exposa `favBicing`/`isBicingFav`/`toggleBicing`
+  - [x] 6.3 `FavStar` cablejat a popup i fila
+  - [x] 6.4 Estrella daurada al marcador favorit
+  - [x] 6.5 `FavoritsView.tsx` estacions barrejades amb parades
+  - [x] 6.6 `FavMap.tsx` estacions favorites
+  - [x] 6.7 lint+build+test

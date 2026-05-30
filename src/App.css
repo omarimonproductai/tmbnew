@@ -2518,3 +2518,145 @@ body {
   font-size: 12px;
   color: #888;
 }
+
+/* --- Bicing (estacions GBFS) ------------------------------------------ */
+/* Rounded-square red badge with the available-bikes count — a different
+   SHAPE from the round TMB dots / Cooltra dots so the two never get
+   confused, even though Bicing's brand is also red. */
+.bicing-marker { background: transparent; border: none; }
+.bicing-marker__count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: #d4111e;
+  color: #fff;
+  border: 2px solid #fff;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+
+/* Compact chips (Aprop meu list + Bicing mode overlay) */
+.bicing-chips { display: inline-flex; gap: 6px; }
+.bicing-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  color: #555;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.bicing-chip__ic { font-size: 13px; line-height: 1; }
+.bicing-chip.active { color: #fff; border-color: #d4111e; background: #d4111e; }
+@media (hover: hover) {
+  .bicing-chip:hover { border-color: #d4111e; }
+}
+
+.aprop-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+.aprop-filters-row .filters { padding: 10px 0; }
+
+/* Aprop meu "Estacions Bicing a prop" list section */
+.bicing-near-section { padding: 4px 0 8px; }
+.bicing-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-top: 1px solid #f0f0f0;
+}
+.bicing-row-badge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #d4111e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bicing-row-info { flex: 1; min-width: 0; }
+.bicing-row-name-row { display: flex; align-items: center; gap: 8px; }
+.bicing-row-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bicing-row-name-row .fav-star { width: 32px; height: 32px; margin-right: 0; }
+.bicing-row-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+.bicing-row-pills { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.bicing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f2f2f2;
+  color: #333;
+}
+.bicing-pill--elec { background: #fff3d6; color: #8a5b00; }
+.bicing-pill--mec { background: #e6f4ea; color: #1b6b34; }
+.bicing-pill--dock { background: #eef1f6; color: #4a5568; }
+
+.bicing-status { font-weight: 600; }
+.bicing-status--operativa { color: #1b9e4b; }
+.bicing-status--tancada { color: #c8001e; }
+.bicing-status--fora-servei { color: #888; }
+
+/* Station popup */
+.bicing-popup { min-width: 180px; }
+.bicing-popup-head { display: flex; align-items: center; gap: 8px; }
+.bicing-popup-name { flex: 1; font-weight: 700; color: #222; }
+.bicing-popup-meta { font-size: 12px; margin-top: 2px; color: #666; }
+.bicing-stats { display: flex; gap: 10px; margin: 8px 0 4px; }
+.bicing-stat { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.bicing-stat__n { font-size: 18px; font-weight: 700; color: #222; }
+.bicing-stat__l { font-size: 10px; color: #888; text-align: center; }
+.bicing-stat--elec .bicing-stat__n { color: #b07900; }
+.bicing-stat--mec .bicing-stat__n { color: #1b6b34; }
+.bicing-cap { font-size: 11px; color: #999; }
+
+/* Bicing mode floating filter bar */
+.bicing-mode-filters {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 600;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 6px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}

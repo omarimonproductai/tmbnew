@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { BicingStationRow } from './BicingStationRow';
 import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { DirectionsButton } from './DirectionsButton';
 import { FavMap } from './FavMap';
 import { FavStar } from './FavStar';
+import { useBicingStations } from '../hooks/useBicingStations';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { inferKind } from '../types/cooltra';
@@ -13,7 +15,30 @@ import { useTempsReal } from '../hooks/useTempsReal';
 import { haversine, formatDistance } from '../utils/distance';
 import { getLineColor } from '../utils/lineColor';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
+import type { BicingStation, FavBicing } from '../types/bicing';
 import type { Coordinate, FavLinia, FavParada } from '../types/tmb';
+
+// Saved stops and Bicing stations share one list (mixed, no separate section).
+type FavListItem =
+  | { kind: 'parada'; parada: FavParada; lat: number; lng: number }
+  | { kind: 'bicing'; station: BicingStation; lat: number; lng: number };
+
+function stationFromFav(fav: FavBicing, live?: BicingStation): BicingStation {
+  return (
+    live ?? {
+      id: fav.id,
+      name: fav.name,
+      lat: fav.lat,
+      lng: fav.lng,
+      capacity: 0,
+      bikesElectric: 0,
+      bikesMechanical: 0,
+      docksAvailable: 0,
+      status: 'operativa',
+      lastReported: 0,
+    }
+  );
+}
 
 type FavSort = 'proximity' | 'recent';
 type FavView = 'list' | 'map';
@@ -47,8 +72,14 @@ interface Props {
 }
 
 export function FavoritsView({ onOpenLine }: Props) {
-  const { favLinies, favParades, toggleLinia, toggleParada } = useFavorits();
+  const { favLinies, favParades, favBicing, toggleLinia, toggleParada } = useFavorits();
   const { position } = useGeolocation(true);
+  const { stations: bicingStations } = useBicingStations(favBicing.length > 0);
+  const liveBicingById = useMemo(() => {
+    const m = new Map<string, BicingStation>();
+    for (const s of bicingStations) m.set(s.id, s);
+    return m;
+  }, [bicingStations]);
   const [sort, setSort] = useState<FavSort>(loadStoredSort);
   const [view, setView] = useState<FavView>('list');
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
@@ -83,19 +114,40 @@ export function FavoritsView({ onOpenLine }: Props) {
   // most-recently-added order.
   const effectiveSort: FavSort = sort === 'proximity' && !position ? 'recent' : sort;
 
-  const orderedParades = useMemo(() => {
+  // Saved stops and Bicing stations mixed into one ordered list.
+  const orderedItems = useMemo<FavListItem[]>(() => {
+    const items: FavListItem[] = [
+      ...favParades.map(
+        (p): FavListItem => ({ kind: 'parada', parada: p, lat: p.lat, lng: p.lng }),
+      ),
+      ...favBicing.map(
+        (b): FavListItem => ({
+          kind: 'bicing',
+          station: stationFromFav(b, liveBicingById.get(b.id)),
+          lat: b.lat,
+          lng: b.lng,
+        }),
+      ),
+    ];
     if (effectiveSort === 'proximity' && position) {
-      return [...favParades].sort(
+      return items.sort(
         (a, b) =>
           haversine(position, { lat: a.lat, lng: a.lng }) -
           haversine(position, { lat: b.lat, lng: b.lng }),
       );
     }
     // 'recent' — store keeps add order (oldest first); show newest first.
-    return [...favParades].reverse();
-  }, [favParades, position, effectiveSort]);
+    return items.reverse();
+  }, [favParades, favBicing, liveBicingById, position, effectiveSort]);
 
-  const isEmpty = favLinies.length === 0 && favParades.length === 0;
+  // Live Bicing stations for the favourites map (fall back to stored position).
+  const favBicingStations = useMemo<BicingStation[]>(
+    () => favBicing.map((b) => stationFromFav(b, liveBicingById.get(b.id))),
+    [favBicing, liveBicingById],
+  );
+
+  const hasMappable = favParades.length > 0 || favBicing.length > 0;
+  const isEmpty = favLinies.length === 0 && favParades.length === 0 && favBicing.length === 0;
 
   if (isEmpty) {
     return (
@@ -142,7 +194,7 @@ export function FavoritsView({ onOpenLine }: Props) {
             </svg>
           </button>
         </div>
-        {favParades.length > 0 && (
+        {hasMappable && (
           <div className="sort-controls" role="group" aria-label="Vista">
             <button
               type="button"
@@ -173,10 +225,11 @@ export function FavoritsView({ onOpenLine }: Props) {
         )}
       </div>
 
-      {view === 'map' && favParades.length > 0 ? (
+      {view === 'map' && hasMappable ? (
         <div className="favorits-map">
           <FavMap
-            parades={orderedParades}
+            parades={favParades}
+            bicingStations={favBicingStations}
             userPosition={position}
             cooltraVehicles={visibleCooltra}
           />
@@ -197,22 +250,32 @@ export function FavoritsView({ onOpenLine }: Props) {
         </div>
       ) : (
         <div className="favorits-scroll">
-          {favParades.length > 0 && (
+          {orderedItems.length > 0 && (
             <section className="favorits-section">
-              <div className="favorits-head">★ Parades desades</div>
-              {orderedParades.map((p) => (
-                <FavStopItem
-                  key={p.id}
-                  parada={p}
-                  distanceM={
-                    position
-                      ? haversine(position, { lat: p.lat, lng: p.lng })
-                      : null
-                  }
-                  onRemove={() => toggleParada(p)}
-                  onOpenLine={onOpenLine}
-                />
-              ))}
+              <div className="favorits-head">★ Parades i estacions desades</div>
+              {orderedItems.map((item) => {
+                const distanceM = position
+                  ? haversine(position, { lat: item.lat, lng: item.lng })
+                  : null;
+                if (item.kind === 'parada') {
+                  return (
+                    <FavStopItem
+                      key={`p-${item.parada.id}`}
+                      parada={item.parada}
+                      distanceM={distanceM}
+                      onRemove={() => toggleParada(item.parada)}
+                      onOpenLine={onOpenLine}
+                    />
+                  );
+                }
+                return (
+                  <BicingStationRow
+                    key={`b-${item.station.id}`}
+                    station={item.station}
+                    distanceM={distanceM}
+                  />
+                );
+              })}
             </section>
           )}
 

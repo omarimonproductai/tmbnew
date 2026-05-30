@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mockup · Bicing</title>
+    <style>
+      :root { font-family: -apple-system, system-ui, sans-serif; }
+      body { margin: 0; background: #f3f4f6; color: #222; padding: 20px; }
+      h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: #888; margin: 28px 0 10px; }
+      .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+      .card { background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 16px; }
+
+      /* Marker variants */
+      .map { position: relative; width: 320px; height: 200px; border-radius: 14px;
+        background: linear-gradient(135deg,#e8eef5,#dde7d8); overflow: hidden; }
+      .bicing-marker { position:absolute; display:flex; align-items:center; justify-content:center;
+        width:24px; height:24px; border-radius:7px; background:#d4111e; color:#fff; border:2px solid #fff;
+        font-size:11px; font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,.35); }
+      .tmb-dot { position:absolute; width:14px; height:14px; border-radius:50%; background:#FF3300; border:2px solid #fff; }
+      .star { position:absolute; font-size:14px; color:#f7a700; text-shadow:0 0 2px #fff; }
+
+      /* Chips */
+      .bicing-chips { display:inline-flex; gap:6px; }
+      .bicing-chip { display:inline-flex; align-items:center; gap:4px; height:32px; padding:0 10px;
+        border-radius:999px; border:1.5px solid #ddd; background:#fff; color:#555; font-size:12px; font-weight:600; cursor:pointer; }
+      .bicing-chip.active { color:#fff; border-color:#d4111e; background:#d4111e; }
+
+      /* Popup */
+      .bicing-popup { min-width:200px; background:#fff; border-radius:10px; padding:12px; box-shadow:0 4px 16px rgba(0,0,0,.18); }
+      .bicing-popup-head { display:flex; align-items:center; gap:8px; }
+      .bicing-popup-name { flex:1; font-weight:700; }
+      .fav { color:#f7a700; font-size:20px; }
+      .bicing-popup-meta { font-size:12px; color:#666; margin-top:2px; }
+      .bicing-stats { display:flex; gap:10px; margin:10px 0 4px; }
+      .bicing-stat { flex:1; display:flex; flex-direction:column; align-items:center; }
+      .bicing-stat__n { font-size:18px; font-weight:700; }
+      .bicing-stat__l { font-size:10px; color:#888; }
+      .elec .bicing-stat__n { color:#b07900; } .mec .bicing-stat__n { color:#1b6b34; }
+      .bicing-cap { font-size:11px; color:#999; }
+      .ok { color:#1b9e4b; font-weight:600; }
+
+      /* List row */
+      .bicing-row { display:flex; gap:10px; padding:10px 12px; border-top:1px solid #f0f0f0; width:330px; background:#fff; }
+      .bicing-row-badge { width:26px; height:26px; border-radius:7px; background:#d4111e; color:#fff; font-weight:700;
+        display:flex; align-items:center; justify-content:center; }
+      .bicing-row-name { font-weight:600; font-size:13px; }
+      .bicing-row-meta { font-size:11px; color:#888; margin-top:2px; }
+      .pills { display:flex; gap:6px; margin-top:6px; }
+      .pill { padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+      .pill.e { background:#fff3d6; color:#8a5b00; } .pill.m { background:#e6f4ea; color:#1b6b34; } .pill.d { background:#eef1f6; color:#4a5568; }
+    </style>
+  </head>
+  <body>
+    <h1 style="font-size:18px">Bicing — variant escollida</h1>
+
+    <h2>Marcador (forma quadrada vs. punts rodons TMB)</h2>
+    <div class="map">
+      <div class="tmb-dot" style="left:60px; top:60px"></div>
+      <div class="bicing-marker" style="left:140px; top:90px">7</div>
+      <div class="bicing-marker" style="left:210px; top:130px">0</div>
+      <div class="bicing-marker" style="left:100px; top:140px">12</div>
+      <div class="star" style="left:142px; top:70px">★</div>
+    </div>
+
+    <h2>Xips compactes (elèctric / mecànic) — desmarcables tots dos</h2>
+    <div class="card">
+      <div class="bicing-chips">
+        <button class="bicing-chip active">⚡ Elèc</button>
+        <button class="bicing-chip active">🚲 Mec</button>
+      </div>
+      <p style="font-size:12px;color:#888">Filtren per disponibilitat real. Tots dos desmarcats → amaga Bicing.</p>
+    </div>
+
+    <h2>Popup d'estació · Fila de llista</h2>
+    <div class="row">
+      <div class="bicing-popup">
+        <div class="bicing-popup-head"><span class="bicing-popup-name">Pl. Catalunya</span><span class="fav">★</span></div>
+        <div class="bicing-popup-meta"><span class="ok">Operativa</span> · 240 m</div>
+        <div class="bicing-stats">
+          <div class="bicing-stat elec"><span class="bicing-stat__n">5</span><span class="bicing-stat__l">elèctriques</span></div>
+          <div class="bicing-stat mec"><span class="bicing-stat__n">8</span><span class="bicing-stat__l">mecàniques</span></div>
+          <div class="bicing-stat"><span class="bicing-stat__n">14</span><span class="bicing-stat__l">ancoratges</span></div>
+        </div>
+        <div class="bicing-cap">Capacitat total 27</div>
+      </div>
+
+      <div class="bicing-row">
+        <div class="bicing-row-badge">B</div>
+        <div>
+          <div class="bicing-row-name">Gran Via · Roger de Llúria</div>
+          <div class="bicing-row-meta">180 m · <span class="ok">Operativa</span></div>
+          <div class="pills"><span class="pill e">⚡ 3</span><span class="pill m">🚲 2</span><span class="pill d">P 15</span></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

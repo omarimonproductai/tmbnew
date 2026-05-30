@@ -28,4 +28,11 @@ describe('ModeToggle', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Ruta' }));
     expect(onChange).toHaveBeenCalledWith('route');
   });
+
+  it('exposes the Bicing mode and fires it', () => {
+    const onChange = vi.fn();
+    render(<ModeToggle value="linies" onChange={onChange} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Bicing' }));
+    expect(onChange).toHaveBeenCalledWith('bicing');
+  });
 });
