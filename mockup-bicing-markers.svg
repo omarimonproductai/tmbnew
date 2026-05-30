@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="1240" viewBox="0 0 860 1240" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif">
+  <defs>
+    <symbol id="logo" viewBox="0 0 300 300">
+      <g transform="translate(0,300) scale(0.05,-0.05)" fill="currentColor" stroke="none">
+        <path d="M2662 5976 c-2509 -279 -3552 -3386 -1726 -5139 1649 -1583 4406 -787 4965 1433 509 2023 -1163 3937 -3239 3706z m-857 -937 c176 -49 297 -362 427 -1109 39 -220 92 -512 118 -650 26 -137 54 -297 61 -355 21 -157 27 -154 356 168 290 284 806 699 1046 840 153 90 414 85 563 -11 126 -80 253 -249 355 -474 40 -87 92 -194 115 -238 51 -97 71 -373 50 -690 -15 -235 -53 -363 -221 -750 l-104 -240 -243 -240 c-133 -132 -285 -291 -337 -354 -166 -201 -309 -218 -653 -80 -289 115 -502 275 -750 559 l-126 144 -86 -91 c-104 -111 -189 -157 -345 -186 -202 -37 -190 -48 -189 166 0 226 -15 291 -232 952 -95 291 -185 609 -209 740 -98 525 -147 756 -184 867 -143 430 -171 742 -76 844 139 149 468 242 664 188z"/>
+        <path d="M3590 3132 c-195 -91 -475 -386 -574 -602 -45 -99 211 -410 551 -669 232 -176 254 -177 428 -14 185 173 173 631 -27 1053 -138 292 -187 322 -378 232z"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="860" height="1240" fill="#f3f4f6"/>
+
+  <!-- Header -->
+  <rect width="860" height="84" fill="#df0102"/>
+  <use href="#logo" x="28" y="20" width="44" height="44" color="#ffffff"/>
+  <text x="86" y="52" fill="#fff" font-size="26" font-weight="700">Bicing · opcions de marcador</text>
+
+  <!-- FILTERS SECTION -->
+  <text x="28" y="132" fill="#888" font-size="15" font-weight="700" letter-spacing="1">FILTRES (ACCIÓ)</text>
+
+  <!-- Agafar chip -->
+  <rect x="28" y="148" width="190" height="60" rx="30" fill="#df0102"/>
+  <!-- square with outgoing arrow -->
+  <rect x="50" y="166" width="22" height="22" rx="4" fill="none" stroke="#fff" stroke-width="3"/>
+  <path d="M64 176 l22 -10 -6 9 9 4 -25 11 6 -10 -16 -4z" fill="#fff"/>
+  <text x="104" y="186" fill="#fff" font-size="20" font-weight="700">Agafar</text>
+
+  <!-- Retornar chip -->
+  <rect x="236" y="148" width="200" height="60" rx="30" fill="#fff" stroke="#df0102" stroke-width="2"/>
+  <rect x="258" y="166" width="22" height="22" rx="4" fill="none" stroke="#df0102" stroke-width="3"/>
+  <path d="M252 176 l22 -10 -6 9 9 4 -25 11 6 -10 -16 -4z" fill="#df0102" transform="rotate(180 269 177)"/>
+  <text x="296" y="186" fill="#df0102" font-size="20" font-weight="700">Retornar</text>
+
+  <text x="28" y="244" fill="#555" font-size="16">Agafar = qualsevol bici lliure (elèc o mec).</text>
+  <text x="28" y="270" fill="#555" font-size="16">En prémer <tspan font-weight="700">Retornar</tspan> apareixen 2 sub-xips per triar el tipus que portes:</text>
+
+  <!-- sub-chips electric / mechanical (only when returning) -->
+  <rect x="28" y="286" width="150" height="48" rx="24" fill="#fff" stroke="#f5a623" stroke-width="2"/>
+  <text x="48" y="316" font-size="20">⚡</text>
+  <text x="78" y="316" fill="#8a5b00" font-size="18" font-weight="700">Elèctric</text>
+
+  <rect x="194" y="286" width="160" height="48" rx="24" fill="#fff" stroke="#1b9e4b" stroke-width="2"/>
+  <text x="214" y="316" font-size="18">🚲</text>
+  <text x="246" y="316" fill="#1b6b34" font-size="18" font-weight="700">Mecànic</text>
+
+  <line x1="28" y1="366" x2="832" y2="366" stroke="#e2e2e2" stroke-width="1"/>
+
+  <!-- MARKERS SECTION on a faux map -->
+  <text x="28" y="400" fill="#888" font-size="15" font-weight="700" letter-spacing="1">MARCADOR AL MAPA — TRIA'N UN (A / B / C / D)</text>
+
+  <!-- faux map -->
+  <rect x="28" y="416" width="804" height="470" rx="16" fill="#e7edf2"/>
+  <g stroke="#ffffff" stroke-width="10" opacity="0.9">
+    <line x1="28" y1="540" x2="832" y2="560"/>
+    <line x1="200" y1="416" x2="240" y2="886"/>
+    <line x1="520" y1="416" x2="560" y2="886"/>
+    <line x1="28" y1="730" x2="832" y2="700"/>
+  </g>
+
+  <!-- Option A: single square, total -->
+  <g transform="translate(120,470)">
+    <rect x="-22" y="-22" width="44" height="44" rx="10" fill="#df0102" stroke="#fff" stroke-width="3"/>
+    <text x="0" y="8" text-anchor="middle" fill="#fff" font-size="22" font-weight="700">12</text>
+  </g>
+  <text x="120" y="540" text-anchor="middle" fill="#222" font-size="18" font-weight="700">A</text>
+  <text x="120" y="562" text-anchor="middle" fill="#555" font-size="13">Quadrat únic</text>
+  <text x="120" y="580" text-anchor="middle" fill="#888" font-size="12">total bicis (tipus al popup)</text>
+
+  <!-- Option B: split square electric|mechanical -->
+  <g transform="translate(330,470)">
+    <rect x="-34" y="-22" width="68" height="44" rx="10" fill="#fff" stroke="#fff" stroke-width="3"/>
+    <path d="M-34 -12 a10 10 0 0 1 10 -10 h24 v44 h-24 a10 10 0 0 1 -10 -10 z" fill="#f5a623"/>
+    <path d="M0 -22 h24 a10 10 0 0 1 10 10 v24 a10 10 0 0 1 -10 10 h-24 z" fill="#1b9e4b"/>
+    <text x="-17" y="7" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">5</text>
+    <text x="17" y="7" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">7</text>
+  </g>
+  <text x="330" y="540" text-anchor="middle" fill="#222" font-size="18" font-weight="700">B</text>
+  <text x="330" y="562" text-anchor="middle" fill="#555" font-size="13">Quadrat partit</text>
+  <text x="330" y="580" text-anchor="middle" fill="#888" font-size="12">⚡ elèc | mec 🚲 d'un cop</text>
+
+  <!-- Option C: square + corner badge -->
+  <g transform="translate(540,470)">
+    <rect x="-22" y="-22" width="44" height="44" rx="10" fill="#df0102" stroke="#fff" stroke-width="3"/>
+    <text x="0" y="9" text-anchor="middle" fill="#fff" font-size="22" font-weight="700">12</text>
+    <circle cx="22" cy="-22" r="14" fill="#f5a623" stroke="#fff" stroke-width="2"/>
+    <text x="22" y="-17" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">5</text>
+  </g>
+  <text x="540" y="540" text-anchor="middle" fill="#222" font-size="18" font-weight="700">C</text>
+  <text x="540" y="562" text-anchor="middle" fill="#555" font-size="13">Quadrat + badge</text>
+  <text x="540" y="580" text-anchor="middle" fill="#888" font-size="12">total + ⚡ elèc al cantó</text>
+
+  <!-- Option D: two round dots -->
+  <g transform="translate(730,470)">
+    <circle cx="-16" cy="0" r="18" fill="#f5a623" stroke="#fff" stroke-width="3"/>
+    <text x="-16" y="6" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">5</text>
+    <circle cx="20" cy="6" r="18" fill="#1b9e4b" stroke="#fff" stroke-width="3"/>
+    <text x="20" y="12" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">7</text>
+  </g>
+  <text x="730" y="540" text-anchor="middle" fill="#222" font-size="18" font-weight="700">D</text>
+  <text x="730" y="562" text-anchor="middle" fill="#555" font-size="13">Dos punts rodons</text>
+  <text x="730" y="580" text-anchor="middle" fill="#888" font-size="12">com Cooltra (elèc + mec)</text>
+
+  <!-- Retornar mode marker variant -->
+  <text x="44" y="650" fill="#555" font-size="15" font-weight="700">En mode RETORNAR el marcador mostra ANCORATGES lliures:</text>
+  <g transform="translate(120,720)">
+    <rect x="-22" y="-22" width="44" height="44" rx="10" fill="#ffffff" stroke="#df0102" stroke-width="3"/>
+    <text x="0" y="9" text-anchor="middle" fill="#df0102" font-size="20" font-weight="700">14</text>
+  </g>
+  <text x="120" y="772" text-anchor="middle" fill="#888" font-size="12">quadrat buit = docks</text>
+
+  <g transform="translate(300,720)">
+    <rect x="-24" y="-22" width="48" height="44" rx="10" fill="#ffffff" stroke="#f5a623" stroke-width="3"/>
+    <text x="-6" y="9" text-anchor="middle" fill="#8a5b00" font-size="18" font-weight="700">14</text>
+    <text x="16" y="9" text-anchor="middle" font-size="14">⚡</text>
+  </g>
+  <text x="300" y="772" text-anchor="middle" fill="#888" font-size="12">docks per a elèctrica</text>
+
+  <!-- Footnote -->
+  <text x="28" y="940" fill="#444" font-size="16" font-weight="700">Notes</text>
+  <text x="28" y="968" fill="#555" font-size="14">· Totes les opcions mantenen el QUADRAT vermell Bicing (identificació ràpida al mapa),</text>
+  <text x="44" y="990" fill="#555" font-size="14">excepte la D, que són punts rodons "com la resta d'icones".</text>
+  <text x="28" y="1018" fill="#555" font-size="14">· El color groc = elèctric, verd = mecànic, vermell Bicing = marca / total.</text>
+  <text x="28" y="1046" fill="#555" font-size="14">· Agafar: estacions amb bici lliure. Retornar+tipus: estacions amb ancoratge per a aquell tipus.</text>
+
+  <!-- recommendation -->
+  <rect x="28" y="1078" width="804" height="120" rx="14" fill="#fff" stroke="#df0102" stroke-width="1.5"/>
+  <text x="48" y="1112" fill="#df0102" font-size="17" font-weight="700">Recomanació</text>
+  <text x="48" y="1140" fill="#333" font-size="15">Opció B (quadrat partit elèc|mec) en mode Agafar — es veuen els dos tipus d'un cop i</text>
+  <text x="48" y="1164" fill="#333" font-size="15">manté la forma quadrada que t'agrada. En mode Retornar, quadrat buit amb el nombre</text>
+  <text x="48" y="1188" fill="#333" font-size="15">d'ancoratges (i ⚡ si has triat elèctric).</text>
+</svg>

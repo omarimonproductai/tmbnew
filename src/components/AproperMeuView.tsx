@@ -17,7 +17,7 @@ import { inferKind } from '../types/cooltra';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
-import { filterStations, resolveBicingFilter } from '../utils/bicingFilter';
+import { filterStations } from '../utils/bicingFilter';
 import { haversine } from '../utils/distance';
 import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
@@ -173,7 +173,7 @@ export function AproperMeuView({
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  const { position, accuracy, status, error, refresh } = useGeolocation(true);
+  const { position, status, error, refresh } = useGeolocation(true);
   const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
   const paradesFiltrades = useMemo(
@@ -189,14 +189,13 @@ export function AproperMeuView({
   const { stations: bicingStations, lastFailureAt: bicingFailureAt } =
     useBicingStations(true);
   const bicingFilters = useBicingFilter(BICING_FILTER_STORAGE_KEY);
-  const bicingFilter = resolveBicingFilter(bicingFilters.electric, bicingFilters.mecanic);
   const bicingNear = useMemo(() => {
     if (!position) return [];
-    return filterStations(bicingStations, bicingFilter)
+    return filterStations(bicingStations, bicingFilters.state)
       .map((s) => ({ station: s, distanceM: haversine(position, { lat: s.lat, lng: s.lng }) }))
       .filter((x) => x.distanceM <= radius)
       .sort((a, b) => a.distanceM - b.distanceM);
-  }, [bicingStations, bicingFilter, position, radius]);
+  }, [bicingStations, bicingFilters.state, position, radius]);
   const bicingMapStations = useMemo(() => bicingNear.map((x) => x.station), [bicingNear]);
 
   // A shared ?parada= link focuses a stop on the map; make sure its marker
@@ -316,10 +315,8 @@ export function AproperMeuView({
         <div className="sheet-body">
           <LocationBlock
             position={position}
-            accuracy={accuracy}
             status={status}
             error={error}
-            onRefresh={refresh}
             radius={radius}
             onRadiusChange={setRadius}
           />
@@ -331,10 +328,10 @@ export function AproperMeuView({
               {parades.length > 0 && <FilterBar value={filtre} onChange={setFiltre} />}
               {bicingStations.length > 0 && (
                 <BicingFilters
-                  electric={bicingFilters.electric}
-                  mecanic={bicingFilters.mecanic}
-                  onElectricChange={bicingFilters.setElectric}
-                  onMecanicChange={bicingFilters.setMecanic}
+                  state={bicingFilters.state}
+                  onToggleAgafar={bicingFilters.toggleAgafar}
+                  onToggleRetornar={bicingFilters.toggleRetornar}
+                  onSetType={bicingFilters.setType}
                 />
               )}
             </div>
@@ -373,6 +370,7 @@ export function AproperMeuView({
           onRefresh={refresh}
           cooltraVehicles={visibleCooltra}
           bicingStations={bicingMapStations}
+          bicingFilter={bicingFilters.state}
         />
         <div className="cooltra-map-control">
           <CooltraMapButton

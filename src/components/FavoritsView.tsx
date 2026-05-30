@@ -34,6 +34,8 @@ function stationFromFav(fav: FavBicing, live?: BicingStation): BicingStation {
       bikesElectric: 0,
       bikesMechanical: 0,
       docksAvailable: 0,
+      docksElectric: 0,
+      docksMechanical: 0,
       status: 'operativa',
       lastReported: 0,
     }

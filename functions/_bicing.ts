@@ -92,6 +92,7 @@ interface RawStationStatus {
   is_returning?: boolean;
   last_reported?: number | string;
   vehicle_types_available?: RawTypeCount[];
+  vehicle_docks_available?: RawTypeCount[];
 }
 
 function deriveStatus(st: RawStationStatus): BicingStatus {
@@ -154,6 +155,24 @@ export async function fetchBicingStations(): Promise<BicingStation[]> {
     }
 
     const docks = num(st.num_docks_available);
+
+    // Docks per type, if the feed breaks it down; otherwise the generic count
+    // applies to both (Bicing docks usually accept any bike type).
+    let docksElec = docks;
+    let docksMech = docks;
+    const vda = st.vehicle_docks_available;
+    if (Array.isArray(vda) && vda.length > 0 && electricById.size > 0) {
+      docksElec = 0;
+      docksMech = 0;
+      for (const v of vda) {
+        const ids = v.vehicle_type_ids ?? (v.vehicle_type_id != null ? [v.vehicle_type_id] : []);
+        const isElectric = ids.some((tid) => electricById.get(String(tid)) === true);
+        const c = num(v.count);
+        if (isElectric) docksElec += c;
+        else docksMech += c;
+      }
+    }
+
     out.push({
       id,
       name: localisedName(meta.name),
@@ -163,6 +182,8 @@ export async function fetchBicingStations(): Promise<BicingStation[]> {
       bikesElectric: elec,
       bikesMechanical: mech,
       docksAvailable: docks,
+      docksElectric: docksElec,
+      docksMechanical: docksMech,
       status: deriveStatus(st),
       lastReported: toEpochMs(st.last_reported),
     });

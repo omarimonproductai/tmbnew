@@ -3,39 +3,24 @@ import type { GeoStatus } from '../hooks/useGeolocation';
 
 interface Props {
   position: Coordinate | null;
-  accuracy: number | null;
   status: GeoStatus;
   error: string | null;
-  onRefresh: () => void;
   radius: number;
   onRadiusChange: (r: number) => void;
 }
 
-export function LocationBlock({
-  position,
-  accuracy,
-  status,
-  error,
-  onRefresh,
-  radius,
-  onRadiusChange,
-}: Props) {
+// The location auto-updates (GPS polls every ~10s) so there's no manual
+// refresh button — it wasn't doing anything the user couldn't already see.
+export function LocationBlock({ position, status, error, radius, onRadiusChange }: Props) {
+  const sub = subtitleFor(status, position, error);
   return (
     <div className="location-block">
       <div className="location-row">
         <div className="geo-dot" data-status={status} />
         <div className="location-info">
           <div className="location-title">{titleFor(status)}</div>
-          <div className="location-sub">{subtitleFor(status, position, accuracy, error)}</div>
+          {sub && <div className="location-sub">{sub}</div>}
         </div>
-        <button
-          type="button"
-          className="geo-btn"
-          onClick={onRefresh}
-          disabled={status === 'requesting'}
-        >
-          {status === 'requesting' ? 'Buscant…' : 'Actualitzar'}
-        </button>
       </div>
       <div className="radius-row">
         <label htmlFor="radius">Radi</label>
@@ -72,16 +57,13 @@ function titleFor(s: GeoStatus) {
 function subtitleFor(
   s: GeoStatus,
   position: Coordinate | null,
-  accuracy: number | null,
   error: string | null,
 ): string {
-  if (s === 'granted' && position) {
-    const acc = accuracy ? ` · precisió ±${Math.round(accuracy)} m` : '';
-    return `${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}${acc}`;
-  }
+  // Coordinates and accuracy are intentionally not shown (not useful).
+  if (s === 'granted' && position) return '';
   if (s === 'denied' || s === 'unavailable') return error ?? '—';
   if (s === 'requesting') return 'Esperant resposta del navegador…';
-  return 'Prem "Actualitzar" per fer servir la teva posició.';
+  return 'Esperant ubicació…';
 }
 
 function formatRadius(m: number) {

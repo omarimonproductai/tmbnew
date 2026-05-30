@@ -59,7 +59,11 @@ export function FavMap({
       )}
       {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
       {bicingStations.length > 0 && (
-        <BicingLayer stations={bicingStations} origin={userPosition} />
+        <BicingLayer
+          stations={bicingStations}
+          filter={{ action: 'agafar', type: 'electric' }}
+          origin={userPosition}
+        />
       )}
       {parades.map((p) => (
         <FavMarker key={p.id} parada={p} />

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { filterStations, resolveBicingFilter, stationMatchesFilter } from './bicingFilter';
-import type { BicingStation } from '../types/bicing';
+import { filterStations, stationMatches } from './bicingFilter';
+import type { BicingFilterState, BicingStation } from '../types/bicing';
 
 function station(over: Partial<BicingStation>): BicingStation {
   return {
@@ -12,55 +12,48 @@ function station(over: Partial<BicingStation>): BicingStation {
     bikesElectric: 0,
     bikesMechanical: 0,
     docksAvailable: 0,
+    docksElectric: 0,
+    docksMechanical: 0,
     status: 'operativa',
     lastReported: 0,
     ...over,
   };
 }
 
-describe('resolveBicingFilter', () => {
-  it('maps the two chips to a combined value', () => {
-    expect(resolveBicingFilter(true, true)).toBe('tots');
-    expect(resolveBicingFilter(true, false)).toBe('electric');
-    expect(resolveBicingFilter(false, true)).toBe('mecanic');
-    expect(resolveBicingFilter(false, false)).toBe('cap');
-  });
-});
+const agafar: BicingFilterState = { action: 'agafar', type: 'electric' };
+const retElec: BicingFilterState = { action: 'retornar', type: 'electric' };
+const retMec: BicingFilterState = { action: 'retornar', type: 'mecanic' };
+const cap: BicingFilterState = { action: 'cap', type: 'electric' };
 
-describe('stationMatchesFilter', () => {
-  const elec = station({ bikesElectric: 3, bikesMechanical: 0 });
-  const mec = station({ bikesElectric: 0, bikesMechanical: 2 });
-  const empty = station({ bikesElectric: 0, bikesMechanical: 0 });
-
-  it('tots: any available bike passes, empty fails', () => {
-    expect(stationMatchesFilter(elec, 'tots')).toBe(true);
-    expect(stationMatchesFilter(mec, 'tots')).toBe(true);
-    expect(stationMatchesFilter(empty, 'tots')).toBe(false);
+describe('stationMatches', () => {
+  it('agafar: passes when any bike is available', () => {
+    expect(stationMatches(station({ bikesElectric: 1 }), agafar)).toBe(true);
+    expect(stationMatches(station({ bikesMechanical: 2 }), agafar)).toBe(true);
+    expect(stationMatches(station({}), agafar)).toBe(false);
   });
 
-  it('electric/mecanic: only that type passes', () => {
-    expect(stationMatchesFilter(elec, 'electric')).toBe(true);
-    expect(stationMatchesFilter(mec, 'electric')).toBe(false);
-    expect(stationMatchesFilter(mec, 'mecanic')).toBe(true);
-    expect(stationMatchesFilter(elec, 'mecanic')).toBe(false);
+  it('retornar: passes when there is a free dock for that type', () => {
+    expect(stationMatches(station({ docksElectric: 3 }), retElec)).toBe(true);
+    expect(stationMatches(station({ docksElectric: 0, docksMechanical: 4 }), retElec)).toBe(false);
+    expect(stationMatches(station({ docksMechanical: 4 }), retMec)).toBe(true);
   });
 
-  it('cap hides every station', () => {
-    expect(stationMatchesFilter(elec, 'cap')).toBe(false);
+  it('cap: hides every station', () => {
+    expect(stationMatches(station({ bikesElectric: 9, docksElectric: 9 }), cap)).toBe(false);
   });
 });
 
 describe('filterStations', () => {
   it('returns empty for cap', () => {
-    expect(filterStations([station({ bikesElectric: 5 })], 'cap')).toEqual([]);
+    expect(filterStations([station({ bikesElectric: 5 })], cap)).toEqual([]);
   });
   it('keeps only matching stations', () => {
     const list = [
       station({ id: 'a', bikesElectric: 1 }),
-      station({ id: 'b', bikesMechanical: 1 }),
+      station({ id: 'b', docksMechanical: 1 }),
       station({ id: 'c' }),
     ];
-    expect(filterStations(list, 'electric').map((s) => s.id)).toEqual(['a']);
-    expect(filterStations(list, 'tots').map((s) => s.id)).toEqual(['a', 'b']);
+    expect(filterStations(list, agafar).map((s) => s.id)).toEqual(['a']);
+    expect(filterStations(list, retMec).map((s) => s.id)).toEqual(['b']);
   });
 });

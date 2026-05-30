@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
+import type { BicingBikeType, BicingFilterState } from '../types/bicing';
 
-export interface BicingFilterState {
-  electric: boolean;
-  mecanic: boolean;
-}
-
-const DEFAULT: BicingFilterState = { electric: true, mecanic: true };
+const DEFAULT: BicingFilterState = { action: 'agafar', type: 'electric' };
 
 function read(key: string): BicingFilterState {
   if (typeof window === 'undefined') return DEFAULT;
@@ -13,17 +9,20 @@ function read(key: string): BicingFilterState {
     const raw = window.localStorage.getItem(key);
     if (!raw) return DEFAULT;
     const parsed = JSON.parse(raw);
-    if (typeof parsed?.electric === 'boolean' && typeof parsed?.mecanic === 'boolean') {
-      return parsed;
-    }
+    const action =
+      parsed?.action === 'agafar' || parsed?.action === 'retornar' || parsed?.action === 'cap'
+        ? parsed.action
+        : 'agafar';
+    const type = parsed?.type === 'mecanic' ? 'mecanic' : 'electric';
+    return { action, type };
   } catch {
-    // ignore
+    return DEFAULT;
   }
-  return DEFAULT;
 }
 
-// Two independent Bicing chips persisted under the given key. Both default on;
-// both can be off (which hides the Bicing layer entirely).
+// Bicing intent filter. Agafar / Retornar are mutually exclusive; tapping the
+// active one again hides the layer ('cap'). When returning, a bike type must
+// be chosen.
 export function useBicingFilter(storageKey: string) {
   const [state, setState] = useState<BicingFilterState>(() => read(storageKey));
 
@@ -37,8 +36,11 @@ export function useBicingFilter(storageKey: string) {
   }, [storageKey, state]);
 
   return {
-    ...state,
-    setElectric: (v: boolean) => setState((s) => ({ ...s, electric: v })),
-    setMecanic: (v: boolean) => setState((s) => ({ ...s, mecanic: v })),
+    state,
+    toggleAgafar: () =>
+      setState((s) => ({ ...s, action: s.action === 'agafar' ? 'cap' : 'agafar' })),
+    toggleRetornar: () =>
+      setState((s) => ({ ...s, action: s.action === 'retornar' ? 'cap' : 'retornar' })),
+    setType: (type: BicingBikeType) => setState((s) => ({ ...s, type, action: 'retornar' })),
   };
 }
