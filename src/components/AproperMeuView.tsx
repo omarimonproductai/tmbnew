@@ -17,7 +17,7 @@ import { inferKind } from '../types/cooltra';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
-import { filterStations, resolveBicingFilter } from '../utils/bicingFilter';
+import { filterStations } from '../utils/bicingFilter';
 import { haversine } from '../utils/distance';
 import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
@@ -186,23 +186,16 @@ export function AproperMeuView({
 
   // Bicing: own layer + own list section (kept out of the "X parades a prop"
   // count). Filtered by the two chips (availability) and by the radius.
-  const { stations: bicingStations, lastFailureAt: bicingFailureAt, refresh: refreshBicing } =
+  const { stations: bicingStations, lastFailureAt: bicingFailureAt } =
     useBicingStations(true);
-  // The manual "Actualitzar" button refreshes the GPS fix and the live Bicing
-  // counts together (TMB stops are static; real-time arrivals load per stop).
-  const handleRefresh = () => {
-    refresh();
-    refreshBicing();
-  };
   const bicingFilters = useBicingFilter(BICING_FILTER_STORAGE_KEY);
-  const bicingFilter = resolveBicingFilter(bicingFilters.electric, bicingFilters.mecanic);
   const bicingNear = useMemo(() => {
     if (!position) return [];
-    return filterStations(bicingStations, bicingFilter)
+    return filterStations(bicingStations, bicingFilters.state)
       .map((s) => ({ station: s, distanceM: haversine(position, { lat: s.lat, lng: s.lng }) }))
       .filter((x) => x.distanceM <= radius)
       .sort((a, b) => a.distanceM - b.distanceM);
-  }, [bicingStations, bicingFilter, position, radius]);
+  }, [bicingStations, bicingFilters.state, position, radius]);
   const bicingMapStations = useMemo(() => bicingNear.map((x) => x.station), [bicingNear]);
 
   // A shared ?parada= link focuses a stop on the map; make sure its marker
@@ -324,7 +317,6 @@ export function AproperMeuView({
             position={position}
             status={status}
             error={error}
-            onRefresh={handleRefresh}
             radius={radius}
             onRadiusChange={setRadius}
           />
@@ -336,10 +328,10 @@ export function AproperMeuView({
               {parades.length > 0 && <FilterBar value={filtre} onChange={setFiltre} />}
               {bicingStations.length > 0 && (
                 <BicingFilters
-                  electric={bicingFilters.electric}
-                  mecanic={bicingFilters.mecanic}
-                  onElectricChange={bicingFilters.setElectric}
-                  onMecanicChange={bicingFilters.setMecanic}
+                  state={bicingFilters.state}
+                  onToggleAgafar={bicingFilters.toggleAgafar}
+                  onToggleRetornar={bicingFilters.toggleRetornar}
+                  onSetType={bicingFilters.setType}
                 />
               )}
             </div>
@@ -378,6 +370,7 @@ export function AproperMeuView({
           onRefresh={refresh}
           cooltraVehicles={visibleCooltra}
           bicingStations={bicingMapStations}
+          bicingFilter={bicingFilters.state}
         />
         <div className="cooltra-map-control">
           <CooltraMapButton

@@ -2520,25 +2520,36 @@ body {
 }
 
 /* --- Bicing (estacions GBFS) ------------------------------------------ */
-/* Rounded-square red badge with the available-bikes count — a different
-   SHAPE from the round TMB dots / Cooltra dots so the two never get
-   confused, even though Bicing's brand is also red. */
-.bicing-marker { background: transparent; border: none; }
-.bicing-marker__count {
+/* SQUARE markers so Bicing reads instantly apart from the round TMB / Cooltra
+   dots. Agafar: split square (green = electric bikes, yellow = mechanical).
+   Retornar: a single square coloured by the chosen type with the free docks. */
+.bicing-sq-icon { background: transparent; border: none; }
+.bicing-sq {
+  display: inline-flex;
+  height: 24px;
+  border-radius: 7px;
+  border: 2px solid #fff;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.bicing-sq--solo {
+  width: 26px;
+  align-items: center;
+  justify-content: center;
+}
+.bicing-sq--split { width: 42px; }
+.bicing-sq__half {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-  background: #d4111e;
-  color: #fff;
-  border: 2px solid #fff;
-  font-size: 11px;
-  font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  box-sizing: border-box;
 }
+.bicing-sq__e { background: #1b9e4b; }
+.bicing-sq__m { background: #f5a623; }
 
 /* Compact chips (Aprop meu list + Bicing mode overlay) */
 .bicing-chips { display: inline-flex; gap: 6px; }
@@ -2556,11 +2567,30 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
-.bicing-chip__ic { font-size: 13px; line-height: 1; }
+.bicing-chip__t { line-height: 1; }
 .bicing-chip.active { color: #fff; border-color: #d4111e; background: #d4111e; }
 @media (hover: hover) {
   .bicing-chip:hover { border-color: #d4111e; }
 }
+
+/* Bike-type sub-chips, shown only when Retornar is active. */
+.bicing-type-chip {
+  width: 34px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+.bicing-type-chip.active { filter: none; opacity: 1; }
+.bicing-type-chip--elec.active { border-color: #1b9e4b; background: #e6f4ea; }
+.bicing-type-chip--mec.active { border-color: #f5a623; background: #fff3d6; }
 
 .aprop-filters-row {
   display: flex;
@@ -2626,8 +2656,8 @@ body {
   background: #f2f2f2;
   color: #333;
 }
-.bicing-pill--elec { background: #fff3d6; color: #8a5b00; }
-.bicing-pill--mec { background: #e6f4ea; color: #1b6b34; }
+.bicing-pill--elec { background: #e6f4ea; color: #1b6b34; }
+.bicing-pill--mec { background: #fff3d6; color: #8a5b00; }
 .bicing-pill--dock { background: #eef1f6; color: #4a5568; }
 
 .bicing-status { font-weight: 600; }
@@ -2644,8 +2674,8 @@ body {
 .bicing-stat { display: flex; flex-direction: column; align-items: center; flex: 1; }
 .bicing-stat__n { font-size: 18px; font-weight: 700; color: #222; }
 .bicing-stat__l { font-size: 10px; color: #888; text-align: center; }
-.bicing-stat--elec .bicing-stat__n { color: #b07900; }
-.bicing-stat--mec .bicing-stat__n { color: #1b6b34; }
+.bicing-stat--elec .bicing-stat__n { color: #1b6b34; }
+.bicing-stat--mec .bicing-stat__n { color: #b07900; }
 .bicing-cap { font-size: 11px; color: #999; }
 
 /* Bicing mode floating filter bar */

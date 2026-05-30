@@ -13,6 +13,8 @@ const sample: BicingStation[] = [
     bikesElectric: 3,
     bikesMechanical: 2,
     docksAvailable: 15,
+    docksElectric: 15,
+    docksMechanical: 15,
     status: 'operativa',
     lastReported: 0,
   },

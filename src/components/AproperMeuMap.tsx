@@ -17,7 +17,7 @@ import { useFavorits } from '../hooks/useFavorits';
 import { favStarIcon } from '../utils/favStarIcon';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
-import type { BicingStation } from '../types/bicing';
+import type { BicingFilterState, BicingStation } from '../types/bicing';
 import type { CooltraVehicle } from '../types/cooltra';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
@@ -34,6 +34,7 @@ interface Props {
   onRefresh?: () => void;
   cooltraVehicles?: CooltraVehicle[];
   bicingStations?: BicingStation[];
+  bicingFilter?: BicingFilterState;
 }
 
 export function AproperMeuMap({
@@ -47,6 +48,7 @@ export function AproperMeuMap({
   onRefresh,
   cooltraVehicles = [],
   bicingStations = [],
+  bicingFilter,
 }: Props) {
   const focusStop = focusStopId
     ? parades.find((p) => p.id === focusStopId) ?? null
@@ -135,7 +137,9 @@ export function AproperMeuMap({
         );
       })}
       {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
-      {bicingStations.length > 0 && <BicingLayer stations={bicingStations} origin={centre} />}
+      {bicingStations.length > 0 && bicingFilter && (
+        <BicingLayer stations={bicingStations} filter={bicingFilter} origin={centre} />
+      )}
       <InvalidateOnResize />
     </MapContainer>
   );

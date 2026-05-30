@@ -8,7 +8,7 @@ import { useBicingFilter } from '../hooks/useBicingFilter';
 import { useBicingStations } from '../hooks/useBicingStations';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { rotateOptions } from '../utils/leafletRotate';
-import { filterStations, resolveBicingFilter } from '../utils/bicingFilter';
+import { filterStations } from '../utils/bicingFilter';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
 const FILTER_STORAGE_KEY = 'tmb-bicing-filter-v1';
@@ -20,8 +20,7 @@ export function BicingView() {
   const filters = useBicingFilter(FILTER_STORAGE_KEY);
   const { position } = useGeolocation(true);
 
-  const filter = resolveBicingFilter(filters.electric, filters.mecanic);
-  const visible = useMemo(() => filterStations(stations, filter), [stations, filter]);
+  const visible = useMemo(() => filterStations(stations, filters.state), [stations, filters.state]);
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   useEffect(() => {
@@ -58,17 +57,17 @@ export function BicingView() {
               </Tooltip>
             </CircleMarker>
           )}
-          <BicingLayer stations={visible} origin={position} />
+          <BicingLayer stations={visible} filter={filters.state} origin={position} />
           <FitToStations stations={visible} userPosition={position} />
           <RecenterButton userPosition={position} />
           <InvalidateOnResize />
         </MapContainer>
         <div className="bicing-mode-filters">
           <BicingFilters
-            electric={filters.electric}
-            mecanic={filters.mecanic}
-            onElectricChange={filters.setElectric}
-            onMecanicChange={filters.setMecanic}
+            state={filters.state}
+            onToggleAgafar={filters.toggleAgafar}
+            onToggleRetornar={filters.toggleRetornar}
+            onSetType={filters.setType}
           />
         </div>
       </section>

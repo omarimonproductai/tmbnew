@@ -4,34 +4,49 @@ import { BicingStationPopup } from './BicingStationPopup';
 import { useFavorits } from '../hooks/useFavorits';
 import { favStarIcon } from '../utils/favStarIcon';
 import { haversine } from '../utils/distance';
-import type { BicingStation } from '../types/bicing';
+import { BICING_TYPE_COLOR, type BicingFilterState, type BicingStation } from '../types/bicing';
 import type { Coordinate } from '../types/tmb';
 
 interface Props {
   stations: BicingStation[];
-  // When provided, the popup shows the distance from this origin.
+  filter: BicingFilterState;
   origin?: Coordinate | null;
 }
 
-// A rounded-square red "B" badge with the total available bikes — visually
-// distinct from the round TMB dots and the small Cooltra dots. Plain DivIcon
-// markers in the default pane (no custom pane / no position:relative) to avoid
-// the Leaflet pitfalls noted in HANDOVER.
-function stationIcon(total: number, fav: boolean): L.DivIcon {
+// SQUARE markers (so Bicing reads instantly apart from the round TMB/Cooltra
+// dots). In "agafar" mode the square is split — green = electric bikes, yellow
+// = mechanical bikes. In "retornar" mode it's a single square coloured by the
+// chosen type, showing the free docks for that type.
+function stationIcon(s: BicingStation, filter: BicingFilterState, fav: boolean): L.DivIcon {
+  if (filter.action === 'retornar') {
+    const color = BICING_TYPE_COLOR[filter.type];
+    const docks = filter.type === 'electric' ? s.docksElectric : s.docksMechanical;
+    return L.divIcon({
+      className: `bicing-sq-icon${fav ? ' is-fav' : ''}`,
+      html: `<span class="bicing-sq bicing-sq--solo" style="background:${color}">${docks}</span>`,
+      iconSize: [26, 24],
+      iconAnchor: [13, 12],
+      popupAnchor: [0, -12],
+    });
+  }
   return L.divIcon({
-    className: `bicing-marker${fav ? ' is-fav' : ''}`,
-    html: `<span class="bicing-marker__count">${total}</span>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    className: `bicing-sq-icon${fav ? ' is-fav' : ''}`,
+    html:
+      `<span class="bicing-sq bicing-sq--split">` +
+      `<span class="bicing-sq__half bicing-sq__e">${s.bikesElectric}</span>` +
+      `<span class="bicing-sq__half bicing-sq__m">${s.bikesMechanical}</span>` +
+      `</span>`,
+    iconSize: [42, 24],
+    iconAnchor: [21, 12],
     popupAnchor: [0, -12],
   });
 }
 
-export function BicingLayer({ stations, origin = null }: Props) {
+export function BicingLayer({ stations, filter, origin = null }: Props) {
   return (
     <>
       {stations.map((s) => (
-        <BicingStationMarker key={s.id} station={s} origin={origin} />
+        <BicingStationMarker key={s.id} station={s} filter={filter} origin={origin} />
       ))}
     </>
   );
@@ -39,20 +54,21 @@ export function BicingLayer({ stations, origin = null }: Props) {
 
 function BicingStationMarker({
   station,
+  filter,
   origin,
 }: {
   station: BicingStation;
+  filter: BicingFilterState;
   origin: Coordinate | null;
 }) {
   const { isBicingFav } = useFavorits();
   const fav = isBicingFav(station.id);
-  const total = station.bikesElectric + station.bikesMechanical;
   const distanceM = origin
     ? haversine(origin, { lat: station.lat, lng: station.lng })
     : null;
   return (
     <>
-      <Marker position={[station.lat, station.lng]} icon={stationIcon(total, fav)}>
+      <Marker position={[station.lat, station.lng]} icon={stationIcon(station, filter, fav)}>
         <Tooltip direction="top" offset={[0, -12]} className="stop-tooltip">
           <span className="tooltip-name">{station.name}</span>
         </Tooltip>
