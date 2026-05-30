@@ -175,7 +175,7 @@ export function AproperMeuView({
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  const { position, status, error, refresh } = useGeolocation(true);
+  const { position, status, refresh } = useGeolocation(true);
   const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
   const paradesFiltrades = useMemo(
@@ -341,13 +341,7 @@ export function AproperMeuView({
           </span>
         </button>
         <div className="sheet-body">
-          <LocationBlock
-            position={position}
-            status={status}
-            error={error}
-            radius={radius}
-            onRadiusChange={setRadius}
-          />
+          <LocationBlock radius={radius} onRadiusChange={setRadius} />
           {loadingParades && parades.length === 0 && (
             <div className="state-msg">Carregant parades de tota la xarxa…</div>
           )}
