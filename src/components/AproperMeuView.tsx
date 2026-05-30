@@ -173,7 +173,7 @@ export function AproperMeuView({
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  const { position, accuracy, status, error, refresh } = useGeolocation(true);
+  const { position, status, error, refresh } = useGeolocation(true);
   const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
   const paradesFiltrades = useMemo(
@@ -186,8 +186,14 @@ export function AproperMeuView({
 
   // Bicing: own layer + own list section (kept out of the "X parades a prop"
   // count). Filtered by the two chips (availability) and by the radius.
-  const { stations: bicingStations, lastFailureAt: bicingFailureAt } =
+  const { stations: bicingStations, lastFailureAt: bicingFailureAt, refresh: refreshBicing } =
     useBicingStations(true);
+  // The manual "Actualitzar" button refreshes the GPS fix and the live Bicing
+  // counts together (TMB stops are static; real-time arrivals load per stop).
+  const handleRefresh = () => {
+    refresh();
+    refreshBicing();
+  };
   const bicingFilters = useBicingFilter(BICING_FILTER_STORAGE_KEY);
   const bicingFilter = resolveBicingFilter(bicingFilters.electric, bicingFilters.mecanic);
   const bicingNear = useMemo(() => {
@@ -316,10 +322,9 @@ export function AproperMeuView({
         <div className="sheet-body">
           <LocationBlock
             position={position}
-            accuracy={accuracy}
             status={status}
             error={error}
-            onRefresh={refresh}
+            onRefresh={handleRefresh}
             radius={radius}
             onRadiusChange={setRadius}
           />

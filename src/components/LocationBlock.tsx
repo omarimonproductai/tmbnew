@@ -1,9 +1,14 @@
+import { useCooldown } from '../hooks/useCooldown';
 import type { Coordinate } from '../types/tmb';
 import type { GeoStatus } from '../hooks/useGeolocation';
 
+// Manual refresh re-fetches the live Bicing counts (and the GPS fix). The
+// Bicing backend caches for 15s, so we gate the button with a matching
+// cooldown and surface the countdown so the user knows why it's waiting.
+const REFRESH_COOLDOWN_MS = 15_000;
+
 interface Props {
   position: Coordinate | null;
-  accuracy: number | null;
   status: GeoStatus;
   error: string | null;
   onRefresh: () => void;
@@ -13,28 +18,45 @@ interface Props {
 
 export function LocationBlock({
   position,
-  accuracy,
   status,
   error,
   onRefresh,
   radius,
   onRadiusChange,
 }: Props) {
+  const cooldown = useCooldown(REFRESH_COOLDOWN_MS);
+  const requesting = status === 'requesting';
+  const disabled = requesting || cooldown.isActive;
+  const sub = subtitleFor(status, position, error);
+
+  const handleClick = () => {
+    if (disabled) return;
+    onRefresh();
+    cooldown.start();
+  };
+
+  const secsLeft = Math.ceil(cooldown.remainingMs / 1000);
+
   return (
     <div className="location-block">
       <div className="location-row">
         <div className="geo-dot" data-status={status} />
         <div className="location-info">
           <div className="location-title">{titleFor(status)}</div>
-          <div className="location-sub">{subtitleFor(status, position, accuracy, error)}</div>
+          {sub && <div className="location-sub">{sub}</div>}
         </div>
         <button
           type="button"
-          className="geo-btn"
-          onClick={onRefresh}
-          disabled={status === 'requesting'}
+          className={`geo-btn${cooldown.isActive ? ' cooldown' : ''}`}
+          onClick={handleClick}
+          disabled={disabled}
+          title={
+            cooldown.isActive
+              ? `Pots tornar a actualitzar en ${secsLeft}s`
+              : 'Actualitzar ubicació i dades'
+          }
         >
-          {status === 'requesting' ? 'Buscant…' : 'Actualitzar'}
+          {requesting ? 'Buscant…' : cooldown.isActive ? `Espera ${secsLeft}s` : 'Actualitzar'}
         </button>
       </div>
       <div className="radius-row">
@@ -72,13 +94,11 @@ function titleFor(s: GeoStatus) {
 function subtitleFor(
   s: GeoStatus,
   position: Coordinate | null,
-  accuracy: number | null,
   error: string | null,
 ): string {
-  if (s === 'granted' && position) {
-    const acc = accuracy ? ` · precisió ±${Math.round(accuracy)} m` : '';
-    return `${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}${acc}`;
-  }
+  // Coordinates and accuracy are intentionally not shown (not useful to the
+  // user). Granted state needs no subtitle.
+  if (s === 'granted' && position) return '';
   if (s === 'denied' || s === 'unavailable') return error ?? '—';
   if (s === 'requesting') return 'Esperant resposta del navegador…';
   return 'Prem "Actualitzar" per fer servir la teva posició.';

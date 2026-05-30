@@ -1,3 +1,4 @@
+import { BicingLogo } from './BicingLogo';
 import { FavStar } from './FavStar';
 import { useFavorits } from '../hooks/useFavorits';
 import { formatDistance } from '../utils/distance';
@@ -13,7 +14,9 @@ export function BicingStationRow({ station, distanceM }: Props) {
   const { isBicingFav, toggleBicing } = useFavorits();
   return (
     <div className="bicing-row">
-      <div className="bicing-row-badge" aria-hidden="true">B</div>
+      <div className="bicing-row-badge" aria-hidden="true">
+        <BicingLogo size={18} />
+      </div>
       <div className="bicing-row-info">
         <div className="bicing-row-name-row">
           <div className="bicing-row-name" title={station.name}>{station.name}</div>

@@ -1,3 +1,5 @@
+import { BicingLogo } from './BicingLogo';
+
 export type AppMode = 'route' | 'linies' | 'bicing' | 'aprop-meu' | 'favorits';
 
 interface Props {
@@ -36,21 +38,7 @@ const OPTIONS: Option[] = [
   {
     value: 'bicing',
     label: 'Bicing',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth={2} />
-        <text
-          x="12"
-          y="17"
-          textAnchor="middle"
-          fontSize="14"
-          fontWeight="700"
-          fill="currentColor"
-        >
-          B
-        </text>
-      </svg>
-    ),
+    icon: <BicingLogo size={20} />,
   },
   {
     value: 'aprop-meu',
