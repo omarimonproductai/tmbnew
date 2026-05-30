@@ -6,7 +6,7 @@ import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
-import { ParadesAprop } from './ParadesAprop';
+import { StopItem } from './ParadesAprop';
 import { Toast } from './Toast';
 import { useBicingFilter } from '../hooks/useBicingFilter';
 import { useBicingStations } from '../hooks/useBicingStations';
@@ -19,6 +19,7 @@ import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
 import { filterStations } from '../utils/bicingFilter';
 import { haversine } from '../utils/distance';
+import type { BicingStation } from '../types/bicing';
 import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
 const TOP_N = 5;
@@ -198,6 +199,32 @@ export function AproperMeuView({
   }, [bicingStations, bicingFilters.state, position, radius]);
   const bicingMapStations = useMemo(() => bicingNear.map((x) => x.station), [bicingNear]);
 
+  // One proximity-ordered list mixing stops and Bicing stations.
+  type MergedItem =
+    | { kind: 'parada'; dist: number; parada: ParadaAprop; rank: number }
+    | { kind: 'bicing'; dist: number; station: BicingStation };
+  const mergedNearby = useMemo<MergedItem[]>(() => {
+    const items: MergedItem[] = [
+      ...paradesFiltrades.map(
+        (p, i): MergedItem => ({ kind: 'parada', dist: p.distanciaM, parada: p, rank: i + 1 }),
+      ),
+      ...bicingNear.map(
+        (b): MergedItem => ({ kind: 'bicing', dist: b.distanceM, station: b.station }),
+      ),
+    ];
+    return items.sort((a, b) => a.dist - b.dist);
+  }, [paradesFiltrades, bicingNear]);
+
+  // Single-line header; each count is shown only when its chips are active.
+  const listHeader = useMemo(() => {
+    const parts: string[] = [];
+    if (filtre !== 'cap') parts.push(`Parades: ${paradesFiltrades.length}`);
+    if (bicingFilters.state.action !== 'cap') {
+      parts.push(`Estacions bicing: ${bicingNear.length}`);
+    }
+    return parts.join(' - ');
+  }, [filtre, paradesFiltrades.length, bicingFilters.state.action, bicingNear.length]);
+
   // A shared ?parada= link focuses a stop on the map; make sure its marker
   // is present even if it falls outside the radius or the active filter.
   const mapParades = useMemo<ParadaAprop[]>(() => {
@@ -336,26 +363,38 @@ export function AproperMeuView({
               )}
             </div>
           )}
-          {parades.length > 0 && (
-            <ParadesAprop
-              parades={paradesFiltrades}
-              topN={TOP_N}
-              onSelectParada={(id) =>
-                setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
-              }
-            />
-          )}
-          {bicingNear.length > 0 && (
-            <div className="bicing-near-section">
-              <div className="section-title">
-                Estacions Bicing a prop{' '}
-                <span className="section-count">· {bicingNear.length}</span>
+          {mergedNearby.length > 0 && (
+            <>
+              {listHeader && <div className="section-title">{listHeader}</div>}
+              <div className="stops-list">
+                {mergedNearby.map((item) =>
+                  item.kind === 'parada' ? (
+                    <StopItem
+                      key={`p-${item.parada.id}`}
+                      parada={item.parada}
+                      rank={item.rank}
+                      topN={TOP_N}
+                      onSelect={(id) =>
+                        setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
+                      }
+                    />
+                  ) : (
+                    <BicingStationRow
+                      key={`b-${item.station.id}`}
+                      station={item.station}
+                      distanceM={item.dist}
+                    />
+                  ),
+                )}
               </div>
-              {bicingNear.map(({ station, distanceM }) => (
-                <BicingStationRow key={station.id} station={station} distanceM={distanceM} />
-              ))}
-            </div>
+            </>
           )}
+          {position &&
+            mergedNearby.length === 0 &&
+            parades.length > 0 &&
+            (filtre !== 'cap' || bicingFilters.state.action !== 'cap') && (
+              <div className="state-msg">No hi ha res a prop en aquest radi.</div>
+            )}
         </div>
       </aside>
       <section className="map-area" aria-label="Mapa amb radi de cerca">

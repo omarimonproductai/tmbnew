@@ -2604,8 +2604,7 @@ body {
 }
 .aprop-filters-row .filters { padding: 10px 0; }
 
-/* Aprop meu "Estacions Bicing a prop" list section */
-.bicing-near-section { padding: 4px 0 8px; }
+/* Bicing station list row (Aprop meu merged list + Favourites) */
 .bicing-row {
   display: flex;
   gap: 10px;
