@@ -1,4 +1,6 @@
+import { DirectionsButton } from './DirectionsButton';
 import { FavStar } from './FavStar';
+import { ShareButton } from './ShareButton';
 import { useFavorits } from '../hooks/useFavorits';
 import { formatDistance } from '../utils/distance';
 import { BICING_STATUS_LABEL, type BicingStation } from '../types/bicing';
@@ -37,6 +39,18 @@ export function BicingStationPopup({ station, distanceM }: Props) {
       </div>
       <BicingStats station={station} />
       <div className="bicing-cap">Capacitat total {station.capacity}</div>
+      <div className="aprop-popup-actions">
+        <DirectionsButton
+          lat={station.lat}
+          lng={station.lng}
+          nom={station.name}
+          variant="block"
+        />
+        <ShareButton
+          bicing={{ name: station.name, lat: station.lat, lng: station.lng }}
+          variant="icon"
+        />
+      </div>
     </div>
   );
 }

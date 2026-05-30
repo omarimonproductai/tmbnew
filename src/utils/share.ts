@@ -38,3 +38,27 @@ export async function shareParada(parada: ParadaAmbLinies): Promise<ShareResult>
     return 'failed';
   }
 }
+
+// Bicing stations have no in-app deep link; share a maps location instead.
+export async function shareBicing(station: {
+  name: string;
+  lat: number;
+  lng: number;
+}): Promise<ShareResult> {
+  const url = `https://www.google.com/maps/search/?api=1&query=${station.lat},${station.lng}`;
+  const text = `Estació Bicing ${station.name}`;
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({ title: 'Tu et Mous Bé', text, url });
+      return 'shared';
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return 'cancelled';
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    return 'copied';
+  } catch {
+    return 'failed';
+  }
+}

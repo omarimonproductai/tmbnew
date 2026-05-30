@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Toast } from './Toast';
-import { shareParada } from '../utils/share';
+import { shareBicing, shareParada } from '../utils/share';
 import type { ParadaAmbLinies } from '../types/tmb';
 
 interface Props {
-  parada: ParadaAmbLinies;
+  // Share either a TMB stop (deep link) or a Bicing station (maps location).
+  parada?: ParadaAmbLinies;
+  bicing?: { name: string; lat: number; lng: number };
   variant?: 'icon' | 'block';
 }
 
@@ -18,12 +20,17 @@ function ShareIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-export function ShareButton({ parada, variant = 'icon' }: Props) {
+export function ShareButton({ parada, bicing, variant = 'icon' }: Props) {
   const [toast, setToast] = useState<string | null>(null);
+  const label = parada?.nom ?? bicing?.name ?? '';
 
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const result = await shareParada(parada);
+    const result = parada
+      ? await shareParada(parada)
+      : bicing
+        ? await shareBicing(bicing)
+        : 'failed';
     if (result === 'copied') setToast('Enllaç copiat al porta-retalls');
     else if (result === 'failed') setToast('No s’ha pogut compartir');
   };
@@ -34,7 +41,7 @@ export function ShareButton({ parada, variant = 'icon' }: Props) {
         type="button"
         className={`share-btn share-btn--${variant}`}
         onClick={handleClick}
-        aria-label={`Comparteix la parada ${parada.nom}`}
+        aria-label={`Comparteix ${label}`}
         title="Comparteix"
       >
         <ShareIcon size={variant === 'block' ? 16 : 18} />

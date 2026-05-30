@@ -624,6 +624,7 @@ body {
   align-items: stretch;
 }
 .aprop-popup-actions .route-here-btn { flex: 1; }
+.aprop-popup-actions .dir-btn--block { flex: 1; width: auto; margin-top: 0; }
 .aprop-popup-actions .share-btn--icon {
   flex-shrink: 0;
   width: 38px;
