@@ -289,7 +289,8 @@ function AproperMeuStopMarker({
   autoOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const [winking, setWinking] = useState(false);
+  // winkPhase: 0 = idle, 1 = enlarged beat, alternates to pulse the marker.
+  const [winkPhase, setWinkPhase] = useState(0);
   const markerRef = useRef<L.CircleMarker>(null);
   const { isParadaFav } = useFavorits();
   const isTop = rank <= topN;
@@ -297,12 +298,29 @@ function AproperMeuStopMarker({
   const color = rep ? getLineColor(rep) : '#666';
   const fav = isParadaFav(parada.id);
 
-  // Briefly enlarge the marker when its list row is tapped ("wink").
+  // When its list row is tapped, make the marker unmistakable: pulse it big a
+  // few times and pop its name label open for ~1s.
   useEffect(() => {
     if (winkNonce == null) return;
-    setWinking(true);
-    const t = window.setTimeout(() => setWinking(false), 500);
-    return () => window.clearTimeout(t);
+    const m = markerRef.current;
+    m?.bringToFront();
+    m?.openTooltip();
+    setWinkPhase(1);
+    let ticks = 0;
+    const id = window.setInterval(() => {
+      ticks += 1;
+      if (ticks >= 6) {
+        window.clearInterval(id);
+        setWinkPhase(0);
+        m?.closeTooltip();
+      } else {
+        setWinkPhase((p) => (p ? 0 : 1));
+      }
+    }, 170);
+    return () => {
+      window.clearInterval(id);
+      m?.closeTooltip();
+    };
   }, [winkNonce]);
 
   // A shared ?parada= link opens this stop's popup on arrival.
@@ -313,7 +331,8 @@ function AproperMeuStopMarker({
   }, [autoOpen]);
 
   const baseRadius = isTop ? 10 : 5;
-  const radius = winking ? baseRadius + 1 : baseRadius;
+  const winking = winkPhase === 1;
+  const radius = winking ? baseRadius + 9 : baseRadius;
   const popupRef = useRef<L.Popup>(null);
   const rePan = () => popupRef.current?.update();
   return (
@@ -323,8 +342,8 @@ function AproperMeuStopMarker({
         center={[parada.lat, parada.lng]}
         radius={radius}
         pathOptions={{
-          color: '#ffffff',
-          weight: winking ? 4 : isTop ? 3 : 1.5,
+          color: winking ? '#1d7df2' : '#ffffff',
+          weight: winking ? 5 : isTop ? 3 : 1.5,
           fillColor: color,
           fillOpacity: 1,
         }}
