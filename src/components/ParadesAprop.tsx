@@ -13,41 +13,9 @@ const TYPE_LABEL: Record<TransportType, string> = {
   bus: 'Bus',
 };
 
-interface Props {
-  parades: ParadaAprop[];
-  topN: number;
-  onSelectParada?: (id: string) => void;
-}
-
-export function ParadesAprop({ parades, topN, onSelectParada }: Props) {
-  if (parades.length === 0) {
-    return (
-      <div className="state-msg">
-        No hi ha parades en aquesta zona. Prova un radi més gran.
-      </div>
-    );
-  }
-  return (
-    <>
-      <div className="section-title">
-        Parades en aquesta zona <span className="section-count">· {parades.length}</span>
-      </div>
-      <div className="stops-list">
-        {parades.map((p, idx) => (
-          <StopItem
-            key={p.id}
-            parada={p}
-            rank={idx + 1}
-            topN={topN}
-            onSelect={onSelectParada}
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function StopItem({
+// A single stop row. Rendered directly by AproperMeuView, interleaved with
+// Bicing station rows in one proximity-ordered list.
+export function StopItem({
   parada,
   rank,
   topN,
