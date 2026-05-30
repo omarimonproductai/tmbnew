@@ -3,18 +3,30 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { FilterBar } from './FilterBar';
 
 describe('FilterBar', () => {
-  it('marca el filtre actiu', () => {
-    render(<FilterBar value="metro" onChange={() => {}} />);
-    expect(screen.getByRole('tab', { name: 'Metro' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
+  it('marca tots dos botons quan el valor es tots', () => {
+    render(<FilterBar value="tots" onChange={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Metro' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Bus' })).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('crida onChange amb el nou valor', () => {
+  it("desactivar Bus quan tots dos estan actius deixa nomes Metro", () => {
     const onChange = vi.fn();
     render(<FilterBar value="tots" onChange={onChange} />);
-    fireEvent.click(screen.getByRole('tab', { name: 'Bus' }));
-    expect(onChange).toHaveBeenCalledWith('bus');
+    fireEvent.click(screen.getByRole('button', { name: 'Bus' }));
+    expect(onChange).toHaveBeenCalledWith('metro');
+  });
+
+  it('reactivar Bus quan nomes Metro estava actiu torna a tots', () => {
+    const onChange = vi.fn();
+    render(<FilterBar value="metro" onChange={onChange} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Bus' }));
+    expect(onChange).toHaveBeenCalledWith('tots');
+  });
+
+  it("no permet desactivar l'unic mode actiu", () => {
+    const onChange = vi.fn();
+    render(<FilterBar value="metro" onChange={onChange} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Metro' }));
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

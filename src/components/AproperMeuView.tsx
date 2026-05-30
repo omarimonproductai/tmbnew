@@ -26,6 +26,7 @@ const RADIUS_MIN = 100;
 const RADIUS_MAX = 1500;
 const RADIUS_DEFAULT = 300;
 const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
+const FILTER_STORAGE_KEY = 'tmb-aprop-meu-filter-v1';
 
 function loadStoredRadius(): number {
   if (typeof window === 'undefined') return RADIUS_DEFAULT;
@@ -46,6 +47,17 @@ function loadStoredCooltra(): boolean {
   } catch {
     return false;
   }
+}
+
+function loadStoredFilter(): FilterType {
+  if (typeof window === 'undefined') return 'tots';
+  try {
+    const raw = window.localStorage.getItem(FILTER_STORAGE_KEY);
+    if (raw === 'tots' || raw === 'metro' || raw === 'bus') return raw;
+  } catch {
+    // ignore
+  }
+  return 'tots';
 }
 
 function getViewportHeight(): number {
@@ -73,7 +85,7 @@ export function AproperMeuView({
   focusStop?: ParadaAmbLinies | null;
 } = {}) {
   const [radius, setRadius] = useState<number>(loadStoredRadius);
-  const [filtre, setFiltre] = useState<FilterType>('tots');
+  const [filtre, setFiltre] = useState<FilterType>(loadStoredFilter);
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
   const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
   const cooltraKinds = useCooltraKindFilters();
@@ -127,6 +139,15 @@ export function AproperMeuView({
       // ignore quota / private-mode errors
     }
   }, [cooltraOn]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(FILTER_STORAGE_KEY, filtre);
+    } catch {
+      // ignore
+    }
+  }, [filtre]);
   const dragRef = useRef<{
     startY: number;
     startHeight: number;
