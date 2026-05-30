@@ -9,9 +9,11 @@ import {
   useMap,
 } from 'react-leaflet';
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
+import { BicingLayer } from './BicingLayer';
 import { CooltraLayer } from './CooltraLayer';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
+import type { BicingStation } from '../types/bicing';
 import type { CooltraVehicle } from '../types/cooltra';
 import type { Coordinate, FavParada } from '../types/tmb';
 
@@ -21,9 +23,15 @@ interface Props {
   parades: FavParada[];
   userPosition?: Coordinate | null;
   cooltraVehicles?: CooltraVehicle[];
+  bicingStations?: BicingStation[];
 }
 
-export function FavMap({ parades, userPosition, cooltraVehicles = [] }: Props) {
+export function FavMap({
+  parades,
+  userPosition,
+  cooltraVehicles = [],
+  bicingStations = [],
+}: Props) {
   return (
     <MapContainer
       center={FALLBACK_CENTER}
@@ -50,10 +58,13 @@ export function FavMap({ parades, userPosition, cooltraVehicles = [] }: Props) {
         </CircleMarker>
       )}
       {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
+      {bicingStations.length > 0 && (
+        <BicingLayer stations={bicingStations} origin={userPosition} />
+      )}
       {parades.map((p) => (
         <FavMarker key={p.id} parada={p} />
       ))}
-      <FitToFavs parades={parades} userPosition={userPosition} />
+      <FitToFavs parades={parades} bicingStations={bicingStations} userPosition={userPosition} />
       <InvalidateOnResize />
     </MapContainer>
   );
@@ -85,20 +96,23 @@ function FavMarker({ parada }: { parada: FavParada }) {
 
 function FitToFavs({
   parades,
+  bicingStations,
   userPosition,
 }: {
   parades: FavParada[];
+  bicingStations: BicingStation[];
   userPosition?: Coordinate | null;
 }) {
   const map = useMap();
   useEffect(() => {
     const bounds = L.latLngBounds([]);
     for (const p of parades) bounds.extend([p.lat, p.lng]);
+    for (const s of bicingStations) bounds.extend([s.lat, s.lng]);
     if (userPosition) bounds.extend([userPosition.lat, userPosition.lng]);
     if (bounds.isValid()) {
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
-  }, [parades, userPosition, map]);
+  }, [parades, bicingStations, userPosition, map]);
   return null;
 }
 

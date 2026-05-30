@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
+import { BicingFilters } from './BicingFilters';
+import { BicingStationRow } from './BicingStationRow';
 import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
 import { ParadesAprop } from './ParadesAprop';
 import { Toast } from './Toast';
+import { useBicingFilter } from '../hooks/useBicingFilter';
+import { useBicingStations } from '../hooks/useBicingStations';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
@@ -13,6 +17,7 @@ import { inferKind } from '../types/cooltra';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
 import { useTotesParades } from '../hooks/useTotesParades';
+import { filterStations, resolveBicingFilter } from '../utils/bicingFilter';
 import { haversine } from '../utils/distance';
 import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
@@ -27,6 +32,7 @@ const RADIUS_MAX = 1500;
 const RADIUS_DEFAULT = 300;
 const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
 const FILTER_STORAGE_KEY = 'tmb-aprop-meu-filter-v1';
+const BICING_FILTER_STORAGE_KEY = 'tmb-aprop-bicing-filter-v1';
 
 function loadStoredRadius(): number {
   if (typeof window === 'undefined') return RADIUS_DEFAULT;
@@ -178,6 +184,21 @@ export function AproperMeuView({
     [paradesDins, filtre],
   );
 
+  // Bicing: own layer + own list section (kept out of the "X parades a prop"
+  // count). Filtered by the two chips (availability) and by the radius.
+  const { stations: bicingStations, lastFailureAt: bicingFailureAt } =
+    useBicingStations(true);
+  const bicingFilters = useBicingFilter(BICING_FILTER_STORAGE_KEY);
+  const bicingFilter = resolveBicingFilter(bicingFilters.electric, bicingFilters.mecanic);
+  const bicingNear = useMemo(() => {
+    if (!position) return [];
+    return filterStations(bicingStations, bicingFilter)
+      .map((s) => ({ station: s, distanceM: haversine(position, { lat: s.lat, lng: s.lng }) }))
+      .filter((x) => x.distanceM <= radius)
+      .sort((a, b) => a.distanceM - b.distanceM);
+  }, [bicingStations, bicingFilter, position, radius]);
+  const bicingMapStations = useMemo(() => bicingNear.map((x) => x.station), [bicingNear]);
+
   // A shared ?parada= link focuses a stop on the map; make sure its marker
   // is present even if it falls outside the radius or the active filter.
   const mapParades = useMemo<ParadaAprop[]>(() => {
@@ -198,6 +219,13 @@ export function AproperMeuView({
       );
     }
   }, [lastFailureAt]);
+  useEffect(() => {
+    if (bicingFailureAt) {
+      setToastMsg(
+        "No s'han pogut actualitzar les estacions Bicing. Mostrant les últimes guardades.",
+      );
+    }
+  }, [bicingFailureAt]);
 
   const isOpen = sheetHeight > SHEET_MIN_HEIGHT + 20;
 
@@ -298,17 +326,38 @@ export function AproperMeuView({
           {loadingParades && parades.length === 0 && (
             <div className="state-msg">Carregant parades de tota la xarxa…</div>
           )}
+          {(parades.length > 0 || bicingStations.length > 0) && (
+            <div className="aprop-filters-row">
+              {parades.length > 0 && <FilterBar value={filtre} onChange={setFiltre} />}
+              {bicingStations.length > 0 && (
+                <BicingFilters
+                  electric={bicingFilters.electric}
+                  mecanic={bicingFilters.mecanic}
+                  onElectricChange={bicingFilters.setElectric}
+                  onMecanicChange={bicingFilters.setMecanic}
+                />
+              )}
+            </div>
+          )}
           {parades.length > 0 && (
-            <>
-              <FilterBar value={filtre} onChange={setFiltre} />
-              <ParadesAprop
-                parades={paradesFiltrades}
-                topN={TOP_N}
-                onSelectParada={(id) =>
-                  setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
-                }
-              />
-            </>
+            <ParadesAprop
+              parades={paradesFiltrades}
+              topN={TOP_N}
+              onSelectParada={(id) =>
+                setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
+              }
+            />
+          )}
+          {bicingNear.length > 0 && (
+            <div className="bicing-near-section">
+              <div className="section-title">
+                Estacions Bicing a prop{' '}
+                <span className="section-count">· {bicingNear.length}</span>
+              </div>
+              {bicingNear.map(({ station, distanceM }) => (
+                <BicingStationRow key={station.id} station={station} distanceM={distanceM} />
+              ))}
+            </div>
           )}
         </div>
       </aside>
@@ -323,6 +372,7 @@ export function AproperMeuView({
           bottomInset={isMobile ? sheetHeight : 0}
           onRefresh={refresh}
           cooltraVehicles={visibleCooltra}
+          bicingStations={bicingMapStations}
         />
         <div className="cooltra-map-control">
           <CooltraMapButton

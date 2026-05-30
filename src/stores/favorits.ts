@@ -1,4 +1,5 @@
 import type { FavLinia, FavParada } from '../types/tmb';
+import type { FavBicing } from '../types/bicing';
 
 // Tiny external store for favourites, shared across every star button and
 // the FavoritsView. Backed by localStorage, no backend. Components read it
@@ -6,6 +7,7 @@ import type { FavLinia, FavParada } from '../types/tmb';
 
 const LINIES_KEY = 'tmb-fav-linies';
 const PARADES_KEY = 'tmb-fav-parades';
+const BICING_KEY = 'tmb-fav-bicing';
 
 function load<T>(key: string): T[] {
   if (typeof window === 'undefined') return [];
@@ -32,6 +34,7 @@ function save(key: string, value: unknown): void {
 // useSyncExternalStore can rely on referential identity.
 let liniesSnapshot: FavLinia[] = load<FavLinia>(LINIES_KEY);
 let paradesSnapshot: FavParada[] = load<FavParada>(PARADES_KEY);
+let bicingSnapshot: FavBicing[] = load<FavBicing>(BICING_KEY);
 
 const listeners = new Set<() => void>();
 function emit(): void {
@@ -49,12 +52,18 @@ export function getLiniesSnapshot(): FavLinia[] {
 export function getParadesSnapshot(): FavParada[] {
   return paradesSnapshot;
 }
+export function getBicingSnapshot(): FavBicing[] {
+  return bicingSnapshot;
+}
 
 export function isLiniaFav(id: string): boolean {
   return liniesSnapshot.some((l) => l.id === id);
 }
 export function isParadaFav(id: string): boolean {
   return paradesSnapshot.some((p) => p.id === id);
+}
+export function isBicingFav(id: string): boolean {
+  return bicingSnapshot.some((b) => b.id === id);
 }
 
 export function toggleLinia(linia: FavLinia): void {
@@ -70,5 +79,13 @@ export function toggleParada(parada: FavParada): void {
     ? paradesSnapshot.filter((p) => p.id !== parada.id)
     : [...paradesSnapshot, parada];
   save(PARADES_KEY, paradesSnapshot);
+  emit();
+}
+
+export function toggleBicing(station: FavBicing): void {
+  bicingSnapshot = isBicingFav(station.id)
+    ? bicingSnapshot.filter((b) => b.id !== station.id)
+    : [...bicingSnapshot, station];
+  save(BICING_KEY, bicingSnapshot);
   emit();
 }
