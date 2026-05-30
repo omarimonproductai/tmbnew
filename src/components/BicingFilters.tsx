@@ -1,3 +1,4 @@
+import { BicingLogo } from './BicingLogo';
 import { BICING_TYPE_LABEL, type BicingFilterState } from '../types/bicing';
 
 interface Props {
@@ -36,21 +37,23 @@ export function BicingFilters({ state, onToggleAgafar, onToggleRetornar, onSetTy
         type="button"
         className={`bicing-chip${state.action === 'agafar' ? ' active' : ''}`}
         aria-pressed={state.action === 'agafar'}
+        aria-label="Bicing: estacions amb bicis per agafar"
         onClick={onToggleAgafar}
-        title="Estacions amb bicis per agafar"
+        title="Bicing — estacions amb bicis per agafar"
       >
+        <BicingLogo size={16} className="bicing-chip__logo" />
         <AgafarIcon />
-        <span className="bicing-chip__t">Agafar</span>
       </button>
       <button
         type="button"
         className={`bicing-chip${state.action === 'retornar' ? ' active' : ''}`}
         aria-pressed={state.action === 'retornar'}
+        aria-label="Bicing: estacions amb ancoratges per retornar"
         onClick={onToggleRetornar}
-        title="Estacions amb ancoratges per retornar"
+        title="Bicing — estacions amb ancoratges per retornar"
       >
+        <BicingLogo size={16} className="bicing-chip__logo" />
         <RetornarIcon />
-        <span className="bicing-chip__t">Retornar</span>
       </button>
 
       {state.action === 'retornar' && (

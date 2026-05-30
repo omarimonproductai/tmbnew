@@ -384,8 +384,24 @@ function FavStopItem({
           ))}
         </div>
       ) : (
-        <div className="fav-stop-status">
-          {loading ? 'Consultant temps real…' : 'Sense vehicles propers ara mateix.'}
+        <div className="fav-stop-noarr">
+          <div className="fav-stop-lines">
+            {parada.liniesQueParen.map((l) => (
+              <button
+                key={l.id}
+                type="button"
+                className="fav-stop-line fav-stop-line--btn"
+                style={{ background: getLineColor(l) }}
+                onClick={() => onOpenLine(l.id, focus)}
+                title={`Veure la línia ${l.codi} al mapa`}
+              >
+                {l.codi}
+              </button>
+            ))}
+          </div>
+          <div className="fav-stop-status">
+            {loading ? 'Consultant temps real…' : 'Sense vehicles propers ara mateix.'}
+          </div>
         </div>
       )}
     </div>
