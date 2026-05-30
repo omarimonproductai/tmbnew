@@ -18,10 +18,10 @@ function station(over: Partial<BicingStation>): BicingStation {
   };
 }
 
-const agafar: BicingFilterState = { action: 'agafar', type: 'electric' };
-const retElec: BicingFilterState = { action: 'retornar', type: 'electric' };
-const retMec: BicingFilterState = { action: 'retornar', type: 'mecanic' };
-const cap: BicingFilterState = { action: 'cap', type: 'electric' };
+const agafar: BicingFilterState = { action: 'agafar' };
+const retElec: BicingFilterState = { action: 'retornar' };
+const retMec: BicingFilterState = { action: 'retornar' };
+const cap: BicingFilterState = { action: 'cap' };
 
 describe('stationMatches', () => {
   it('agafar: passes when any bike is available', () => {

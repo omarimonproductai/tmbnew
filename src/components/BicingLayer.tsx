@@ -36,8 +36,15 @@ function soloIcon(color: string, value: number, fav: boolean): L.DivIcon {
 
 function stationIcon(s: BicingStation, filter: BicingFilterState, fav: boolean): L.DivIcon {
   if (filter.action === 'retornar') {
-    // Any free dock accepts the bike; colour the square by the chosen type.
-    return soloIcon(BICING_TYPE_COLOR[filter.type], s.docksAvailable, fav);
+    // Return: free docks, shown as a red square with a black frame + white
+    // number (type doesn't matter — any dock takes any bike).
+    return L.divIcon({
+      className: `bicing-sq-icon${fav ? ' is-fav' : ''}`,
+      html: `<span class="bicing-sq bicing-sq--solo bicing-sq--return">${s.docksAvailable}</span>`,
+      iconSize: [26, 24],
+      iconAnchor: [13, 12],
+      popupAnchor: [0, -12],
+    });
   }
   const e = s.bikesElectric;
   const m = s.bikesMechanical;

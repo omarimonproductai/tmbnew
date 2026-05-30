@@ -50,13 +50,16 @@ export function BicingStationRow({ station, distanceM, onSelect }: Props) {
         </div>
         <div className="bicing-row-pills">
           <span className="bicing-pill bicing-pill--elec" title="Bicis elèctriques">
-            ⚡ {station.bikesElectric}
+            <span className="bicing-pill-ic" aria-hidden="true">⚡</span>
+            {station.bikesElectric}
           </span>
           <span className="bicing-pill bicing-pill--mec" title="Bicis mecàniques">
-            🚲 {station.bikesMechanical}
+            <span className="bicing-pill-ic" aria-hidden="true">🚲</span>
+            {station.bikesMechanical}
           </span>
           <span className="bicing-pill bicing-pill--dock" title="Ancoratges lliures">
-            P {station.docksAvailable}
+            <span className="bicing-pill-ic" aria-hidden="true">P</span>
+            {station.docksAvailable}
           </span>
         </div>
       </div>
