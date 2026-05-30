@@ -106,6 +106,7 @@ export function AproperMeuView({
   // A list tap "winks" the matching map marker. The nonce lets the same
   // stop re-trigger the animation on repeated taps.
   const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
+  const [bicingWink, setBicingWink] = useState<{ id: string; nonce: number } | null>(null);
   const [sheetHeight, setSheetHeight] = useState(initialSheetHeight);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
@@ -174,7 +175,7 @@ export function AproperMeuView({
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  const { position, status, error, refresh } = useGeolocation(true);
+  const { position, status, refresh } = useGeolocation(true);
   const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
   const paradesFiltrades = useMemo(
@@ -340,13 +341,7 @@ export function AproperMeuView({
           </span>
         </button>
         <div className="sheet-body">
-          <LocationBlock
-            position={position}
-            status={status}
-            error={error}
-            radius={radius}
-            onRadiusChange={setRadius}
-          />
+          <LocationBlock radius={radius} onRadiusChange={setRadius} />
           {loadingParades && parades.length === 0 && (
             <div className="state-msg">Carregant parades de tota la xarxa…</div>
           )}
@@ -383,6 +378,9 @@ export function AproperMeuView({
                       key={`b-${item.station.id}`}
                       station={item.station}
                       distanceM={item.dist}
+                      onSelect={(id) =>
+                        setBicingWink((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
+                      }
                     />
                   ),
                 )}
@@ -410,6 +408,7 @@ export function AproperMeuView({
           cooltraVehicles={visibleCooltra}
           bicingStations={bicingMapStations}
           bicingFilter={bicingFilters.state}
+          bicingWinkTarget={bicingWink}
         />
         <div className="cooltra-map-control">
           <CooltraMapButton

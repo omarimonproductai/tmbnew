@@ -13,10 +13,6 @@ export interface BicingStation {
   bikesElectric: number;
   bikesMechanical: number;
   docksAvailable: number;
-  // Docks available per bike type (GBFS vehicle_docks_available; falls back to
-  // the generic dock count when the feed doesn't break it down).
-  docksElectric: number;
-  docksMechanical: number;
   status: BicingStatus;
   lastReported: number; // epoch ms
 }

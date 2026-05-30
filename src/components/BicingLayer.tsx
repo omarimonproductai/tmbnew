@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import { useEffect, useRef } from 'react';
 import { Marker, Popup, Tooltip } from 'react-leaflet';
 import { BicingStationPopup } from './BicingStationPopup';
 import { useFavorits } from '../hooks/useFavorits';
@@ -14,6 +15,8 @@ interface Props {
   // The favourites map already implies everything is a favourite, so the gold
   // star overlay is redundant there.
   showFavStar?: boolean;
+  // Set when a list row is tapped, to "wink" the matching station marker.
+  winkTarget?: { id: string; nonce: number } | null;
 }
 
 // SQUARE markers (so Bicing reads instantly apart from the round TMB/Cooltra
@@ -33,8 +36,8 @@ function soloIcon(color: string, value: number, fav: boolean): L.DivIcon {
 
 function stationIcon(s: BicingStation, filter: BicingFilterState, fav: boolean): L.DivIcon {
   if (filter.action === 'retornar') {
-    const docks = filter.type === 'electric' ? s.docksElectric : s.docksMechanical;
-    return soloIcon(BICING_TYPE_COLOR[filter.type], docks, fav);
+    // Any free dock accepts the bike; colour the square by the chosen type.
+    return soloIcon(BICING_TYPE_COLOR[filter.type], s.docksAvailable, fav);
   }
   const e = s.bikesElectric;
   const m = s.bikesMechanical;
@@ -57,7 +60,13 @@ function stationIcon(s: BicingStation, filter: BicingFilterState, fav: boolean):
     : soloIcon(BICING_TYPE_COLOR.mecanic, m, fav);
 }
 
-export function BicingLayer({ stations, filter, origin = null, showFavStar = true }: Props) {
+export function BicingLayer({
+  stations,
+  filter,
+  origin = null,
+  showFavStar = true,
+  winkTarget = null,
+}: Props) {
   return (
     <>
       {stations.map((s) => (
@@ -67,6 +76,7 @@ export function BicingLayer({ stations, filter, origin = null, showFavStar = tru
           filter={filter}
           origin={origin}
           showFavStar={showFavStar}
+          winkNonce={winkTarget?.id === s.id ? winkTarget.nonce : null}
         />
       ))}
     </>
@@ -78,20 +88,49 @@ function BicingStationMarker({
   filter,
   origin,
   showFavStar,
+  winkNonce,
 }: {
   station: BicingStation;
   filter: BicingFilterState;
   origin: Coordinate | null;
   showFavStar: boolean;
+  winkNonce: number | null;
 }) {
   const { isBicingFav } = useFavorits();
   const fav = isBicingFav(station.id);
+  const markerRef = useRef<L.Marker>(null);
   const distanceM = origin
     ? haversine(origin, { lat: station.lat, lng: station.lng })
     : null;
+
+  // Pulse the square + pop the name label when its list row is tapped.
+  useEffect(() => {
+    if (winkNonce == null) return;
+    const m = markerRef.current;
+    const el = m?.getElement();
+    m?.setZIndexOffset(1000);
+    m?.openTooltip();
+    el?.classList.add('bicing-wink');
+    const t = window.setTimeout(() => {
+      el?.classList.remove('bicing-wink');
+      m?.closeTooltip();
+      m?.setZIndexOffset(0);
+    }, 1050);
+    return () => {
+      window.clearTimeout(t);
+      el?.classList.remove('bicing-wink');
+      m?.closeTooltip();
+      m?.setZIndexOffset(0);
+    };
+  }, [winkNonce]);
+
   return (
     <>
-      <Marker position={[station.lat, station.lng]} icon={stationIcon(station, filter, fav)}>
+      <Marker
+        ref={markerRef}
+        position={[station.lat, station.lng]}
+        icon={stationIcon(station, filter, fav)}
+      >
         <Tooltip direction="top" offset={[0, -12]} className="stop-tooltip">
           <span className="tooltip-name">{station.name}</span>
         </Tooltip>

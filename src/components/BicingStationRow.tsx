@@ -7,13 +7,17 @@ import { BICING_STATUS_LABEL, type BicingStation } from '../types/bicing';
 interface Props {
   station: BicingStation;
   distanceM?: number | null;
+  onSelect?: (id: string) => void;
 }
 
-// Row used in the "Estacions Bicing a prop" list (and reused in Favorits).
-export function BicingStationRow({ station, distanceM }: Props) {
+// Row used in the Aprop meu merged list (and reused in Favorits).
+export function BicingStationRow({ station, distanceM, onSelect }: Props) {
   const { isBicingFav, toggleBicing } = useFavorits();
   return (
-    <div className="bicing-row">
+    <div
+      className={`bicing-row${onSelect ? ' clickable' : ''}`}
+      onClick={onSelect ? () => onSelect(station.id) : undefined}
+    >
       <div className="bicing-row-badge" aria-hidden="true">
         <BicingLogo size={18} />
       </div>

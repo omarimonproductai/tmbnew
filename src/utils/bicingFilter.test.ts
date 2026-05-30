@@ -12,8 +12,6 @@ function station(over: Partial<BicingStation>): BicingStation {
     bikesElectric: 0,
     bikesMechanical: 0,
     docksAvailable: 0,
-    docksElectric: 0,
-    docksMechanical: 0,
     status: 'operativa',
     lastReported: 0,
     ...over,
@@ -32,14 +30,14 @@ describe('stationMatches', () => {
     expect(stationMatches(station({}), agafar)).toBe(false);
   });
 
-  it('retornar: passes when there is a free dock for that type', () => {
-    expect(stationMatches(station({ docksElectric: 3 }), retElec)).toBe(true);
-    expect(stationMatches(station({ docksElectric: 0, docksMechanical: 4 }), retElec)).toBe(false);
-    expect(stationMatches(station({ docksMechanical: 4 }), retMec)).toBe(true);
+  it('retornar: passes when there are free docks (any bike type)', () => {
+    expect(stationMatches(station({ docksAvailable: 3 }), retElec)).toBe(true);
+    expect(stationMatches(station({ docksAvailable: 3 }), retMec)).toBe(true);
+    expect(stationMatches(station({ docksAvailable: 0 }), retElec)).toBe(false);
   });
 
   it('cap: hides every station', () => {
-    expect(stationMatches(station({ bikesElectric: 9, docksElectric: 9 }), cap)).toBe(false);
+    expect(stationMatches(station({ bikesElectric: 9, docksAvailable: 9 }), cap)).toBe(false);
   });
 });
 
@@ -50,7 +48,7 @@ describe('filterStations', () => {
   it('keeps only matching stations', () => {
     const list = [
       station({ id: 'a', bikesElectric: 1 }),
-      station({ id: 'b', docksMechanical: 1 }),
+      station({ id: 'b', docksAvailable: 1 }),
       station({ id: 'c' }),
     ];
     expect(filterStations(list, agafar).map((s) => s.id)).toEqual(['a']);
