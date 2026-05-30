@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { getLinies } from '../services/tmb';
 import type { Linia, TransportType } from '../types/tmb';
 
-export type FilterType = 'tots' | TransportType;
+// 'cap' = both chips off (show nothing). 'tots' = both on.
+export type FilterType = 'tots' | 'cap' | TransportType;
 
 const FILTER_STORAGE_KEY = 'tmb-linies-filter-v1';
 
@@ -10,7 +11,7 @@ function loadStoredFilter(): FilterType {
   if (typeof window === 'undefined') return 'tots';
   try {
     const raw = window.localStorage.getItem(FILTER_STORAGE_KEY);
-    if (raw === 'tots' || raw === 'metro' || raw === 'bus') return raw;
+    if (raw === 'tots' || raw === 'cap' || raw === 'metro' || raw === 'bus') return raw;
   } catch {
     // ignore
   }

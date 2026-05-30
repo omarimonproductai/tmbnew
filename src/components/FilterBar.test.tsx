@@ -23,10 +23,16 @@ describe('FilterBar', () => {
     expect(onChange).toHaveBeenCalledWith('tots');
   });
 
-  it("no permet desactivar l'unic mode actiu", () => {
+  it("desactivar l'unic mode actiu deixa tot desmarcat (cap)", () => {
     const onChange = vi.fn();
     render(<FilterBar value="metro" onChange={onChange} />);
     fireEvent.click(screen.getByRole('button', { name: 'Metro' }));
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenCalledWith('cap');
+  });
+
+  it('cap deixa tots dos botons sense marcar', () => {
+    render(<FilterBar value="cap" onChange={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Metro' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Bus' })).toHaveAttribute('aria-pressed', 'false');
   });
 });

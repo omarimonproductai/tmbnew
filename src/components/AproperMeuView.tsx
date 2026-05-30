@@ -53,7 +53,7 @@ function loadStoredFilter(): FilterType {
   if (typeof window === 'undefined') return 'tots';
   try {
     const raw = window.localStorage.getItem(FILTER_STORAGE_KEY);
-    if (raw === 'tots' || raw === 'metro' || raw === 'bus') return raw;
+    if (raw === 'tots' || raw === 'cap' || raw === 'metro' || raw === 'bus') return raw;
   } catch {
     // ignore
   }

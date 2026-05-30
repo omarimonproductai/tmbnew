@@ -6,31 +6,21 @@ interface Props {
 }
 
 // Independent toggles: tap Metro or Bus to flip its visibility. The combined
-// state still resolves to one of 'tots' | 'metro' | 'bus' so the rest of the
-// app keeps working unchanged. Both can't be off — the last enabled chip
-// stays sticky.
+// state resolves to one of 'tots' | 'metro' | 'bus' | 'cap' so the rest of the
+// app keeps working unchanged. Both off ('cap') is allowed and shows nothing.
 export function FilterBar({ value, onChange }: Props) {
   const metroOn = value === 'tots' || value === 'metro';
   const busOn = value === 'tots' || value === 'bus';
 
-  const toggleMetro = () => {
-    if (metroOn) {
-      // Try to turn off metro
-      if (!busOn) return; // would leave both off; ignore
-      onChange('bus');
-    } else {
-      onChange(busOn ? 'tots' : 'metro');
-    }
+  const resolve = (metro: boolean, bus: boolean): FilterType => {
+    if (metro && bus) return 'tots';
+    if (metro) return 'metro';
+    if (bus) return 'bus';
+    return 'cap';
   };
 
-  const toggleBus = () => {
-    if (busOn) {
-      if (!metroOn) return;
-      onChange('metro');
-    } else {
-      onChange(metroOn ? 'tots' : 'bus');
-    }
-  };
+  const toggleMetro = () => onChange(resolve(!metroOn, busOn));
+  const toggleBus = () => onChange(resolve(metroOn, !busOn));
 
   return (
     <div className="filters" role="group" aria-label="Filtre per tipus de transport">
