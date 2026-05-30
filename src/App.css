@@ -2554,6 +2554,21 @@ body {
 .bicing-sq__e { background: #1b9e4b; }
 .bicing-sq__m { background: #f5a623; }
 
+/* Wink when its list row is tapped: pulse the square + a blue highlight ring.
+   Animate the inner .bicing-sq (Leaflet uses transform on the icon root for
+   positioning, so we must not touch that). */
+@keyframes bicing-wink-pulse {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.7); }
+  50% { transform: scale(1.1); }
+  75% { transform: scale(1.55); }
+}
+.bicing-sq-icon.bicing-wink .bicing-sq {
+  animation: bicing-wink-pulse 1s ease;
+  transform-origin: center;
+  box-shadow: 0 0 0 3px #1d7df2, 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
 /* Compact chips (Aprop meu list + Bicing mode overlay) */
 .bicing-chips { display: inline-flex; gap: 6px; }
 .bicing-chip {
@@ -2583,13 +2598,17 @@ body {
   border-radius: 999px;
   border: 1.5px solid #ddd;
   background: #fff;
-  font-size: 15px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   filter: grayscale(1);
   opacity: 0.6;
+}
+/* The emoji carries extra descent; a fixed 1em line box centres it cleanly. */
+.bicing-type-glyph {
+  font-size: 15px;
+  line-height: 1;
+  display: block;
 }
 .bicing-type-chip.active { filter: none; opacity: 1; }
 .bicing-type-chip--elec.active { border-color: #1b9e4b; background: #e6f4ea; }

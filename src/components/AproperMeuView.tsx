@@ -106,6 +106,7 @@ export function AproperMeuView({
   // A list tap "winks" the matching map marker. The nonce lets the same
   // stop re-trigger the animation on repeated taps.
   const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
+  const [bicingWink, setBicingWink] = useState<{ id: string; nonce: number } | null>(null);
   const [sheetHeight, setSheetHeight] = useState(initialSheetHeight);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
@@ -383,6 +384,9 @@ export function AproperMeuView({
                       key={`b-${item.station.id}`}
                       station={item.station}
                       distanceM={item.dist}
+                      onSelect={(id) =>
+                        setBicingWink((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
+                      }
                     />
                   ),
                 )}
@@ -410,6 +414,7 @@ export function AproperMeuView({
           cooltraVehicles={visibleCooltra}
           bicingStations={bicingMapStations}
           bicingFilter={bicingFilters.state}
+          bicingWinkTarget={bicingWink}
         />
         <div className="cooltra-map-control">
           <CooltraMapButton

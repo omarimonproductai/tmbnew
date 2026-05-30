@@ -65,7 +65,7 @@ export function BicingFilters({ state, onToggleAgafar, onToggleRetornar, onSetTy
             onClick={() => onSetType('electric')}
             title={`Retornar bici ${BICING_TYPE_LABEL.electric}`}
           >
-            ⚡
+            <span className="bicing-type-glyph" aria-hidden="true">⚡</span>
           </button>
           <button
             type="button"
@@ -74,7 +74,7 @@ export function BicingFilters({ state, onToggleAgafar, onToggleRetornar, onSetTy
             onClick={() => onSetType('mecanic')}
             title={`Retornar bici ${BICING_TYPE_LABEL.mecanic}`}
           >
-            🚲
+            <span className="bicing-type-glyph" aria-hidden="true">🚲</span>
           </button>
         </>
       )}

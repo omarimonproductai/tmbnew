@@ -35,6 +35,7 @@ interface Props {
   cooltraVehicles?: CooltraVehicle[];
   bicingStations?: BicingStation[];
   bicingFilter?: BicingFilterState;
+  bicingWinkTarget?: { id: string; nonce: number } | null;
 }
 
 export function AproperMeuMap({
@@ -49,6 +50,7 @@ export function AproperMeuMap({
   cooltraVehicles = [],
   bicingStations = [],
   bicingFilter,
+  bicingWinkTarget = null,
 }: Props) {
   const focusStop = focusStopId
     ? parades.find((p) => p.id === focusStopId) ?? null
@@ -138,7 +140,12 @@ export function AproperMeuMap({
       })}
       {cooltraVehicles.length > 0 && <CooltraLayer vehicles={cooltraVehicles} />}
       {bicingStations.length > 0 && bicingFilter && (
-        <BicingLayer stations={bicingStations} filter={bicingFilter} origin={centre} />
+        <BicingLayer
+          stations={bicingStations}
+          filter={bicingFilter}
+          origin={centre}
+          winkTarget={bicingWinkTarget}
+        />
       )}
       <InvalidateOnResize />
     </MapContainer>
