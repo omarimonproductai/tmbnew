@@ -1,11 +1,14 @@
 import { BicingLogo } from './BicingLogo';
-import { BICING_TYPE_LABEL, type BicingFilterState } from '../types/bicing';
+import type { BicingFilterState } from '../types/bicing';
 
 interface Props {
   state: BicingFilterState;
   onToggleAgafar: () => void;
   onToggleRetornar: () => void;
-  onSetType: (t: 'electric' | 'mecanic') => void;
+  // 'round' (Bicing mode): circular, arrow-only — no "b" logo (already in
+  // Bicing context). Default 'pill' (Aprop meu): logo + arrow, to stand apart
+  // from the Metro/Bus chips.
+  round?: boolean;
 }
 
 // Box + horizontal arrow leaving it (take a bike out).
@@ -30,54 +33,32 @@ function RetornarIcon() {
   );
 }
 
-export function BicingFilters({ state, onToggleAgafar, onToggleRetornar, onSetType }: Props) {
+export function BicingFilters({ state, onToggleAgafar, onToggleRetornar, round }: Props) {
+  const cls = round ? 'bicing-round-chip' : 'bicing-chip';
   return (
     <div className="bicing-chips" role="group" aria-label="Filtre Bicing">
       <button
         type="button"
-        className={`bicing-chip${state.action === 'agafar' ? ' active' : ''}`}
+        className={`${cls}${state.action === 'agafar' ? ' active' : ''}`}
         aria-pressed={state.action === 'agafar'}
         aria-label="Bicing: estacions amb bicis per agafar"
         onClick={onToggleAgafar}
-        title="Bicing — estacions amb bicis per agafar"
+        title="Estacions amb bicis per agafar"
       >
-        <BicingLogo size={16} className="bicing-chip__logo" />
+        {!round && <BicingLogo size={16} className="bicing-chip__logo" />}
         <AgafarIcon />
       </button>
       <button
         type="button"
-        className={`bicing-chip${state.action === 'retornar' ? ' active' : ''}`}
+        className={`${cls}${state.action === 'retornar' ? ' active' : ''}`}
         aria-pressed={state.action === 'retornar'}
         aria-label="Bicing: estacions amb ancoratges per retornar"
         onClick={onToggleRetornar}
-        title="Bicing — estacions amb ancoratges per retornar"
+        title="Estacions amb ancoratges per retornar"
       >
-        <BicingLogo size={16} className="bicing-chip__logo" />
+        {!round && <BicingLogo size={16} className="bicing-chip__logo" />}
         <RetornarIcon />
       </button>
-
-      {state.action === 'retornar' && (
-        <>
-          <button
-            type="button"
-            className={`bicing-type-chip bicing-type-chip--elec${state.type === 'electric' ? ' active' : ''}`}
-            aria-pressed={state.type === 'electric'}
-            onClick={() => onSetType('electric')}
-            title={`Retornar bici ${BICING_TYPE_LABEL.electric}`}
-          >
-            <span className="bicing-type-glyph" aria-hidden="true">⚡</span>
-          </button>
-          <button
-            type="button"
-            className={`bicing-type-chip bicing-type-chip--mec${state.type === 'mecanic' ? ' active' : ''}`}
-            aria-pressed={state.type === 'mecanic'}
-            onClick={() => onSetType('mecanic')}
-            title={`Retornar bici ${BICING_TYPE_LABEL.mecanic}`}
-          >
-            <span className="bicing-type-glyph" aria-hidden="true">🚲</span>
-          </button>
-        </>
-      )}
     </div>
   );
 }

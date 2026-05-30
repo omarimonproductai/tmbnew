@@ -67,7 +67,7 @@ export function BicingView() {
             state={filters.state}
             onToggleAgafar={filters.toggleAgafar}
             onToggleRetornar={filters.toggleRetornar}
-            onSetType={filters.setType}
+            round
           />
         </div>
       </section>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import type { BicingBikeType, BicingFilterState } from '../types/bicing';
+import type { BicingFilterState } from '../types/bicing';
 
-const DEFAULT: BicingFilterState = { action: 'agafar', type: 'electric' };
+const DEFAULT: BicingFilterState = { action: 'agafar' };
 
 function read(key: string): BicingFilterState {
   if (typeof window === 'undefined') return DEFAULT;
@@ -13,16 +13,14 @@ function read(key: string): BicingFilterState {
       parsed?.action === 'agafar' || parsed?.action === 'retornar' || parsed?.action === 'cap'
         ? parsed.action
         : 'agafar';
-    const type = parsed?.type === 'mecanic' ? 'mecanic' : 'electric';
-    return { action, type };
+    return { action };
   } catch {
     return DEFAULT;
   }
 }
 
 // Bicing intent filter. Agafar / Retornar are mutually exclusive; tapping the
-// active one again hides the layer ('cap'). When returning, a bike type must
-// be chosen.
+// active one again hides the layer ('cap').
 export function useBicingFilter(storageKey: string) {
   const [state, setState] = useState<BicingFilterState>(() => read(storageKey));
 
@@ -38,9 +36,8 @@ export function useBicingFilter(storageKey: string) {
   return {
     state,
     toggleAgafar: () =>
-      setState((s) => ({ ...s, action: s.action === 'agafar' ? 'cap' : 'agafar' })),
+      setState((s) => ({ action: s.action === 'agafar' ? 'cap' : 'agafar' })),
     toggleRetornar: () =>
-      setState((s) => ({ ...s, action: s.action === 'retornar' ? 'cap' : 'retornar' })),
-    setType: (type: BicingBikeType) => setState((s) => ({ ...s, type, action: 'retornar' })),
+      setState((s) => ({ action: s.action === 'retornar' ? 'cap' : 'retornar' })),
   };
 }

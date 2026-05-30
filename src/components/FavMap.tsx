@@ -61,7 +61,7 @@ export function FavMap({
       {bicingStations.length > 0 && (
         <BicingLayer
           stations={bicingStations}
-          filter={{ action: 'agafar', type: 'electric' }}
+          filter={{ action: 'agafar' }}
           origin={userPosition}
           showFavStar={false}
         />

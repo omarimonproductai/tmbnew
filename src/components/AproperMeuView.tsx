@@ -353,7 +353,6 @@ export function AproperMeuView({
                   state={bicingFilters.state}
                   onToggleAgafar={bicingFilters.toggleAgafar}
                   onToggleRetornar={bicingFilters.toggleRetornar}
-                  onSetType={bicingFilters.setType}
                 />
               )}
             </div>

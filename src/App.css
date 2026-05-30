@@ -2506,6 +2506,13 @@ body {
 }
 .bicing-sq__e { background: #1b9e4b; }
 .bicing-sq__m { background: #f5a623; }
+/* Return mode: red square, black frame, white number (free docks). */
+.bicing-sq--return {
+  background: #d4111e;
+  border-color: #111;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Wink when its list row is tapped: pulse the square + a blue highlight ring.
    Animate the inner .bicing-sq (Leaflet uses transform on the icon root for
@@ -2538,34 +2545,28 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
-.bicing-chip__t { line-height: 1; }
 .bicing-chip.active { color: #fff; border-color: #d4111e; background: #d4111e; }
 @media (hover: hover) {
   .bicing-chip:hover { border-color: #d4111e; }
 }
 
-/* Bike-type sub-chips, shown only when Retornar is active. */
-.bicing-type-chip {
-  width: 34px;
-  height: 32px;
-  border-radius: 999px;
+/* Round, arrow-only chips for the Bicing mode map (no "b" logo). */
+.bicing-round-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: 1.5px solid #ddd;
   background: #fff;
+  color: #555;
   cursor: pointer;
-  display: grid;
-  place-items: center;
-  filter: grayscale(1);
-  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-/* The emoji carries extra descent; a fixed 1em line box centres it cleanly. */
-.bicing-type-glyph {
-  font-size: 15px;
-  line-height: 1;
-  display: block;
+.bicing-round-chip.active { color: #fff; border-color: #d4111e; background: #d4111e; }
+@media (hover: hover) {
+  .bicing-round-chip:hover { border-color: #d4111e; }
 }
-.bicing-type-chip.active { filter: none; opacity: 1; }
-.bicing-type-chip--elec.active { border-color: #1b9e4b; background: #e6f4ea; }
-.bicing-type-chip--mec.active { border-color: #f5a623; background: #fff3d6; }
 
 .aprop-filters-row {
   display: flex;
@@ -2597,6 +2598,8 @@ body {
   align-items: center;
   justify-content: center;
 }
+/* Block removes the inline-SVG baseline gap that pushed the logo ~1px low. */
+.bicing-row-badge svg { display: block; }
 .bicing-row-info { flex: 1; min-width: 0; }
 .bicing-row-name-row { display: flex; align-items: center; gap: 8px; }
 .bicing-row-name {
@@ -2627,8 +2630,17 @@ body {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
+  line-height: 1;
   background: #f2f2f2;
   color: #333;
+}
+/* Pin the glyph to a 1em line box so it sits centred next to the number. */
+.bicing-pill-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 12px;
 }
 .bicing-pill--elec { background: #e6f4ea; color: #1b6b34; }
 .bicing-pill--mec { background: #fff3d6; color: #8a5b00; }
