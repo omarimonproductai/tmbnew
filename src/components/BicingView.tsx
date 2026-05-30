@@ -1,5 +1,4 @@
-import L from 'leaflet';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { BicingFilters } from './BicingFilters';
 import { BicingLayer } from './BicingLayer';
@@ -12,6 +11,7 @@ import { filterStations } from '../utils/bicingFilter';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
 const FILTER_STORAGE_KEY = 'tmb-bicing-filter-v1';
+const DEFAULT_ZOOM = 15;
 
 // New "Bicing" mode: the full city map of every station, filterable by bike
 // type (electric / mechanical), both chips deselectable.
@@ -34,7 +34,7 @@ export function BicingView() {
       <section className="map-area" aria-label="Mapa d'estacions Bicing">
         <MapContainer
           center={position ? [position.lat, position.lng] : FALLBACK_CENTER}
-          zoom={13}
+          zoom={DEFAULT_ZOOM}
           zoomSnap={0}
           className="map-container"
           scrollWheelZoom
@@ -58,7 +58,7 @@ export function BicingView() {
             </CircleMarker>
           )}
           <BicingLayer stations={visible} filter={filters.state} origin={position} />
-          <FitToStations stations={visible} userPosition={position} />
+          <CenterOnUser userPosition={position} />
           <RecenterButton userPosition={position} />
           <InvalidateOnResize />
         </MapContainer>
@@ -76,27 +76,16 @@ export function BicingView() {
   );
 }
 
-// Fit once to the visible stations (and the user) on first paint; afterwards
-// let the user pan/zoom freely.
-function FitToStations({
-  stations,
-  userPosition,
-}: {
-  stations: { lat: number; lng: number }[];
-  userPosition: { lat: number; lng: number } | null;
-}) {
+// Centre on the user at a street-level zoom once their position arrives
+// (the map opens here by default); afterwards the user pans/zooms freely.
+function CenterOnUser({ userPosition }: { userPosition: { lat: number; lng: number } | null }) {
   const map = useMap();
-  const done = useMemo(() => ({ v: false }), []);
+  const done = useRef(false);
   useEffect(() => {
-    if (done.v || stations.length === 0) return;
-    const bounds = L.latLngBounds([]);
-    for (const s of stations) bounds.extend([s.lat, s.lng]);
-    if (userPosition) bounds.extend([userPosition.lat, userPosition.lng]);
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-      done.v = true;
-    }
-  }, [stations, userPosition, map, done]);
+    if (done.current || !userPosition) return;
+    map.setView([userPosition.lat, userPosition.lng], DEFAULT_ZOOM);
+    done.current = true;
+  }, [userPosition, map]);
   return null;
 }
 

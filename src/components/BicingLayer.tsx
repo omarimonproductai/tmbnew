@@ -11,6 +11,9 @@ interface Props {
   stations: BicingStation[];
   filter: BicingFilterState;
   origin?: Coordinate | null;
+  // The favourites map already implies everything is a favourite, so the gold
+  // star overlay is redundant there.
+  showFavStar?: boolean;
 }
 
 // SQUARE markers (so Bicing reads instantly apart from the round TMB/Cooltra
@@ -54,11 +57,17 @@ function stationIcon(s: BicingStation, filter: BicingFilterState, fav: boolean):
     : soloIcon(BICING_TYPE_COLOR.mecanic, m, fav);
 }
 
-export function BicingLayer({ stations, filter, origin = null }: Props) {
+export function BicingLayer({ stations, filter, origin = null, showFavStar = true }: Props) {
   return (
     <>
       {stations.map((s) => (
-        <BicingStationMarker key={s.id} station={s} filter={filter} origin={origin} />
+        <BicingStationMarker
+          key={s.id}
+          station={s}
+          filter={filter}
+          origin={origin}
+          showFavStar={showFavStar}
+        />
       ))}
     </>
   );
@@ -68,10 +77,12 @@ function BicingStationMarker({
   station,
   filter,
   origin,
+  showFavStar,
 }: {
   station: BicingStation;
   filter: BicingFilterState;
   origin: Coordinate | null;
+  showFavStar: boolean;
 }) {
   const { isBicingFav } = useFavorits();
   const fav = isBicingFav(station.id);
@@ -88,7 +99,7 @@ function BicingStationMarker({
           <BicingStationPopup station={station} distanceM={distanceM} />
         </Popup>
       </Marker>
-      {fav && (
+      {fav && showFavStar && (
         <Marker
           position={[station.lat, station.lng]}
           icon={favStarIcon(12)}

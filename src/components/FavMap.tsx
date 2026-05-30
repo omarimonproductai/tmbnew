@@ -63,6 +63,7 @@ export function FavMap({
           stations={bicingStations}
           filter={{ action: 'agafar', type: 'electric' }}
           origin={userPosition}
+          showFavStar={false}
         />
       )}
       {parades.map((p) => (
