@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { CircleMarker, Marker, Popup, Tooltip } from 'react-leaflet';
 import { StopPopup } from './StopPopup';
 import { useFavorits } from '../hooks/useFavorits';
+import { favStarIcon } from '../utils/favStarIcon';
 import type { Linia, LiniaResum, Parada } from '../types/tmb';
 
 interface Props {
@@ -30,19 +31,6 @@ function correspondenceIcon(corrs: LiniaResum[], offsetX: number, offsetY: numbe
     html: `<div class="corr-badges">${badges}</div>`,
     iconSize: [0, 0],
     iconAnchor: [offsetX, offsetY],
-  });
-}
-
-const STAR_PATH =
-  'M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.96 6.1 20.5l1.1-6.47-4.7-4.58 6.5-.95z';
-
-function favStarIcon(radius: number): L.DivIcon {
-  return L.divIcon({
-    className: 'stop-fav-icon',
-    html: `<svg viewBox="0 0 24 24" width="18" height="18"><path d="${STAR_PATH}" fill="#f7a700" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
-    iconSize: [18, 18],
-    // Sit just above the stop dot.
-    iconAnchor: [9, radius + 18],
   });
 }
 

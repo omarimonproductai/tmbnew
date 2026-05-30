@@ -4,6 +4,7 @@ import {
   Circle,
   CircleMarker,
   MapContainer,
+  Marker,
   Popup,
   TileLayer,
   Tooltip,
@@ -11,6 +12,8 @@ import {
 } from 'react-leaflet';
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
 import { CooltraLayer } from './CooltraLayer';
+import { useFavorits } from '../hooks/useFavorits';
+import { favStarIcon } from '../utils/favStarIcon';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
 import type { CooltraVehicle } from '../types/cooltra';
@@ -279,9 +282,11 @@ function AproperMeuStopMarker({
   const [open, setOpen] = useState(false);
   const [winking, setWinking] = useState(false);
   const markerRef = useRef<L.CircleMarker>(null);
+  const { isParadaFav } = useFavorits();
   const isTop = rank <= topN;
   const rep = pickRepresentativeLine(parada.liniesQueParen);
   const color = rep ? getLineColor(rep) : '#666';
+  const fav = isParadaFav(parada.id);
 
   // Briefly enlarge the marker when its list row is tapped ("wink").
   useEffect(() => {
@@ -299,32 +304,43 @@ function AproperMeuStopMarker({
   }, [autoOpen]);
 
   const baseRadius = isTop ? 10 : 5;
+  const radius = winking ? baseRadius + 1 : baseRadius;
   const popupRef = useRef<L.Popup>(null);
   const rePan = () => popupRef.current?.update();
   return (
-    <CircleMarker
-      ref={markerRef}
-      center={[parada.lat, parada.lng]}
-      radius={winking ? baseRadius + 1 : baseRadius}
-      pathOptions={{
-        color: '#ffffff',
-        weight: winking ? 4 : isTop ? 3 : 1.5,
-        fillColor: color,
-        fillOpacity: 1,
-      }}
-      eventHandlers={{
-        popupopen: () => setOpen(true),
-        popupclose: () => setOpen(false),
-      }}
-    >
-      <Tooltip direction="top" offset={[0, -4]} className="stop-tooltip">
-        {isTop && <span className="rank-mini">{rank}</span>}
-        <span className="tooltip-name">{parada.nom}</span>
-      </Tooltip>
-      <Popup ref={popupRef} autoPanPaddingTopLeft={[10, 90]}>
-        <AproperMeuStopPopup parada={parada} enabled={open} onContentResize={rePan} />
-      </Popup>
-    </CircleMarker>
+    <>
+      <CircleMarker
+        ref={markerRef}
+        center={[parada.lat, parada.lng]}
+        radius={radius}
+        pathOptions={{
+          color: '#ffffff',
+          weight: winking ? 4 : isTop ? 3 : 1.5,
+          fillColor: color,
+          fillOpacity: 1,
+        }}
+        eventHandlers={{
+          popupopen: () => setOpen(true),
+          popupclose: () => setOpen(false),
+        }}
+      >
+        <Tooltip direction="top" offset={[0, -4]} className="stop-tooltip">
+          {isTop && <span className="rank-mini">{rank}</span>}
+          <span className="tooltip-name">{parada.nom}</span>
+        </Tooltip>
+        <Popup ref={popupRef} autoPanPaddingTopLeft={[10, 90]}>
+          <AproperMeuStopPopup parada={parada} enabled={open} onContentResize={rePan} />
+        </Popup>
+      </CircleMarker>
+      {fav && (
+        <Marker
+          position={[parada.lat, parada.lng]}
+          icon={favStarIcon(radius)}
+          interactive={false}
+          keyboard={false}
+        />
+      )}
+    </>
   );
 }
 

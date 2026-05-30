@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { DirectionsButton } from './DirectionsButton';
+import { FavStar } from './FavStar';
 import { ShareButton } from './ShareButton';
+import { useFavorits } from '../hooks/useFavorits';
 import { useTempsReal } from '../hooks/useTempsReal';
 import { formatDistance } from '../utils/distance';
 import { getLineColor } from '../utils/lineColor';
@@ -57,6 +59,7 @@ function StopItem({
   onSelect?: (id: string) => void;
 }) {
   const isTop = rank <= topN;
+  const { isParadaFav, toggleParada } = useFavorits();
   const primary = parada.liniesQueParen[0];
   const { data, loading } = useTempsReal(
     primary ? parada.tipus : null,
@@ -95,6 +98,21 @@ function StopItem({
       <div className="stop-info">
         <div className="stop-name-row">
           <div className="stop-name" title={parada.nom}>{parada.nom}</div>
+          <FavStar
+            active={isParadaFav(parada.id)}
+            onToggle={() =>
+              toggleParada({
+                id: parada.id,
+                codi: parada.codi,
+                nom: parada.nom,
+                lat: parada.lat,
+                lng: parada.lng,
+                tipus: parada.tipus,
+                liniesQueParen: parada.liniesQueParen,
+              })
+            }
+            size={18}
+          />
           <ShareButton parada={parada} />
           <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} />
         </div>
