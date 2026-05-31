@@ -350,7 +350,13 @@ function FgcLineStops({
               <span className="fgc-stoplist-name">{p.nom}</span>
               <span className="fgc-stoplist-lines">
                 {p.liniesQueParen.map((codi) => (
-                  <span key={codi} className="fgc-stoplist-linebadge">{codi}</span>
+                  <span
+                    key={codi}
+                    className="fgc-stoplist-linebadge"
+                    style={{ background: fgcLineColor(codi) }}
+                  >
+                    {codi}
+                  </span>
                 ))}
               </span>
               <FavStar active={isFgcFav(p.id)} onToggle={() => toggleFgc({ ...p })} size={18} />

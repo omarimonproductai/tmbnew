@@ -175,12 +175,14 @@ body {
 }
 .fgc-stoplist-lines { display: inline-flex; gap: 4px; flex-shrink: 0; }
 .fgc-stoplist-linebadge {
-  font-size: 10px;
+  min-width: 26px;
+  text-align: center;
+  font-size: 11px;
   font-weight: 700;
-  color: #666;
-  background: #eee;
-  border-radius: 4px;
-  padding: 1px 5px;
+  color: #fff;
+  background: #888; /* overridden inline with each line's colour */
+  border-radius: 5px;
+  padding: 2px 6px;
 }
 
 /* FGC stop marker: train glyph in a white rounded square (currentColor border
