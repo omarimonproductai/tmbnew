@@ -226,7 +226,7 @@ function LocationRefreshButton({
   return (
     <div
       className="aprop-refresh-control"
-      style={{ bottom: `${bottomInset + 72}px` }}
+      style={{ top: '14px' }}
     >
       <button
         type="button"

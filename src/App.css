@@ -1727,15 +1727,40 @@ body {
   flex-shrink: 0;
 }
 .favorits-map { flex: 1; min-height: 0; position: relative; }
+.favorits-toolbar--hidden { display: none; }
+/* Cooltra control sits in the bottom-right stack; the moto/bike filters expand
+   UPWARD (column-reverse keeps the logo button at the bottom). */
 .cooltra-map-control {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 500;
+  right: 16px;
+  z-index: 700;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: column-reverse;
+  gap: 10px;
   align-items: flex-end;
+}
+/* Aprop meu: just above the recenter button (which clears the bottom sheet). */
+.cooltra-map-control--aprop { bottom: calc(var(--sheet-height, 0px) + 72px); }
+/* Favorits map: top of the recenter / list-toggle / Cooltra stack. */
+.cooltra-map-control--fav { bottom: 128px; }
+
+/* Favorits map: round list-toggle button, between recenter and Cooltra. */
+.fav-map-listbtn {
+  position: absolute;
+  right: 16px;
+  bottom: 72px;
+  z-index: 700;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #1d7df2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
 }
 
 .cooltra-kind-btn {

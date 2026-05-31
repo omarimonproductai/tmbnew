@@ -409,7 +409,7 @@ export function AproperMeuView({
           bicingFilter={bicingFilters.state}
           bicingWinkTarget={bicingWink}
         />
-        <div className="cooltra-map-control">
+        <div className="cooltra-map-control cooltra-map-control--aprop">
           <CooltraMapButton
             value={cooltraOn}
             onChange={setCooltraOn}

@@ -166,7 +166,7 @@ export function FavoritsView({ onOpenLine }: Props) {
 
   return (
     <main className="app-main favorits-view">
-      <div className="favorits-toolbar">
+      <div className={`favorits-toolbar${view === 'map' ? ' favorits-toolbar--hidden' : ''}`}>
         <div className="sort-controls" role="group" aria-label="Ordenació">
           <button
             type="button"
@@ -233,7 +233,19 @@ export function FavoritsView({ onOpenLine }: Props) {
             userPosition={position}
             cooltraVehicles={visibleCooltra}
           />
-          <div className="cooltra-map-control">
+          <button
+            type="button"
+            className="fav-map-listbtn"
+            onClick={() => setView('list')}
+            aria-label="Veure com a llista"
+            title="Llista"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+              <line x1="8" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="20" y2="12" /><line x1="8" y1="18" x2="20" y2="18" />
+              <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </button>
+          <div className="cooltra-map-control cooltra-map-control--fav">
             <CooltraMapButton
               value={cooltraOn}
               onChange={setCooltraOn}

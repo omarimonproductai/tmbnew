@@ -70,6 +70,7 @@ export function FavMap({
         <FavMarker key={p.id} parada={p} />
       ))}
       <FitToFavs parades={parades} bicingStations={bicingStations} userPosition={userPosition} />
+      {userPosition && <FavRecenterButton userPosition={userPosition} />}
       <InvalidateOnResize />
     </MapContainer>
   );
@@ -96,6 +97,27 @@ function FavMarker({ parada }: { parada: FavParada }) {
         <AproperMeuStopPopup parada={parada} enabled={open} />
       </Popup>
     </CircleMarker>
+  );
+}
+
+function FavRecenterButton({ userPosition }: { userPosition: Coordinate }) {
+  const map = useMap();
+  return (
+    <div className="recenter-control" style={{ bottom: '16px' }}>
+      <button
+        type="button"
+        onClick={() => map.setView([userPosition.lat, userPosition.lng], 15)}
+        aria-label="Centrar el mapa a la meva ubicació"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <line x1="12" y1="2" x2="12" y2="5" />
+          <line x1="12" y1="19" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="5" y2="12" />
+          <line x1="19" y1="12" x2="22" y2="12" />
+        </svg>
+      </button>
+    </div>
   );
 }
 
