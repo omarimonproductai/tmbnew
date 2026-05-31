@@ -35,9 +35,12 @@ export function useBicingFilter(storageKey: string) {
 
   return {
     state,
+    // Aprop meu: tapping the active chip hides the layer ('cap').
     toggleAgafar: () =>
       setState((s) => ({ action: s.action === 'agafar' ? 'cap' : 'agafar' })),
     toggleRetornar: () =>
       setState((s) => ({ action: s.action === 'retornar' ? 'cap' : 'retornar' })),
+    // Bicing mode: radio behaviour — always one selected, never 'cap'.
+    setAction: (action: 'agafar' | 'retornar') => setState({ action }),
   };
 }

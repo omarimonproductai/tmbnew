@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { DirectionsButton } from './DirectionsButton';
 import { RouteHereButton } from './RouteHereButton';
 import { FavStar } from './FavStar';
 import { ShareButton } from './ShareButton';
@@ -93,6 +94,7 @@ export function AproperMeuStopPopup({ parada, enabled, onContentResize }: Props)
           lng={parada.lng}
           variant="block"
         />
+        <DirectionsButton lat={parada.lat} lng={parada.lng} nom={parada.nom} variant="icon" />
         <ShareButton parada={parada} variant="icon" />
       </div>
     </div>

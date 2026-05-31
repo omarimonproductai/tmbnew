@@ -20,7 +20,11 @@ export function BicingView() {
   const filters = useBicingFilter(FILTER_STORAGE_KEY);
   const { position } = useGeolocation(true);
 
-  const visible = useMemo(() => filterStations(stations, filters.state), [stations, filters.state]);
+  // In Bicing mode it's always one or the other — never 'cap' (blank map).
+  const action: 'agafar' | 'retornar' =
+    filters.state.action === 'retornar' ? 'retornar' : 'agafar';
+  const effState = { action };
+  const visible = useMemo(() => filterStations(stations, effState), [stations, action]);
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   useEffect(() => {
@@ -57,16 +61,16 @@ export function BicingView() {
               </Tooltip>
             </CircleMarker>
           )}
-          <BicingLayer stations={visible} filter={filters.state} origin={position} />
+          <BicingLayer stations={visible} filter={effState} origin={position} />
           <CenterOnUser userPosition={position} />
           <RecenterButton userPosition={position} />
           <InvalidateOnResize />
         </MapContainer>
         <div className="bicing-mode-filters">
           <BicingFilters
-            state={filters.state}
-            onToggleAgafar={filters.toggleAgafar}
-            onToggleRetornar={filters.toggleRetornar}
+            state={effState}
+            onToggleAgafar={() => filters.setAction('agafar')}
+            onToggleRetornar={() => filters.setAction('retornar')}
             round
           />
         </div>

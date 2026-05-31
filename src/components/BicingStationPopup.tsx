@@ -1,4 +1,5 @@
 import { DirectionsButton } from './DirectionsButton';
+import { RouteHereButton } from './RouteHereButton';
 import { FavStar } from './FavStar';
 import { ShareButton } from './ShareButton';
 import { useFavorits } from '../hooks/useFavorits';
@@ -40,12 +41,8 @@ export function BicingStationPopup({ station, distanceM }: Props) {
       <BicingStats station={station} />
       <div className="bicing-cap">Capacitat total {station.capacity}</div>
       <div className="aprop-popup-actions">
-        <DirectionsButton
-          lat={station.lat}
-          lng={station.lng}
-          nom={station.name}
-          variant="block"
-        />
+        <RouteHereButton name={station.name} lat={station.lat} lng={station.lng} variant="block" />
+        <DirectionsButton lat={station.lat} lng={station.lng} nom={station.name} variant="icon" />
         <ShareButton
           bicing={{ name: station.name, lat: station.lat, lng: station.lng }}
           variant="icon"
