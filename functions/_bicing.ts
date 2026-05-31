@@ -1,4 +1,5 @@
 import type { BicingStation, BicingStatus } from '../src/types/bicing';
+import { titleCaseName } from '../src/utils/titleCase';
 
 // GBFS v3.0 discovery for Bicing Barcelona. Public feed, no credentials.
 const GBFS_DISCOVERY =
@@ -41,11 +42,13 @@ function feedUrls(discovery: unknown): Record<string, string> {
 
 // v3.0 names are localised arrays [{ text, language }]; v2.x are plain strings.
 function localisedName(name: unknown): string {
-  if (typeof name === 'string') return name;
+  // The Bicing GBFS feed delivers names in ALL CAPS; title-case them so they
+  // read like the TMB/FGC names ("C/ VILLAR, 2" → "C/ Villar, 2").
+  if (typeof name === 'string') return titleCaseName(name);
   if (Array.isArray(name)) {
     const arr = name as Array<{ text?: string; language?: string }>;
     const ca = arr.find((n) => n?.language === 'ca');
-    return (ca ?? arr[0])?.text ?? '';
+    return titleCaseName((ca ?? arr[0])?.text ?? '');
   }
   return '';
 }
