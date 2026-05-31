@@ -14,13 +14,10 @@ export function RouteCompactSummary({ origin, destination, onEdit }: Props) {
       onClick={onEdit}
       aria-label="Edita els punts de la ruta"
     >
-      <span className="planner-compact-icons">
+      <span className="planner-compact-grid">
         <span className="planner-dot planner-dot--origin" />
-        <span className="planner-compact-line" />
-        <span className="planner-dot planner-dot--dest" />
-      </span>
-      <span className="planner-compact-text">
         <span className="planner-compact-name">{origin?.name ?? '—'}</span>
+        <span className="planner-dot planner-dot--dest" />
         <span className="planner-compact-name">{destination?.name ?? '—'}</span>
       </span>
       <svg

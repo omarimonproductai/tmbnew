@@ -13,7 +13,7 @@ interface Props {
   variant?: 'icon' | 'block';
 }
 
-function WalkIcon({ size = 16 }: { size?: number }) {
+export function WalkIcon({ size = 16 }: { size?: number }) {
   return (
     <svg
       width={size}

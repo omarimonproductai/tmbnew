@@ -1,5 +1,6 @@
 import L from 'leaflet';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import {
   CircleMarker,
   MapContainer,
@@ -11,6 +12,7 @@ import {
   useMap,
 } from 'react-leaflet';
 import { CooltraLayer } from './CooltraLayer';
+import { WalkIcon } from './DirectionsButton';
 import { rotateOptions } from '../utils/leafletRotate';
 import { decodePolyline } from '../utils/polyline';
 import type { CooltraVehicle } from '../types/cooltra';
@@ -80,6 +82,42 @@ function modeLabel(mode: LegMode): string {
   }
 }
 
+// Skip the walking glyph on very short connector walks (e.g. platform changes)
+// so the map doesn't get cluttered next to the boarding markers.
+const WALK_GLYPH_MIN_M = 80;
+const WALK_GLYPH_HTML = renderToStaticMarkup(<WalkIcon size={15} />);
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function legMidpoint(points: [number, number][]): [number, number] | null {
+  if (points.length === 0) return null;
+  return points[Math.floor(points.length / 2)];
+}
+
+// Line-number badge (route short name on its line colour) so each coloured
+// segment is identifiable at a glance. iconSize 0 + a translate(-50%,-50%)
+// child centres the badge on the latlng without guessing its width.
+function lineBadgeIcon(leg: Leg): L.DivIcon {
+  return L.divIcon({
+    className: 'route-leg-glyph',
+    html: `<span class="route-leg-badge" style="background:${legColor(leg)}">${escapeHtml(leg.routeShortName ?? '')}</span>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+}
+
+// Walking-person glyph (same icon as the Bicing/TMB popups) on walk legs.
+function walkLegIcon(): L.DivIcon {
+  return L.divIcon({
+    className: 'route-leg-glyph',
+    html: `<span class="route-walk-badge">${WALK_GLYPH_HTML}</span>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+}
+
 export function RoutePlanMap({
   origin,
   destination,
@@ -138,6 +176,35 @@ export function RoutePlanMap({
               dashArray: isWalk ? '4 8' : undefined,
               lineCap: 'round',
             }}
+          />
+        );
+      })}
+
+      {/* Per-leg midpoint glyphs: line badge for transit, walking person for
+          walk legs — so the route reads at a glance without opening popups. */}
+      {itinerary.legs.map((leg, idx) => {
+        const mid = legMidpoint(legGeometryPoints(leg));
+        if (!mid) return null;
+        if (leg.mode === 'WALK') {
+          if (leg.distance < WALK_GLYPH_MIN_M) return null;
+          return (
+            <Marker
+              key={`glyph-${idx}`}
+              position={mid}
+              icon={walkLegIcon()}
+              interactive={false}
+              keyboard={false}
+            />
+          );
+        }
+        if (!leg.routeShortName) return null;
+        return (
+          <Marker
+            key={`glyph-${idx}`}
+            position={mid}
+            icon={lineBadgeIcon(leg)}
+            interactive={false}
+            keyboard={false}
           />
         );
       })}
@@ -311,13 +378,26 @@ function RecenterButton({ points }: { points: [number, number][] }) {
   );
 }
 
+// Fit the map to the route ONCE per distinct route. Re-renders from background
+// refreshes (Cooltra every 60s, the GPS watch) must not re-fit, or they'd reset
+// the user's zoom/pan mid-gesture. We key on a signature of the route geometry
+// so only a genuinely different route triggers a new fit; manual re-centering
+// stays available via the recenter button.
 function FitToRoute({ points }: { points: [number, number][] }) {
   const map = useMap();
+  const lastSig = useRef('');
+  const signature =
+    points.length < 2
+      ? ''
+      : `${points.length}|${points[0][0]},${points[0][1]}|${points[points.length - 1][0]},${points[points.length - 1][1]}`;
   useEffect(() => {
     if (points.length < 2) return;
+    if (signature === lastSig.current) return;
+    lastSig.current = signature;
     const bounds = L.latLngBounds(points.map(([lat, lng]) => L.latLng(lat, lng)));
     map.fitBounds(bounds, { padding: [40, 40] });
-  }, [points, map]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signature, map]);
   return null;
 }
 
