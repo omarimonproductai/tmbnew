@@ -404,12 +404,6 @@ export function AproperMeuView({
           </span>
         </button>
         <div className="sheet-body">
-          <WeatherSummary
-            forecast={weather.forecast}
-            source={weather.source}
-            loading={weather.loading}
-            error={weather.error}
-          />
           <LocationBlock radius={radius} onRadiusChange={setRadius} />
           {loadingParades && parades.length === 0 && (
             <div className="state-msg">Carregant parades de tota la xarxa…</div>
@@ -503,6 +497,14 @@ export function AproperMeuView({
           fgcStations={fgcMapStations}
           fgcWinkTarget={fgcWink}
         />
+        <div className="aprop-weather-slot">
+          <WeatherSummary
+            forecast={weather.forecast}
+            source={weather.source}
+            loading={weather.loading}
+            error={weather.error}
+          />
+        </div>
         <div className="aprop-refresh-slot">
           <RefreshControl onRefresh={handleRefreshData} />
         </div>
