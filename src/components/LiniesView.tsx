@@ -10,7 +10,6 @@ import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
-import { type ViewMode } from './ViewToggle';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { inferKind } from '../types/cooltra';
@@ -31,6 +30,8 @@ import type {
   Parada,
   VehiclePos,
 } from '../types/tmb';
+
+type ViewMode = 'map' | 'list';
 
 function getIsMobile(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;

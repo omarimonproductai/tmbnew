@@ -350,10 +350,11 @@ posta (és un disc ple; a 44 es veia més gros que els altres). Tots centrats a
 6. **Push "surt ara"** o **widget B2B**: només si la retenció validada justifica
    trencar el cost zero.
 
-> **Deute tècnic menor d'aquesta sessió:** `public/logo-tmb.png` ja no s'usa
-> (substituït per SVG inline) — es pot esborrar. El component `ViewToggle` i el seu
-> CSS (`.view-toggle-*`, `.panel-toggle-mobile`) han quedat orfes en treure el
-> segmented de Línies; conservats per no trencar res, però es poden netejar.
+> **Deute tècnic menor — NETEJAT:** s'ha esborrat `public/logo-tmb.png` (ja no
+> s'usa, substituït per SVG inline), el component orfe `ViewToggle` (+ el seu
+> test) i el CSS associat (`.view-toggle-*`, `.panel-toggle-mobile`). El tipus
+> `ViewMode` viu ara inline a `LiniesView.tsx`. `.planner-view-toggle` és una
+> classe diferent (Route Planner) i es manté.
 
 ### Com encarar la propera feature
 

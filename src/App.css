@@ -1134,30 +1134,6 @@ body {
 .lhb-arrow { color: #999; font-weight: 700; }
 .lhb-desti { color: #c8001e; }
 
-/* --- View toggle (Mapa / Llista) --- */
-.view-toggle-wrapper {
-  position: absolute;
-  top: 14px;
-  left: 60px;
-  z-index: 500;
-}
-.view-toggle-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: white;
-  border: none;
-  color: #555;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  font-family: inherit;
-  transition: transform 0.1s ease, color 0.15s ease;
-}
-.view-toggle-btn:hover { color: #1c1c1e; transform: scale(1.04); }
-.view-toggle-btn:active { transform: scale(0.96); }
-
 /* --- Line list view --- */
 .line-list-view {
   position: absolute;
@@ -1443,10 +1419,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-.panel-toggle-mobile {
-  display: none;
-}
-
 /* Scrim shown behind the mobile line-search panel so the stop list under
    it is dimmed and not tappable. Desktop never renders it (sidebar). */
 .panel-backdrop { display: none; }
@@ -1577,27 +1549,6 @@ body {
   .tmb-logo { width: 30px; height: 30px; font-size: 10px; border-radius: 6px; }
   .mode-toggle .mode-btn { padding: 4px 8px; font-size: 11px; }
 
-  .panel-toggle-mobile {
-    position: absolute;
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-    right: 16px;
-    z-index: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 2px solid #ffffff;
-    background: #c8001e;
-    color: #ffffff;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
-    font-family: inherit;
-  }
-  .panel-toggle-mobile:hover { transform: scale(1.05); }
-  .panel-toggle-mobile.active { background: #ffffff; color: #c8001e; }
-
   .map-controls-stack {
     top: 10px;
     right: 10px;
@@ -1605,8 +1556,6 @@ body {
     align-items: flex-end;
     gap: 8px;
   }
-
-  .view-toggle-wrapper { top: 10px; left: 10px; }
 
   .line-header-wrapper {
     top: 12px;
