@@ -62,6 +62,11 @@ body {
 @media (min-width: 641px) {
   .mode-toggle .mode-btn__label { display: inline; }
   .mode-toggle .mode-btn { padding: 6px 12px; }
+  /* Aprop meu sidebar: a touch wider so all modality chips (Metro · Bus ·
+     Bicing agafar/retornar · FGC) fit on a single row. Only the bottom-sheet
+     panel (Aprop meu) is widened — Línies/FGC keep the shared 320px width. */
+  .panel--bottom-sheet { width: 380px; }
+  .panel--bottom-sheet .aprop-filters-row { flex-wrap: nowrap; }
 }
 
 .tmb-logo {
