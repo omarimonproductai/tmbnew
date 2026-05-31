@@ -9,6 +9,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon-32.png', 'favicon-16.png', 'apple-touch-icon.png'],
+      workbox: {
+        // Never serve the SPA shell for API routes: the service worker's
+        // navigation fallback was shadowing /api/* when opened directly in the
+        // address bar (a navigation request), so they appeared to "open the app".
+        navigateFallbackDenylist: [/^\/api\//],
+      },
       manifest: {
         name: 'Tu et Mous Bé',
         short_name: 'TuetMousBé',
