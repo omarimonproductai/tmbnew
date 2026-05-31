@@ -147,6 +147,7 @@ export function LiniesView({
   const handleSelect = (linia: Linia) => {
     setSeleccio(linia);
     setPanelOpen(false);
+    setViewMode('map'); // picking a line lands on the map (also on mobile)
     setMapFocus(null);
   };
 

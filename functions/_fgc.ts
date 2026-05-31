@@ -1,4 +1,5 @@
 import { FGC_ROUTE_IDS } from '../src/data/fgcStatic';
+import { FGC_TRIPS } from '../src/data/fgcTrips';
 import { decodeFeedMessage } from '../src/utils/gtfsRt';
 import type { FgcArribada, FgcVehicle } from '../src/types/fgc';
 
@@ -35,11 +36,15 @@ async function fetchPbFeed(slug: string) {
   return decodeFeedMessage(new Uint8Array(await pbRes.arrayBuffer()));
 }
 
-// Map a feed route_id (GTFS route_id) to our line code (route_short_name). The
-// build pre-bake fills FGC_ROUTE_IDS; with the curated seed it's empty, so we
-// fall back to comparing the raw value.
-function routeCodi(routeId: string): string {
-  return FGC_ROUTE_IDS[routeId] ?? routeId;
+// The FGC GTFS-RT feed omits route_id and headsign per entity, carrying only an
+// opaque trip_id. We resolve the line + destination from the pre-baked
+// trip_id → { c, h } map (the RT trip_id may carry a "|…" suffix; strip it).
+function tripInfo(tripId: string): { c: string; h: string } | null {
+  if (!tripId) return null;
+  return FGC_TRIPS[tripId] ?? FGC_TRIPS[tripId.split('|')[0]] ?? null;
+}
+function codiFromTrip(tripId: string, routeId: string): string {
+  return tripInfo(tripId)?.c ?? FGC_ROUTE_IDS[routeId] ?? routeId;
 }
 
 export async function fetchFgcVehicles(liniaCodi?: string): Promise<FgcVehicle[]> {
@@ -47,13 +52,14 @@ export async function fetchFgcVehicles(liniaCodi?: string): Promise<FgcVehicle[]
   const target = liniaCodi?.toUpperCase();
   return vehicles
     .filter((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng))
-    .map((v) => ({ codi: routeCodi(v.routeId), v }))
+    .map((v) => ({ codi: codiFromTrip(v.tripId, v.routeId), info: tripInfo(v.tripId), v }))
     .filter(({ codi }) => !target || codi.toUpperCase() === target)
-    .map(({ codi, v }) => ({
-      id: v.id || `${v.lat},${v.lng}`,
+    .map(({ codi, info, v }) => ({
+      id: v.id || v.tripId || `${v.lat},${v.lng}`,
       liniaCodi: codi,
       lat: v.lat,
       lng: v.lng,
+      destinacio: info?.h || undefined,
     }));
 }
 
@@ -62,13 +68,14 @@ export async function fetchFgcArrivals(stopCodi: string): Promise<FgcArribada[]>
   const now = Date.now();
   const arribades: FgcArribada[] = [];
   for (const tu of tripUpdates) {
+    const info = tripInfo(tu.tripId);
     for (const s of tu.stops) {
       if (s.stopId !== stopCodi) continue;
       const minuts =
         s.time !== null ? Math.max(0, Math.round((s.time * 1000 - now) / 60000)) : null;
       arribades.push({
-        liniaCodi: routeCodi(tu.routeId),
-        destinacio: '',
+        liniaCodi: info?.c ?? FGC_ROUTE_IDS[tu.routeId] ?? tu.routeId,
+        destinacio: info?.h ?? '',
         minutsRestants: minuts,
         text: minuts !== null ? `${minuts} min` : '—',
       });

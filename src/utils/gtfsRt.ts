@@ -60,6 +60,7 @@ class Reader {
 export interface RtVehicle {
   id: string;
   routeId: string;
+  tripId: string;
   lat: number;
   lng: number;
 }
@@ -121,20 +122,24 @@ function parseVehicleDescriptor(buf: Uint8Array): string {
 function parseVehicle(buf: Uint8Array): RtVehicle {
   const r = new Reader(buf);
   let routeId = '';
+  let tripId = '';
   let lat = NaN;
   let lng = NaN;
   let id = '';
   while (!r.eof) {
     const { field, wire } = r.tag();
-    if (field === 1 && wire === 2) routeId = parseTrip(r.bytes()).routeId;
-    else if (field === 2 && wire === 2) {
+    if (field === 1 && wire === 2) {
+      const t = parseTrip(r.bytes());
+      routeId = t.routeId;
+      tripId = t.tripId;
+    } else if (field === 2 && wire === 2) {
       const p = parsePosition(r.bytes());
       lat = p.lat;
       lng = p.lng;
     } else if (field === 8 && wire === 2) id = parseVehicleDescriptor(r.bytes());
     else r.skip(wire);
   }
-  return { id, routeId, lat, lng };
+  return { id, routeId, tripId, lat, lng };
 }
 
 // StopTimeEvent: time=2 (int64)

@@ -28,7 +28,7 @@ function f32(field: number, val: number): number[] {
 
 describe('decodeFeedMessage', () => {
   it('decodes vehicle positions and trip-update arrivals', () => {
-    const trip = str(5, 'L6'); // TripDescriptor.route_id
+    const trip = [...str(1, 'TRIPV'), ...str(5, 'L6')]; // TripDescriptor trip_id + route_id
     const pos = [...f32(1, 41.3873), ...f32(2, 2.1699)]; // Position lat/lng
     const vd = str(1, 'v123'); // VehicleDescriptor.id
     const vehiclePosition = [
@@ -54,6 +54,7 @@ describe('decodeFeedMessage', () => {
     expect(vehicles).toHaveLength(1);
     expect(vehicles[0].id).toBe('v123');
     expect(vehicles[0].routeId).toBe('L6');
+    expect(vehicles[0].tripId).toBe('TRIPV');
     expect(vehicles[0].lat).toBeCloseTo(41.3873, 3);
     expect(vehicles[0].lng).toBeCloseTo(2.1699, 3);
 
