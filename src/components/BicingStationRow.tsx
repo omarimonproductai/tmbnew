@@ -8,18 +8,23 @@ interface Props {
   station: BicingStation;
   distanceM?: number | null;
   onSelect?: (id: string) => void;
+  // Proximity position in the Aprop meu list (shown above the "b" badge).
+  rank?: number;
 }
 
 // Row used in the Aprop meu merged list (and reused in Favorits).
-export function BicingStationRow({ station, distanceM, onSelect }: Props) {
+export function BicingStationRow({ station, distanceM, onSelect, rank }: Props) {
   const { isBicingFav, toggleBicing } = useFavorits();
   return (
     <div
       className={`bicing-row${onSelect ? ' clickable' : ''}`}
       onClick={onSelect ? () => onSelect(station.id) : undefined}
     >
-      <div className="bicing-row-badge" aria-hidden="true">
-        <BicingLogo size={18} />
+      <div className="bicing-row-rank">
+        {rank != null && <span className="bicing-row-num">{rank}</span>}
+        <span className="bicing-row-badge" aria-hidden="true">
+          <BicingLogo size={16} />
+        </span>
       </div>
       <div className="bicing-row-info">
         <div className="bicing-row-name-row">

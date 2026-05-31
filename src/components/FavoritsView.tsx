@@ -194,36 +194,20 @@ export function FavoritsView({ onOpenLine }: Props) {
             </svg>
           </button>
         </div>
-        {hasMappable && (
-          <div className="sort-controls" role="group" aria-label="Vista">
-            <button
-              type="button"
-              className={`sort-btn${view === 'list' ? ' active' : ''}`}
-              onClick={() => setView('list')}
-              aria-pressed={view === 'list'}
-              aria-label="Veure com a llista"
-              title="Llista"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
-                <line x1="8" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="20" y2="12" /><line x1="8" y1="18" x2="20" y2="18" />
-                <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className={`sort-btn${view === 'map' ? ' active' : ''}`}
-              onClick={() => setView('map')}
-              aria-pressed={view === 'map'}
-              aria-label="Veure les parades al mapa"
-              title="Mapa"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20 3 7" /><line x1="9" y1="4" x2="9" y2="17" /><line x1="15" y1="7" x2="15" y2="20" />
-              </svg>
-            </button>
-          </div>
-        )}
       </div>
+      {view === 'list' && hasMappable && (
+        <button
+          type="button"
+          className="fav-map-fab"
+          onClick={() => setView('map')}
+          aria-label="Veure al mapa"
+          title="Mapa"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20 3 7" /><line x1="9" y1="4" x2="9" y2="17" /><line x1="15" y1="7" x2="15" y2="20" />
+          </svg>
+        </button>
+      )}
 
       {view === 'map' && hasMappable ? (
         <div className="favorits-map">

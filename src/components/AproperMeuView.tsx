@@ -7,6 +7,7 @@ import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
 import { LocationBlock } from './LocationBlock';
 import { StopItem } from './ParadesAprop';
+import { RefreshControl } from './RefreshControl';
 import { Toast } from './Toast';
 import { useBicingFilter } from '../hooks/useBicingFilter';
 import { useBicingStations } from '../hooks/useBicingStations';
@@ -188,8 +189,13 @@ export function AproperMeuView({
 
   // Bicing: own layer + own list section (kept out of the "X parades a prop"
   // count). Filtered by the two chips (availability) and by the radius.
-  const { stations: bicingStations, lastFailureAt: bicingFailureAt } =
+  const { stations: bicingStations, lastFailureAt: bicingFailureAt, refresh: refreshBicing } =
     useBicingStations(true);
+  // Manual refresh re-fetches live Bicing data + GPS (cooldown via RefreshControl).
+  const handleRefreshData = async () => {
+    refresh();
+    await refreshBicing();
+  };
   const bicingFilters = useBicingFilter(BICING_FILTER_STORAGE_KEY);
   const bicingNear = useMemo(() => {
     if (!position) return [];
@@ -202,12 +208,12 @@ export function AproperMeuView({
 
   // One proximity-ordered list mixing stops and Bicing stations.
   type MergedItem =
-    | { kind: 'parada'; dist: number; parada: ParadaAprop; rank: number }
+    | { kind: 'parada'; dist: number; parada: ParadaAprop }
     | { kind: 'bicing'; dist: number; station: BicingStation };
   const mergedNearby = useMemo<MergedItem[]>(() => {
     const items: MergedItem[] = [
       ...paradesFiltrades.map(
-        (p, i): MergedItem => ({ kind: 'parada', dist: p.distanciaM, parada: p, rank: i + 1 }),
+        (p): MergedItem => ({ kind: 'parada', dist: p.distanciaM, parada: p }),
       ),
       ...bicingNear.map(
         (b): MergedItem => ({ kind: 'bicing', dist: b.distanceM, station: b.station }),
@@ -361,12 +367,12 @@ export function AproperMeuView({
             <>
               {listHeader && <div className="section-title">{listHeader}</div>}
               <div className="stops-list">
-                {mergedNearby.map((item) =>
+                {mergedNearby.map((item, i) =>
                   item.kind === 'parada' ? (
                     <StopItem
                       key={`p-${item.parada.id}`}
                       parada={item.parada}
-                      rank={item.rank}
+                      rank={i + 1}
                       topN={TOP_N}
                       onSelect={(id) =>
                         setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
@@ -377,6 +383,7 @@ export function AproperMeuView({
                       key={`b-${item.station.id}`}
                       station={item.station}
                       distanceM={item.dist}
+                      rank={i + 1}
                       onSelect={(id) =>
                         setBicingWink((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
                       }
@@ -403,12 +410,14 @@ export function AproperMeuView({
           winkTarget={winkTarget}
           focusStopId={focusStop?.id ?? null}
           bottomInset={isMobile ? sheetHeight : 0}
-          onRefresh={refresh}
           cooltraVehicles={visibleCooltra}
           bicingStations={bicingMapStations}
           bicingFilter={bicingFilters.state}
           bicingWinkTarget={bicingWink}
         />
+        <div className="aprop-refresh-slot">
+          <RefreshControl onRefresh={handleRefreshData} />
+        </div>
         <div className="cooltra-map-control cooltra-map-control--aprop">
           <CooltraMapButton
             value={cooltraOn}

@@ -1368,8 +1368,8 @@ body {
   text-align: right;
 }
 .refresh-control {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid #ffffff;
   background: #ffffff;
@@ -1438,30 +1438,6 @@ body {
 }
 .recenter-control button:hover { transform: scale(1.06); }
 .recenter-control button:active { transform: scale(0.95); }
-
-.aprop-refresh-control {
-  position: absolute;
-  right: 16px;
-  z-index: 700;
-  pointer-events: none;
-}
-.aprop-refresh-control button {
-  pointer-events: auto;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  background: #ffffff;
-  color: #444;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-.aprop-refresh-control button:hover { transform: scale(1.06); color: #c8001e; }
-.aprop-refresh-control button:active { transform: scale(0.95); }
 
 /* Bottom-sheet variant of .panel (Aprop meu on mobile) — desktop falls
    back to the normal sidebar layout below. */
@@ -1621,7 +1597,25 @@ body {
 }
 
 /* --- Favorits view --- */
-.favorits-view { display: flex; flex-direction: column; overflow: hidden; }
+.favorits-view { display: flex; flex-direction: column; overflow: hidden; position: relative; }
+/* Floating round button to switch the list to the map (bottom-right). */
+.fav-map-fab {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 700;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+}
 .favorits-scroll {
   flex: 1;
   min-height: 0;
@@ -1719,7 +1713,7 @@ body {
 .favorits-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   padding: 8px 12px;
   background: #fff;
@@ -1736,11 +1730,17 @@ body {
   z-index: 700;
   display: flex;
   flex-direction: column-reverse;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-end;
 }
-/* Aprop meu: just above the recenter button (which clears the bottom sheet). */
-.cooltra-map-control--aprop { bottom: calc(var(--sheet-height, 0px) + 72px); }
+/* Aprop meu bottom-right stack: recenter (16) · refresh (72) · Cooltra (128). */
+.cooltra-map-control--aprop { bottom: calc(var(--sheet-height, 0px) + 128px); }
+.aprop-refresh-slot {
+  position: absolute;
+  right: 16px;
+  bottom: calc(var(--sheet-height, 0px) + 72px);
+  z-index: 700;
+}
 /* Favorits map: top of the recenter / list-toggle / Cooltra stack. */
 .cooltra-map-control--fav { bottom: 128px; }
 
@@ -1755,7 +1755,7 @@ body {
   border-radius: 50%;
   border: 2px solid #ffffff;
   background: #ffffff;
-  color: #1d7df2;
+  color: #555;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1765,8 +1765,8 @@ body {
 
 .cooltra-kind-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1795,8 +1795,8 @@ body {
 }
 .cooltra-map-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #fff;
   border: none;
@@ -2588,8 +2588,8 @@ body {
 
 /* Round, arrow-only chips for the Bicing mode map (no "b" logo). */
 .bicing-round-chip {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1.5px solid #ddd;
   background: #fff;
@@ -2621,15 +2621,26 @@ body {
   padding: 10px 12px;
   border-top: 1px solid #f0f0f0;
 }
-.bicing-row-badge {
+/* Left column: proximity number (when in the Aprop meu list) above the "b". */
+.bicing-row-rank {
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.bicing-row-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: #f4a300;
+  line-height: 1;
+}
+.bicing-row-badge {
+  width: 24px;
+  height: 24px;
   border-radius: 7px;
   background: #d4111e;
   color: #fff;
-  font-weight: 700;
-  font-size: 13px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2705,12 +2716,12 @@ body {
 .bicing-mode-filters {
   position: absolute;
   right: 16px;
-  bottom: 76px;
+  bottom: 72px;
   z-index: 700;
 }
 .bicing-mode-filters .bicing-chips {
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .bicing-mode-filters .bicing-round-chip {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
