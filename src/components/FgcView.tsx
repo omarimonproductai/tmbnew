@@ -13,6 +13,7 @@ import { CooltraLayer } from './CooltraLayer';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FgcLayer } from './FgcLayer';
 import { FgcLineListView } from './FgcLineListView';
+import { LineHeaderBanner } from './LineHeaderBanner';
 import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
@@ -25,6 +26,7 @@ import { useFgcStations } from '../hooks/useFgcStations';
 import { useFgcVehicles } from '../hooks/useFgcVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { inferKind } from '../types/cooltra';
+import type { Linia } from '../types/tmb';
 import { fgcLineColor } from '../utils/fgc';
 import { haversine } from '../utils/distance';
 import { rotateOptions } from '../utils/leafletRotate';
@@ -150,12 +152,8 @@ export function FgcView() {
       <section className="map-area" aria-label="Mapa FGC">
         {detall && (
           <div className="line-header-wrapper">
-            <span className="line-header-banner">
-              <span className="line-badge" style={{ background: detall.linia.color }}>
-                {detall.linia.codi}
-              </span>
-              <span className="line-header-name">{detall.linia.nom}</span>
-            </span>
+            {/* Same banner as TMB (rounded adaptive badge + origen → destí). */}
+            <LineHeaderBanner linia={{ ...detall.linia, tipus: 'metro' } as Linia} />
           </div>
         )}
 
