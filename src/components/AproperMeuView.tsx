@@ -384,6 +384,7 @@ export function AproperMeuView({
                       station={item.station}
                       distanceM={item.dist}
                       rank={i + 1}
+                      topN={TOP_N}
                       onSelect={(id) =>
                         setBicingWink((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
                       }

@@ -61,10 +61,10 @@ function stationIcon(s: BicingStation, filter: BicingFilterState, fav: boolean):
       popupAnchor: [0, -12],
     });
   }
-  // Only one type available → single-colour square (no "0").
-  return e > 0
-    ? soloIcon(BICING_TYPE_COLOR.electric, e, fav)
-    : soloIcon(BICING_TYPE_COLOR.mecanic, m, fav);
+  if (e > 0) return soloIcon(BICING_TYPE_COLOR.electric, e, fav);
+  if (m > 0) return soloIcon(BICING_TYPE_COLOR.mecanic, m, fav);
+  // Empty station: grey square with "0" — it exists but has no bikes.
+  return soloIcon('#9aa0a6', 0, fav);
 }
 
 export function BicingLayer({

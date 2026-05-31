@@ -24,10 +24,10 @@ const retMec: BicingFilterState = { action: 'retornar' };
 const cap: BicingFilterState = { action: 'cap' };
 
 describe('stationMatches', () => {
-  it('agafar: passes when any bike is available', () => {
+  it('agafar: shows every station (empty ones are painted grey, not hidden)', () => {
     expect(stationMatches(station({ bikesElectric: 1 }), agafar)).toBe(true);
     expect(stationMatches(station({ bikesMechanical: 2 }), agafar)).toBe(true);
-    expect(stationMatches(station({}), agafar)).toBe(false);
+    expect(stationMatches(station({}), agafar)).toBe(true);
   });
 
   it('retornar: passes when there are free docks (any bike type)', () => {
@@ -51,7 +51,9 @@ describe('filterStations', () => {
       station({ id: 'b', docksAvailable: 1 }),
       station({ id: 'c' }),
     ];
-    expect(filterStations(list, agafar).map((s) => s.id)).toEqual(['a']);
+    // agafar shows all (empties included, painted grey on the map).
+    expect(filterStations(list, agafar).map((s) => s.id)).toEqual(['a', 'b', 'c']);
+    // retornar only stations with a free dock.
     expect(filterStations(list, retMec).map((s) => s.id)).toEqual(['b']);
   });
 });

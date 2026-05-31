@@ -1,7 +1,8 @@
 import type { BicingFilterState, BicingStation } from '../types/bicing';
 
 // A station passes the filter when it satisfies the user's intent:
-//  - agafar  → has ≥1 bike available (any type — when taking, any will do).
+//  - agafar  → always shown; empty stations (0 bikes) are still painted (grey)
+//             so the user knows they exist but are empty (not a data glitch).
 //  - retornar→ has ≥1 free dock. In Bicing any free dock accepts any bike, so
 //             the chosen type doesn't change which stations qualify (it only
 //             reflects what the user is carrying).
@@ -9,7 +10,7 @@ import type { BicingFilterState, BicingStation } from '../types/bicing';
 export function stationMatches(s: BicingStation, f: BicingFilterState): boolean {
   switch (f.action) {
     case 'agafar':
-      return s.bikesElectric > 0 || s.bikesMechanical > 0;
+      return true;
     case 'retornar':
       return s.docksAvailable > 0;
     case 'cap':
