@@ -135,55 +135,9 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* FGC stop-list view (mirrors TMB's list view; overlays the map-area). */
-.fgc-stop-list-view { padding: 12px; }
-.fgc-stoplist-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 4px 12px;
-}
-.fgc-stoplist-title { font-weight: 700; color: #222; flex: 1; min-width: 0; }
-.fgc-stoplist-live { font-size: 12px; font-weight: 700; color: #1f7a3d; flex-shrink: 0; }
-.fgc-stoplist { list-style: none; margin: 0; padding: 0; }
-.fgc-stoplist-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 6px;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-}
-.fgc-stoplist-row:hover { background: #fafafa; }
-.fgc-stoplist-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid #1f7a3d;
-  flex-shrink: 0;
-}
-.fgc-stoplist-row.terminal .fgc-stoplist-dot { width: 15px; height: 15px; }
-.fgc-stoplist-name {
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  color: #1c1c1e;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.fgc-stoplist-lines { display: inline-flex; gap: 4px; flex-shrink: 0; }
-.fgc-stoplist-linebadge {
-  min-width: 26px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  background: #888; /* overridden inline with each line's colour */
-  border-radius: 5px;
-  padding: 2px 6px;
-}
+/* Single-direction FGC list: let its one column fill the width (TMB only
+   stretches columns in the multi-direction case). */
+.fgc-line-listview .list-column { flex: 1; min-width: 0; }
 
 /* FGC stop marker: train glyph in a white rounded square (currentColor border
    = line colour) so it reads apart from TMB dots / Bicing squares / Cooltra. */

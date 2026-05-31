@@ -11,15 +11,14 @@ import {
 import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraLayer } from './CooltraLayer';
 import { CooltraMapButton } from './CooltraMapButton';
-import { FavStar } from './FavStar';
 import { FgcLayer } from './FgcLayer';
+import { FgcLineListView } from './FgcLineListView';
 import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
-import { useFavorits } from '../hooks/useFavorits';
 import { useFgcLinies } from '../hooks/useFgcLinies';
 import { useFgcLiniaDetall } from '../hooks/useFgcLiniaDetall';
 import { useFgcStations } from '../hooks/useFgcStations';
@@ -51,7 +50,6 @@ export function FgcView() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [showVehicles, setShowVehicles] = useState(true);
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
-  const [wink, setWink] = useState<{ id: string; nonce: number } | null>(null);
 
   const { detall } = useFgcLiniaDetall(selected);
   // No line selected → all FGC trains (each coloured by its own line).
@@ -191,7 +189,7 @@ export function FgcView() {
               <Polyline positions={polyline} pathOptions={{ color, weight: 5, opacity: 0.9 }} />
             )}
             {detall && (
-              <FgcLayer parades={detall.parades} color={color} origin={position} winkTarget={wink} />
+              <FgcLayer parades={detall.parades} color={color} origin={position} />
             )}
             {showVehicles &&
               vehicles.map((v) => (
@@ -220,14 +218,7 @@ export function FgcView() {
             <InvalidateOnResize />
           </MapContainer>
         ) : (
-          <FgcLineStops
-            detall={detall}
-            vehicleCount={vehicles.length}
-            onSelectStop={(id) => {
-              setWink({ id, nonce: (wink?.nonce ?? 0) + 1 });
-              setViewMode('map');
-            }}
-          />
+          <FgcLineListView detall={detall} />
         )}
 
         {!selected && !panelOpen && (
@@ -310,61 +301,6 @@ export function FgcView() {
         )}
       </section>
     </main>
-  );
-}
-
-// Stop list for the selected line (mirrors TMB's LineListView): ordered stops
-// with terminals marked, the line badge, favourite star, and tap-to-locate.
-function FgcLineStops({
-  detall,
-  vehicleCount,
-  onSelectStop,
-}: {
-  detall: NonNullable<ReturnType<typeof useFgcLiniaDetall>['detall']>;
-  vehicleCount: number;
-  onSelectStop: (id: string) => void;
-}) {
-  const { isFgcFav, toggleFgc } = useFavorits();
-  const last = detall.parades.length - 1;
-  return (
-    <div className="line-list-view fgc-stop-list-view">
-      <div className="fgc-stoplist-head">
-        <span className="fgc-line-badge" style={{ background: detall.linia.color }}>
-          {detall.linia.codi}
-        </span>
-        <span className="fgc-stoplist-title">{detall.linia.nom}</span>
-        {vehicleCount > 0 && (
-          <span className="fgc-stoplist-live">{vehicleCount} en circulació</span>
-        )}
-      </div>
-      <ol className="fgc-stoplist">
-        {detall.parades.map((p, idx) => {
-          const terminal = idx === 0 || idx === last;
-          return (
-            <li
-              key={p.id}
-              className={`fgc-stoplist-row${terminal ? ' terminal' : ''}`}
-              onClick={() => onSelectStop(p.id)}
-            >
-              <span className="fgc-stoplist-dot" style={{ borderColor: detall.linia.color }} />
-              <span className="fgc-stoplist-name">{p.nom}</span>
-              <span className="fgc-stoplist-lines">
-                {p.liniesQueParen.map((codi) => (
-                  <span
-                    key={codi}
-                    className="fgc-stoplist-linebadge"
-                    style={{ background: fgcLineColor(codi) }}
-                  >
-                    {codi}
-                  </span>
-                ))}
-              </span>
-              <FavStar active={isFgcFav(p.id)} onToggle={() => toggleFgc({ ...p })} size={18} />
-            </li>
-          );
-        })}
-      </ol>
-    </div>
   );
 }
 
