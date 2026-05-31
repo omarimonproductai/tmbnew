@@ -1567,6 +1567,16 @@ body {
   .list-sentit-selector { display: flex; }
   .list-columns.multi .list-column:not(.active) { display: none; }
 
+  /* Línies: the line-search list opens as a panel over the lower half. Keep the
+     close-X floating just above that list (not at the very top of the screen)
+     and hide the map's recenter so the X is the only control on screen.
+     Scoped with :not(.panel--bottom-sheet) so Aprop meu (which also uses
+     .panel--open) keeps its recenter. */
+  .linies-fab--close { top: auto; bottom: 14px; }
+  .panel.panel--open:not(.panel--bottom-sheet) ~ .map-area .recenter-control {
+    display: none;
+  }
+
   /* Move Leaflet's zoom buttons to the bottom-left on mobile. When the
      'Aprop meu' bottom sheet is around, lift them above its peek so the
      buttons stay tappable while the sheet is collapsed. */
@@ -2564,9 +2574,9 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
-.bicing-chip.active { color: #fff; border-color: #d4111e; background: #d4111e; }
+.bicing-chip.active { color: #fff; border-color: #c8001e; background: #c8001e; }
 @media (hover: hover) {
-  .bicing-chip:hover { border-color: #d4111e; }
+  .bicing-chip:hover { border-color: #c8001e; }
 }
 
 /* Round, arrow-only chips for the Bicing mode map (no "b" logo). */
@@ -2582,9 +2592,9 @@ body {
   align-items: center;
   justify-content: center;
 }
-.bicing-round-chip.active { color: #fff; border-color: #d4111e; background: #d4111e; }
+.bicing-round-chip.active { color: #fff; border-color: #c8001e; background: #c8001e; }
 @media (hover: hover) {
-  .bicing-round-chip:hover { border-color: #d4111e; }
+  .bicing-round-chip:hover { border-color: #c8001e; }
 }
 
 .aprop-filters-row {

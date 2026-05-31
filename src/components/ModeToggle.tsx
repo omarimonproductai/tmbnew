@@ -29,9 +29,9 @@ const OPTIONS: Option[] = [
     // Monochrome "TMB" mark (currentColor) so it adapts like the other icons:
     // white on the red header, red on the active white pill.
     icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" fill="none" stroke="currentColor" strokeWidth={2} />
-        <text x="12" y="15.4" textAnchor="middle" fontSize="7.5" fontWeight="800" fill="currentColor" fontFamily="inherit" letterSpacing="-0.3">
+      <svg width="30" height="19" viewBox="0 0 30 19" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="17" rx="4.5" fill="none" stroke="currentColor" strokeWidth={1.8} />
+        <text x="15" y="14" textAnchor="middle" fontSize="11" fontWeight="900" fill="currentColor" fontFamily="Arial, Helvetica, sans-serif" letterSpacing="-0.5">
           TMB
         </text>
       </svg>
