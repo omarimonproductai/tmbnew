@@ -2854,7 +2854,9 @@ body {
   position: absolute;
   top: 12px;
   left: 12px;
-  z-index: 700;
+  /* Above Leaflet's controls (zoom/rotation sit at z-index 1000) so the open
+     panel covers them instead of being overlapped — but below toasts/banners. */
+  z-index: 1200;
 }
 @media (min-width: 641px) {
   .aprop-weather-slot { left: 52px; }
