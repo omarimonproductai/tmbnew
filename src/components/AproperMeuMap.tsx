@@ -13,12 +13,14 @@ import {
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
 import { BicingLayer } from './BicingLayer';
 import { CooltraLayer } from './CooltraLayer';
+import { FgcLayer } from './FgcLayer';
 import { useFavorits } from '../hooks/useFavorits';
 import { favStarIcon } from '../utils/favStarIcon';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
 import type { BicingFilterState, BicingStation } from '../types/bicing';
 import type { CooltraVehicle } from '../types/cooltra';
+import type { FgcParada } from '../types/fgc';
 import type { Coordinate, ParadaAprop } from '../types/tmb';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
@@ -35,6 +37,8 @@ interface Props {
   bicingStations?: BicingStation[];
   bicingFilter?: BicingFilterState;
   bicingWinkTarget?: { id: string; nonce: number } | null;
+  fgcStations?: FgcParada[];
+  fgcWinkTarget?: { id: string; nonce: number } | null;
 }
 
 export function AproperMeuMap({
@@ -49,6 +53,8 @@ export function AproperMeuMap({
   bicingStations = [],
   bicingFilter,
   bicingWinkTarget = null,
+  fgcStations = [],
+  fgcWinkTarget = null,
 }: Props) {
   const focusStop = focusStopId
     ? parades.find((p) => p.id === focusStopId) ?? null
@@ -136,6 +142,9 @@ export function AproperMeuMap({
           origin={centre}
           winkTarget={bicingWinkTarget}
         />
+      )}
+      {fgcStations.length > 0 && (
+        <FgcLayer parades={fgcStations} origin={centre} winkTarget={fgcWinkTarget} />
       )}
       <InvalidateOnResize />
     </MapContainer>

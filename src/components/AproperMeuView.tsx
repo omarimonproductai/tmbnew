@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AproperMeuMap } from './AproperMeuMap';
 import { BicingFilters } from './BicingFilters';
 import { BicingStationRow } from './BicingStationRow';
+import { FgcStationRow } from './FgcStationRow';
 import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
@@ -11,6 +12,7 @@ import { RefreshControl } from './RefreshControl';
 import { Toast } from './Toast';
 import { useBicingFilter } from '../hooks/useBicingFilter';
 import { useBicingStations } from '../hooks/useBicingStations';
+import { useFgcStations } from '../hooks/useFgcStations';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
@@ -21,6 +23,7 @@ import { useTotesParades } from '../hooks/useTotesParades';
 import { filterStations } from '../utils/bicingFilter';
 import { haversine } from '../utils/distance';
 import type { BicingStation } from '../types/bicing';
+import type { FgcParada } from '../types/fgc';
 import type { ParadaAmbLinies, ParadaAprop } from '../types/tmb';
 
 const TOP_N = 5;
@@ -35,6 +38,16 @@ const RADIUS_DEFAULT = 300;
 const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
 const FILTER_STORAGE_KEY = 'tmb-aprop-meu-filter-v1';
 const BICING_FILTER_STORAGE_KEY = 'tmb-aprop-bicing-filter-v1';
+const FGC_FILTER_STORAGE_KEY = 'tmb-aprop-fgc-filter-v1';
+
+function loadStoredFgcOn(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    return window.localStorage.getItem(FGC_FILTER_STORAGE_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
 
 function loadStoredRadius(): number {
   if (typeof window === 'undefined') return RADIUS_DEFAULT;
@@ -108,6 +121,8 @@ export function AproperMeuView({
   // stop re-trigger the animation on repeated taps.
   const [winkTarget, setWinkTarget] = useState<{ id: string; nonce: number } | null>(null);
   const [bicingWink, setBicingWink] = useState<{ id: string; nonce: number } | null>(null);
+  const [fgcWink, setFgcWink] = useState<{ id: string; nonce: number } | null>(null);
+  const [fgcOn, setFgcOn] = useState<boolean>(loadStoredFgcOn);
   const [sheetHeight, setSheetHeight] = useState(initialSheetHeight);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(getIsMobile);
@@ -157,6 +172,15 @@ export function AproperMeuView({
       // ignore
     }
   }, [filtre]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(FGC_FILTER_STORAGE_KEY, fgcOn ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [fgcOn]);
   const dragRef = useRef<{
     startY: number;
     startHeight: number;
@@ -206,10 +230,22 @@ export function AproperMeuView({
   }, [bicingStations, bicingFilters.state, position, radius]);
   const bicingMapStations = useMemo(() => bicingNear.map((x) => x.station), [bicingNear]);
 
-  // One proximity-ordered list mixing stops and Bicing stations.
+  // FGC stops near the user (own toggle + radius), proximity-ordered.
+  const { stations: fgcStations, lastFailureAt: fgcFailureAt } = useFgcStations(true);
+  const fgcNear = useMemo(() => {
+    if (!position || !fgcOn) return [];
+    return fgcStations
+      .map((p) => ({ parada: p, distanceM: haversine(position, { lat: p.lat, lng: p.lng }) }))
+      .filter((x) => x.distanceM <= radius)
+      .sort((a, b) => a.distanceM - b.distanceM);
+  }, [fgcStations, fgcOn, position, radius]);
+  const fgcMapStations = useMemo(() => fgcNear.map((x) => x.parada), [fgcNear]);
+
+  // One proximity-ordered list mixing stops, Bicing and FGC stations.
   type MergedItem =
     | { kind: 'parada'; dist: number; parada: ParadaAprop }
-    | { kind: 'bicing'; dist: number; station: BicingStation };
+    | { kind: 'bicing'; dist: number; station: BicingStation }
+    | { kind: 'fgc'; dist: number; fgc: FgcParada };
   const mergedNearby = useMemo<MergedItem[]>(() => {
     const items: MergedItem[] = [
       ...paradesFiltrades.map(
@@ -218,19 +254,30 @@ export function AproperMeuView({
       ...bicingNear.map(
         (b): MergedItem => ({ kind: 'bicing', dist: b.distanceM, station: b.station }),
       ),
+      ...fgcNear.map(
+        (f): MergedItem => ({ kind: 'fgc', dist: f.distanceM, fgc: f.parada }),
+      ),
     ];
     return items.sort((a, b) => a.dist - b.dist);
-  }, [paradesFiltrades, bicingNear]);
+  }, [paradesFiltrades, bicingNear, fgcNear]);
 
   // Single-line header; each count is shown only when its chips are active.
   const listHeader = useMemo(() => {
     const parts: string[] = [];
     if (filtre !== 'cap') parts.push(`Parades: ${paradesFiltrades.length}`);
     if (bicingFilters.state.action !== 'cap') {
-      parts.push(`Estacions bicing: ${bicingNear.length}`);
+      parts.push(`Bicing: ${bicingNear.length}`);
     }
+    if (fgcOn) parts.push(`FGC: ${fgcNear.length}`);
     return parts.join(' - ');
-  }, [filtre, paradesFiltrades.length, bicingFilters.state.action, bicingNear.length]);
+  }, [
+    filtre,
+    paradesFiltrades.length,
+    bicingFilters.state.action,
+    bicingNear.length,
+    fgcOn,
+    fgcNear.length,
+  ]);
 
   // A shared ?parada= link focuses a stop on the map; make sure its marker
   // is present even if it falls outside the radius or the active filter.
@@ -259,6 +306,13 @@ export function AproperMeuView({
       );
     }
   }, [bicingFailureAt]);
+  useEffect(() => {
+    if (fgcFailureAt) {
+      setToastMsg(
+        "No s'han pogut actualitzar les parades FGC. Mostrant les últimes guardades.",
+      );
+    }
+  }, [fgcFailureAt]);
 
   const isOpen = sheetHeight > SHEET_MIN_HEIGHT + 20;
 
@@ -361,6 +415,17 @@ export function AproperMeuView({
                   onToggleRetornar={bicingFilters.toggleRetornar}
                 />
               )}
+              {fgcStations.length > 0 && (
+                <button
+                  type="button"
+                  className={`filter-btn${fgcOn ? ' active' : ''}`}
+                  aria-pressed={fgcOn}
+                  onClick={() => setFgcOn((v) => !v)}
+                  title="Mostrar/amagar parades FGC"
+                >
+                  FGC
+                </button>
+              )}
             </div>
           )}
           {mergedNearby.length > 0 && (
@@ -378,7 +443,7 @@ export function AproperMeuView({
                         setWinkTarget((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
                       }
                     />
-                  ) : (
+                  ) : item.kind === 'bicing' ? (
                     <BicingStationRow
                       key={`b-${item.station.id}`}
                       station={item.station}
@@ -387,6 +452,17 @@ export function AproperMeuView({
                       topN={TOP_N}
                       onSelect={(id) =>
                         setBicingWink((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
+                      }
+                    />
+                  ) : (
+                    <FgcStationRow
+                      key={`f-${item.fgc.id}`}
+                      parada={item.fgc}
+                      distanceM={item.dist}
+                      rank={i + 1}
+                      topN={TOP_N}
+                      onSelect={(id) =>
+                        setFgcWink((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }))
                       }
                     />
                   ),
@@ -415,6 +491,8 @@ export function AproperMeuView({
           bicingStations={bicingMapStations}
           bicingFilter={bicingFilters.state}
           bicingWinkTarget={bicingWink}
+          fgcStations={fgcMapStations}
+          fgcWinkTarget={fgcWink}
         />
         <div className="aprop-refresh-slot">
           <RefreshControl onRefresh={handleRefreshData} />

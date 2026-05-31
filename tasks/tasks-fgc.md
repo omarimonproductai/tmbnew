@@ -103,13 +103,13 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
   - [x] 3.7 Substituir el placeholder de `App.tsx` per `<FgcView />`
   - [x] 3.8 `lint + test + build` i push
 
-- [ ] 4.0 Integració d'FGC a "Aprop meu"
-  - [ ] 4.1 `useFgcStations` (totes les parades FGC) i barrejar-les a la llista unificada per proximitat (numerades)
-  - [ ] 4.2 Marcadors FGC al mapa d'Aprop meu (reusar `FgcLayer`) respectant radi + "guinyo" en tocar la fila
-  - [ ] 4.3 Filtre FGC: estendre `FilterType`/`FilterBar` amb un toggle FGC; persistència `tmb-aprop-fgc-filter-v1`
-  - [ ] 4.4 Capçalera de comptadors amb el recompte d'FGC (igual que parades/Bicing)
-  - [ ] 4.5 Tests del filtre (`FilterBar` / utilitat)
-  - [ ] 4.6 `lint + test + build` i push
+- [x] 4.0 Integració d'FGC a "Aprop meu"
+  - [x] 4.1 `useFgcStations` (totes les parades FGC) i barrejar-les a la llista unificada per proximitat (numerades)
+  - [x] 4.2 Marcadors FGC al mapa d'Aprop meu (reusar `FgcLayer`) respectant radi + "guinyo" en tocar la fila
+  - [x] 4.3 Filtre FGC: estendre `FilterType`/`FilterBar` amb un toggle FGC; persistència `tmb-aprop-fgc-filter-v1`
+  - [x] 4.4 Capçalera de comptadors amb el recompte d'FGC (igual que parades/Bicing)
+  - [x] 4.5 Tests del filtre (`FilterBar` / utilitat)
+  - [x] 4.6 `lint + test + build` i push
 
 - [ ] 5.0 Temps real FGC
   - [ ] 5.1 Decidir la via RT (records JSON d'Opendatasoft vs GTFS-RT protobuf) després de validar en una Pages Function de prova
