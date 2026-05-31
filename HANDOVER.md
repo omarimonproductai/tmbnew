@@ -34,8 +34,8 @@ Copia-ho al primer missatge de la sessió nova per posar-la al dia ràpid.
 > MCP de GitHub torna a funcionar, pots tornar als PRs; si no, el push directe a
 > `main` és vàlid i desplega igual.
 >
-> **Sis modes al header** (esquerra→dreta): **FGC** · Bicing · Línies (icona
-> "TMB" monocroma) · Ruta · Aprop meu · ★ Favorits.
+> **Sis modes al header** (esquerra→dreta): Línies (icona "TMB" monocroma) ·
+> Bicing · **FGC** · Ruta · Aprop meu · ★ Favorits.
 >
 > **Tres regles d'or:**
 > 1. **No confiïs en docs que prometen un format.** L'API de TMB i la de Cooltra van

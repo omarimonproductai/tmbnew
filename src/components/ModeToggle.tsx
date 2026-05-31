@@ -16,16 +16,6 @@ interface Option {
 
 const OPTIONS: Option[] = [
   {
-    value: 'fgc',
-    label: 'FGC',
-    icon: <FgcLogo size={14} />,
-  },
-  {
-    value: 'bicing',
-    label: 'Bicing',
-    icon: <BicingLogo size={20} />,
-  },
-  {
     value: 'linies',
     label: 'Línies',
     // Monochrome "TMB" mark (currentColor) so it adapts like the other icons:
@@ -38,6 +28,16 @@ const OPTIONS: Option[] = [
         </text>
       </svg>
     ),
+  },
+  {
+    value: 'bicing',
+    label: 'Bicing',
+    icon: <BicingLogo size={20} />,
+  },
+  {
+    value: 'fgc',
+    label: 'FGC',
+    icon: <FgcLogo size={14} />,
   },
   {
     value: 'route',

@@ -264,7 +264,7 @@ export function AproperMeuView({
   // Single-line header; each count is shown only when its chips are active.
   const listHeader = useMemo(() => {
     const parts: string[] = [];
-    if (filtre !== 'cap') parts.push(`Parades: ${paradesFiltrades.length}`);
+    if (filtre !== 'cap') parts.push(`Metro/Bus: ${paradesFiltrades.length}`);
     if (bicingFilters.state.action !== 'cap') {
       parts.push(`Bicing: ${bicingNear.length}`);
     }
