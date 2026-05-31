@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { FilterBar } from './FilterBar';
@@ -10,7 +10,7 @@ import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
 import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
-import { ViewToggle, type ViewMode } from './ViewToggle';
+import { type ViewMode } from './ViewToggle';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { inferKind } from '../types/cooltra';
@@ -92,6 +92,19 @@ export function LiniesView({
   // When set, the map zooms onto this point (a favourite stop) instead of
   // fitting the whole line. Cleared on any manual line pick.
   const [mapFocus, setMapFocus] = useState<Coordinate | null>(null);
+  // Direction (sentit) of the list view, lifted so the map-area ⇄ button can
+  // cycle it. LineListView reports the available directions.
+  const [listSentit, setListSentit] = useState<string>('');
+  const [listSentits, setListSentits] = useState<string[]>([]);
+  const handleColumnsChange = useCallback((sentits: string[]) => {
+    setListSentits(sentits);
+    setListSentit((prev) => (sentits.includes(prev) ? prev : sentits[0] ?? ''));
+  }, []);
+  const cycleSentit = () => {
+    if (listSentits.length < 2) return;
+    const i = listSentits.indexOf(listSentit);
+    setListSentit(listSentits[(i + 1) % listSentits.length]);
+  };
 
   // When the favourites view asks to open a specific line, select it once
   // the line catalogue is loaded, switch to the map, and zoom to the
@@ -271,34 +284,8 @@ export function LiniesView({
       </aside>
       <section className="map-area" aria-label="Vista de la línia">
         {seleccio && (
-          <button
-            type="button"
-            className={`panel-toggle-mobile${panelOpen ? ' active' : ''}`}
-            onClick={() => setPanelOpen((v) => !v)}
-            aria-label={panelOpen ? 'Tancar cerca de línies' : 'Obrir cerca de línies'}
-            aria-expanded={panelOpen}
-          >
-          {panelOpen ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
-              <line x1="6" y1="6" x2="18" y2="18" />
-              <line x1="18" y1="6" x2="6" y2="18" />
-            </svg>
-          ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="16" y1="16" x2="21" y2="21" />
-            </svg>
-          )}
-          </button>
-        )}
-        {seleccio && (
           <div className="line-header-wrapper">
             <LineHeaderBanner linia={seleccio} />
-          </div>
-        )}
-        {seleccio && (
-          <div className="view-toggle-wrapper">
-            <ViewToggle value={viewMode} onChange={setViewMode} />
           </div>
         )}
         {viewMode === 'map' || !seleccio ? (
@@ -320,26 +307,14 @@ export function LiniesView({
             }
             correspondencesPerParada={correspondencesPerParada}
             nearestStopCodi={nearestStopCodi}
+            activeSentit={listSentit || undefined}
+            onActiveSentitChange={setListSentit}
+            onColumnsChange={handleColumnsChange}
           />
         )}
+        {/* Top-right: vehicle data controls (both views). */}
         {seleccio && (
           <div className="map-controls-stack">
-            {viewMode === 'map' && (
-              <>
-                <CooltraMapButton
-                  value={cooltraOn}
-                  onChange={setCooltraOn}
-                />
-                {cooltraOn && (
-                  <CooltraKindFilters
-                    motos={cooltraKinds.motos}
-                    bikes={cooltraKinds.bikes}
-                    onMotosChange={cooltraKinds.setMotos}
-                    onBikesChange={cooltraKinds.setBikes}
-                  />
-                )}
-              </>
-            )}
             <RefreshControl onRefresh={refreshVehicles} />
             <VehicleVisibilityToggle
               value={showVehicles}
@@ -348,22 +323,88 @@ export function LiniesView({
             />
           </div>
         )}
-        {!seleccio && (
-          <div className="map-controls-stack">
-            <CooltraMapButton
-              value={cooltraOn}
-              onChange={setCooltraOn}
-            />
-            {cooltraOn && (
-              <CooltraKindFilters
-                motos={cooltraKinds.motos}
-                bikes={cooltraKinds.bikes}
-                onMotosChange={cooltraKinds.setMotos}
-                onBikesChange={cooltraKinds.setBikes}
-              />
-            )}
-          </div>
-        )}
+        {/* Bottom-right FAB stack (column-reverse → first child sits lowest). */}
+        <div
+          className={`linies-fab-stack${
+            viewMode === 'map' || !seleccio ? ' linies-fab-stack--mapview' : ''
+          }`}
+        >
+          {seleccio && viewMode === 'list' ? (
+            <>
+              <button
+                type="button"
+                className="linies-fab"
+                onClick={() => setViewMode('map')}
+                aria-label="Veure al mapa"
+                title="Mapa"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20 3 7" /><line x1="9" y1="4" x2="9" y2="17" /><line x1="15" y1="7" x2="15" y2="20" />
+                </svg>
+              </button>
+              {listSentits.length > 1 && (
+                <button
+                  type="button"
+                  className="linies-fab"
+                  onClick={cycleSentit}
+                  aria-label="Canviar de sentit"
+                  title="Canviar de sentit"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                    <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                  </svg>
+                </button>
+              )}
+              <button
+                type="button"
+                className="linies-fab"
+                onClick={() => setPanelOpen((v) => !v)}
+                aria-label="Cercar línia"
+                title="Cercar línia"
+              >
+                <SearchIcon />
+              </button>
+            </>
+          ) : (
+            <>
+              {seleccio && (
+                <button
+                  type="button"
+                  className="linies-fab"
+                  onClick={() => setViewMode('list')}
+                  aria-label="Veure com a llista"
+                  title="Llista"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+                    <line x1="8" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="20" y2="12" /><line x1="8" y1="18" x2="20" y2="18" />
+                    <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                </button>
+              )}
+              {seleccio && (
+                <button
+                  type="button"
+                  className="linies-fab"
+                  onClick={() => setPanelOpen((v) => !v)}
+                  aria-label="Cercar línia"
+                  title="Cercar línia"
+                >
+                  <SearchIcon />
+                </button>
+              )}
+              <CooltraMapButton value={cooltraOn} onChange={setCooltraOn} />
+              {cooltraOn && (
+                <CooltraKindFilters
+                  motos={cooltraKinds.motos}
+                  bikes={cooltraKinds.bikes}
+                  onMotosChange={cooltraKinds.setMotos}
+                  onBikesChange={cooltraKinds.setBikes}
+                />
+              )}
+            </>
+          )}
+        </div>
         {seleccio && paradesLoading && (
           <div className="map-overlay">Carregant parades…</div>
         )}
@@ -377,6 +418,15 @@ export function LiniesView({
         )}
       </section>
     </main>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="16" y1="16" x2="21" y2="21" />
+    </svg>
   );
 }
 

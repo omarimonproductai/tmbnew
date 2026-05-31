@@ -97,8 +97,52 @@ export function MapView({
       {userPosition && <UserDot position={userPosition} hasLine={!!linia} />}
       <AutoFit linia={linia} parades={parades} disabled={!!focusPoint} />
       {focusPoint && <FocusOnPoint point={focusPoint} />}
+      <RecenterControl userPosition={userPosition ?? null} linia={linia} parades={parades} />
       <InvalidateOnResize />
     </MapContainer>
+  );
+}
+
+// Bottom-right recenter: centres on the user when located, otherwise refits
+// the selected line.
+function RecenterControl({
+  userPosition,
+  linia,
+  parades,
+}: {
+  userPosition: Coordinate | null;
+  linia: Linia | null;
+  parades: Parada[];
+}) {
+  const map = useMap();
+  const recenter = () => {
+    if (userPosition) {
+      map.setView([userPosition.lat, userPosition.lng], 15);
+      return;
+    }
+    const bounds = L.latLngBounds([]);
+    if (linia?.geometry) {
+      const coords =
+        linia.geometry.type === 'LineString'
+          ? linia.geometry.coordinates
+          : linia.geometry.coordinates.flat();
+      coords.forEach(([lng, lat]) => bounds.extend([lat, lng]));
+    }
+    parades.forEach((p) => bounds.extend([p.lat, p.lng]));
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40] });
+  };
+  return (
+    <div className="recenter-control" style={{ bottom: '16px' }}>
+      <button type="button" onClick={recenter} aria-label="Centrar el mapa">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <line x1="12" y1="2" x2="12" y2="5" />
+          <line x1="12" y1="19" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="5" y2="12" />
+          <line x1="19" y1="12" x2="22" y2="12" />
+        </svg>
+      </button>
+    </div>
   );
 }
 

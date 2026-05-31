@@ -8,6 +8,10 @@ interface Props {
   vehicles: VehicleRaw[];
   correspondencesPerParada: Map<string, LiniaResum[]>;
   nearestStopCodi?: string | null;
+  // Direction tab can be driven from outside (the map-area ⇄ button).
+  activeSentit?: string;
+  onActiveSentitChange?: (sentit: string) => void;
+  onColumnsChange?: (sentits: string[]) => void;
 }
 
 interface Column {
@@ -26,6 +30,9 @@ export function LineListView({
   vehicles,
   correspondencesPerParada,
   nearestStopCodi,
+  activeSentit: activeSentitProp,
+  onActiveSentitChange,
+  onColumnsChange,
 }: Props) {
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const nearestRowRef = useRef<HTMLDivElement | null>(null);
@@ -101,9 +108,20 @@ export function LineListView({
     });
   }, [columns, vehicles]);
 
-  const [activeSentit, setActiveSentit] = useState<string>(
+  const [internalSentit, setInternalSentit] = useState<string>(
     columns[0]?.sentit ?? 'default',
   );
+  // Controlled by the parent when it passes activeSentit; otherwise internal.
+  const activeSentit = activeSentitProp ?? internalSentit;
+  const setActiveSentit = (s: string) => {
+    setInternalSentit(s);
+    onActiveSentitChange?.(s);
+  };
+
+  // Tell the parent which directions exist (so the ⇄ button can cycle them).
+  useEffect(() => {
+    onColumnsChange?.(columns.map((c) => c.sentit));
+  }, [columns, onColumnsChange]);
 
   // Stops arrive after the view mounts, so the columns (and their sentit
   // keys) change from the initial empty 'default' to the real ones. If the
@@ -115,6 +133,7 @@ export function LineListView({
     if (!columns.some((c) => c.sentit === activeSentit)) {
       setActiveSentit(columns[0].sentit);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columns, activeSentit]);
 
   // Scroll the user's nearest stop into the viewport once we know it.
