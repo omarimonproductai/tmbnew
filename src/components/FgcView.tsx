@@ -52,8 +52,8 @@ export function FgcView() {
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
 
   const { detall } = useFgcLiniaDetall(selected);
-  // No line selected → all FGC trains (each coloured by its own line).
-  const { vehicles, refresh } = useFgcVehicles(selected, showVehicles);
+  // Trains only for the selected line — the default FGC view stays a clean map.
+  const { vehicles, refresh } = useFgcVehicles(selected, !!selected && showVehicles);
   const { stations } = useFgcStations(true);
   const { position } = useGeolocation(true);
   const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
@@ -225,8 +225,8 @@ export function FgcView() {
           <div className="map-hint">Selecciona una línia FGC per veure les parades</div>
         )}
 
-        {/* Top-right: refresh + vehicle visibility (map view, panel closed). */}
-        {viewMode === 'map' && !panelOpen && (
+        {/* Top-right: refresh + vehicle visibility (line selected, map, panel closed). */}
+        {detall && viewMode === 'map' && !panelOpen && (
           <div className="map-controls-stack">
             <RefreshControl onRefresh={refresh} />
             <VehicleVisibilityToggle value={showVehicles} onChange={setShowVehicles} tipus="metro" />
