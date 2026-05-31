@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   CircleMarker,
   MapContainer,
@@ -131,12 +131,19 @@ function FitToFavs({
   userPosition?: Coordinate | null;
 }) {
   const map = useMap();
+  // Fit ONCE, the first time we have valid bounds. Re-fitting when the GPS
+  // position (or async Bicing data) arrives later would zoom out to keep the
+  // user's distant location in view — exactly the jump we want to avoid. The
+  // recenter button stays available to jump to the user on demand.
+  const fitted = useRef(false);
   useEffect(() => {
+    if (fitted.current) return;
     const bounds = L.latLngBounds([]);
     for (const p of parades) bounds.extend([p.lat, p.lng]);
     for (const s of bicingStations) bounds.extend([s.lat, s.lng]);
     if (userPosition) bounds.extend([userPosition.lat, userPosition.lng]);
     if (bounds.isValid()) {
+      fitted.current = true;
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
   }, [parades, bicingStations, userPosition, map]);
