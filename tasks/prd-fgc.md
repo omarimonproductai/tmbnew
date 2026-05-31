@@ -136,17 +136,31 @@ mobilitat de Barcelona.
   TMB. Cal introduir un concepte d'**operador** (`TMB | FGC`) als tipus i a la lògica de
   línies/parades/favorits, en lloc de duplicar tot el flux. Decidir aviat: estendre els
   tipus existents amb un camp `operator` vs. tipus paral·lels.
+- **Fonts de dades FGC (confirmades per recerca, maig 2026).** FGC publica Open Data al
+  portal **Dades Obertes FGC** (Opendatasoft, `dadesobertes.fgc.cat`):
+  - **GTFS estàtic:** `https://www.fgc.cat/google/google_transit.zip` (zip; inclou rutes,
+    parades, shapes i, típicament, `route_color`).
+  - **GTFS‑Realtime** (protobuf): datasets `vehicle-positions-gtfs_realtime` (posicions),
+    `trip-updates-gtfs_realtime` (arribades) i `alerts-gtfs_realtime` (alertes de servei).
+  - → Això **resol la pregunta oberta #1**: el temps real existeix (posicions + arribades),
+    així que la paritat total (§16–17) és viable.
 - **Ingesta GTFS + GTFS‑RT.** El GTFS estàtic d'FGC és petit; opció recomanada per al
   **límit de 50 subrequests/invocació de Cloudflare free**: **pre‑bake** de les dades
   estàtiques (línies/parades/shapes/colors filtrades a "connexió Barcelona") en un JSON
-  durant el build, servit per la Function. El **temps real** (GTFS‑RT) requereix descodificar
-  **Protobuf** en runtime a la Function (trip updates per a arribades, vehicle positions per
-  a posicions).
-- **⚠️ Verificar el feed real (regla d'or del projecte).** Confirmar amb crida real:
-  (a) disponibilitat i format del **GTFS‑RT d'FGC** (o API de "properes circulacions");
-  (b) que els `route_color`/noms quadren; (c) que el host és accessible des de les Pages
-  Functions. Si NO hi ha feed RT públic viable, el temps real (§16–17) passa a ser
-  *stretch goal* i v1 surt amb dades estàtiques (degradació elegant).
+  durant el build, servit per la Function. Per al temps real hi ha **dues vies a avaluar**:
+  (a) consumir el **GTFS‑RT protobuf** i descodificar‑lo a la Function (cal un decoder
+  Protobuf); (b) usar l'**API de records JSON d'Opendatasoft** del mateix dataset
+  (`/api/explore/v2.1/catalog/datasets/<slug>/records`), que retorna **JSON** i evitaria el
+  protobuf. Preferir (b) si el contingut és equivalent (molt més simple a Cloudflare).
+- **⚠️ Validació pendent en producció (regla d'or).** Des de l'entorn de dev els hosts FGC
+  estan **fora de l'allowlist** (no s'ha pogut baixar el feed; mateix cas que Bicing). Cal
+  validar **en una Pages Function** (o entorn amb xarxa oberta): URL exacta del GTFS‑RT
+  (protobuf vs. records JSON), si cal **API key/token** d'Opendatasoft, i que
+  `route_color`/noms/`shapes` quadren. Si una via RT no fos viable, v1 degrada a estàtic.
+- **Línies que qualifiquen (connexió directa a Barcelona).** Barcelona‑Vallès des de Pl.
+  Catalunya (L6, L7, L12, S1, S2, S5/S6/S7…) i Llobregat‑Anoia des de Pl. Espanya (L8, S3,
+  S4, S8, S9, R5, R6, R50, R60). Excloses: Lleida–La Pobla de Segur, Cremallera de
+  Montserrat, Vall de Núria i funiculars (sense parada a Barcelona).
 - **Definició de "Barcelona ciutat".** Els GTFS stops no porten municipi; cal un criteri
   programàtic (polígon municipal de Barcelona, o bbox + curació) per decidir quines línies
   qualifiquen. Resoldre a la fase de dades.
@@ -171,12 +185,13 @@ mobilitat de Barcelona.
 
 ## 9. Preguntes obertes
 
-1. **Feed de temps real FGC:** existeix un GTFS‑RT (o API) públic i accessible des de
-   Cloudflare? Quin format/endpoint? (Bloqueja §16–17.)
+1. ~~Feed de temps real FGC~~ **RESOLT**: FGC publica GTFS‑RT (posicions, arribades,
+   alertes) a `dadesobertes.fgc.cat`. Queda per validar **en producció**: URL exacta
+   (protobuf vs. records JSON d'Opendatasoft) i si cal **API key**. (Veure §7.)
 2. **Criteri exacte de "Barcelona ciutat":** polígon municipal oficial o llista curada
    d'estacions? Inclou casos límit (p. ex. estacions a la frontera del terme)?
-3. **Marca i icona:** quina representació monocroma volem per al mode (wordmark "FGC" vs.
-   glyph de tren)? Cal el mockup aprovat.
+3. ~~Marca i icona~~ **RESOLT**: ja s'ha creat `FgcLogo` (isotip de les baules entrellaçades,
+   monocrom `currentColor`) i el mode nou al header amb placeholder "FGC · properament".
 4. **Posició al header:** confirmem `FGC` just després de `Línies`? (6 modes; a mòbil són
    només icones, però convé validar que no quedi atapeït.)
 5. **Favorits de línies FGC (§14):** es confirma que es poden marcar línies FGC, o v1 es
