@@ -1,6 +1,7 @@
 import { BicingLogo } from './BicingLogo';
+import { FgcLogo } from './FgcLogo';
 
-export type AppMode = 'route' | 'linies' | 'bicing' | 'aprop-meu' | 'favorits';
+export type AppMode = 'route' | 'linies' | 'fgc' | 'bicing' | 'aprop-meu' | 'favorits';
 
 interface Props {
   value: AppMode;
@@ -36,6 +37,11 @@ const OPTIONS: Option[] = [
         </text>
       </svg>
     ),
+  },
+  {
+    value: 'fgc',
+    label: 'FGC',
+    icon: <FgcLogo size={18} />,
   },
   {
     value: 'bicing',
