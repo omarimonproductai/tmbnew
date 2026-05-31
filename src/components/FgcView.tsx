@@ -49,6 +49,7 @@ export function FgcView() {
   const [sort, setSort] = useState<SortMode>('proximity');
   const [selected, setSelected] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('map');
+  const [sentit, setSentit] = useState<'forward' | 'backward'>('forward');
   const [panelOpen, setPanelOpen] = useState(true);
   const [showVehicles, setShowVehicles] = useState(true);
   const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
@@ -117,6 +118,7 @@ export function FgcView() {
     setSelected(codi);
     setPanelOpen(false);
     setViewMode('map');
+    setSentit('forward');
   };
 
   return (
@@ -216,7 +218,7 @@ export function FgcView() {
             <InvalidateOnResize />
           </MapContainer>
         ) : (
-          <FgcLineListView detall={detall} />
+          <FgcLineListView detall={detall} sentit={sentit} />
         )}
 
         {!selected && !panelOpen && (
@@ -270,6 +272,20 @@ export function FgcView() {
                     <polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20 3 7" /><line x1="9" y1="4" x2="9" y2="17" /><line x1="15" y1="7" x2="15" y2="20" />
                   </svg>
                 )}
+              </button>
+            )}
+            {detall && viewMode === 'list' && (
+              <button
+                type="button"
+                className="linies-fab"
+                onClick={() => setSentit((s) => (s === 'forward' ? 'backward' : 'forward'))}
+                aria-label="Canviar de sentit"
+                title="Canviar de sentit"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                  <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                </svg>
               </button>
             )}
             <button

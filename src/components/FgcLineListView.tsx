@@ -7,9 +7,19 @@ import type { FgcLinia } from '../types/fgc';
 // FGC stop list — mirrors TMB's LineListView/StopRow (same classes/markup) so
 // the design is identical: numbered stops, coloured connection badges, a
 // chevron that expands the live arrivals for that stop.
-export function FgcLineListView({ detall }: { detall: FgcLiniaDetall }) {
+export function FgcLineListView({
+  detall,
+  sentit = 'forward',
+}: {
+  detall: FgcLiniaDetall;
+  sentit?: 'forward' | 'backward';
+}) {
   const [expanded, setExpanded] = useState<string | null>(null);
-  const desti = detall.parades[detall.parades.length - 1]?.nom ?? detall.linia.nom;
+  // The two directions are the stop list and its reverse (same idea as TMB's
+  // synthesised metro directions).
+  const parades =
+    sentit === 'backward' ? [...detall.parades].reverse() : detall.parades;
+  const desti = parades[parades.length - 1]?.nom ?? detall.linia.nom;
   return (
     <div className="line-list-view fgc-line-listview">
       <div className="list-columns">
@@ -18,7 +28,7 @@ export function FgcLineListView({ detall }: { detall: FgcLiniaDetall }) {
             → {desti}
           </div>
           <div className="list-column-rows">
-            {detall.parades.map((p, idx) => (
+            {parades.map((p, idx) => (
               <FgcStopRow
                 key={p.id}
                 parada={p}
