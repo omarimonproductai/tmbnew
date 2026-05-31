@@ -59,6 +59,12 @@ body {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 .mode-toggle .mode-btn__label { display: none; }
+.mode-toggle .mode-btn__img {
+  height: 20px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
 @media (min-width: 641px) {
   .mode-toggle .mode-btn__label { display: inline; }
   .mode-toggle .mode-btn { padding: 6px 12px; }

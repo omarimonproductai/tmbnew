@@ -27,12 +27,13 @@ const OPTIONS: Option[] = [
     value: 'linies',
     label: 'Línies',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="4" y="3" width="16" height="14" rx="3" />
-        <line x1="4" y1="11" x2="20" y2="11" />
-        <circle cx="8" cy="19" r="1.5" />
-        <circle cx="16" cy="19" r="1.5" />
-      </svg>
+      <img
+        src="/logo-tmb.png"
+        alt=""
+        className="mode-btn__img"
+        draggable={false}
+        aria-hidden="true"
+      />
     ),
   },
   {
