@@ -52,11 +52,17 @@ Copia-ho al primer missatge de la sessió nova per posar-la al dia ràpid.
 > Quan tinguis preguntes ambigües, **pregunta primer** (regla 1 de `CLAUDE.md`).
 > Si la solució més òbvia trenca un patró establert, dilo i proposa alternatives.
 >
-> Mira el bloc "**Estat de producció actual**" més avall — l'última sessió va
-> aterrar la integració **Bicing** (mode nou + capa a Aprop meu + favorits) i una
-> ronda molt llarga de polish de controls de mapa (totes les icones rodones de
-> mapa a 44 px, piles a baix-dreta, etc.). No reinventis components que ja
-> existeixen.
+> Mira el bloc "**Estat de producció actual**" més avall. L'última sessió va aterrar
+> la integració completa d'**FGC** com a segon operador (mode propi idèntic a TMB,
+> Aprop meu, favorits i **temps real GTFS‑RT** descodificant protobuf), va unificar
+> **tots els refrescos a 30 s** i va fer netes diverses incoherències d'UI. **Llegeix
+> la secció "FGC (Ferrocarrils)" sencera** abans de tocar res d'FGC. No reinventis
+> components que ja existeixen.
+>
+> **Workflow d'aquesta sessió:** s'ha treballat i fet **push directe a `main`** (sense
+> PR; `main` no té protecció i Cloudflare desplega sol). El `prebuild` regenera les
+> dades reals d'FGC a cada deploy. `npm run lint && npm test && npm run build` verds
+> abans de cada push.
 
 ---
 
@@ -177,38 +183,94 @@ nom, estat, distància, elèctriques/mecàniques, ancoratges, capacitat + accion
 **"Ruta fins aquí" + caminant (Apple/Google Maps a peu) + Compartir** (comparteix
 un enllaç de mapa, no `?parada=`).
 
-#### FGC (Ferrocarrils) — mode nou + capa a Aprop meu + favorits
-PRD/tasks a `tasks/prd-fgc.md` i `tasks/tasks-fgc.md`. FGC com a **segon operador**.
+#### FGC (Ferrocarrils) — segon operador complet (mode + Aprop meu + favorits + temps real)
+PRD/tasks a `tasks/prd-fgc.md` i `tasks/tasks-fgc.md`. **Estat: a producció i funcional**
+(mode, mapa, llista, favorits i temps real). FGC és el **segon operador** real de l'app.
 
-**Inclusió:** línies amb **connexió directa a Barcelona** (≥1 parada dins el terme
-municipal): Barcelona‑Vallès (L6/L7/L12/S1/S2/S5/S6/S7) i Llobregat‑Anoia
-(L8/S3/S4/S8/S9/R5/R6…). Es mostra la **línia sencera** (parades fora de BCN incloses).
+**Inclusió:** línies amb **connexió directa a Barcelona** (≥1 parada dins una bbox del terme
+de Barcelona): Barcelona‑Vallès (L6/L7/L12/S1/S2/…) i Llobregat‑Anoia (L8/S3/S4/R5/R6/R50/
+R60/…) + el Funicular de Vallvidrera. Es mostra la **línia sencera** (parades fora de BCN incloses).
 
-**Dades:** `src/data/fgcStatic.ts` és un **seed curat** (línies + parades ordenades +
-colors). En prod es **regenera** amb `npm run build:fgc` (`scripts/build-fgc-data.mjs`)
-des del GTFS oficial (`https://www.fgc.cat/google/google_transit.zip`). ⚠️ El script
-NO està dins de `npm run build` (els hosts FGC són fora de l'allowlist de dev; es regenera
-manualment/CI). Derivacions pures a `src/utils/fgc.ts` (testat).
+##### Dades estàtiques (línies/parades/colors) — `npm run build:fgc`
+- `scripts/build-fgc-data.mjs` baixa el **GTFS oficial** (`https://www.fgc.cat/google/google_transit.zip`,
+  amb `fflate` per descomprimir), filtra rutes amb connexió a Barcelona, **deduplica per codi**
+  (es queda la variant amb més parades), **descarta parades amb coords invàlides** i emet
+  **dos fitxers**: `src/data/fgcStatic.ts` (`FGC_LINES`, `FGC_STOPS`, `FGC_LINE_STOPS`,
+  `FGC_ROUTE_IDS`) i `src/data/fgcTrips.ts` (`FGC_TRIPS`: `trip_id → {c: línia, h: headsign}`).
+- ⚠️ **Important:** ara el script SÍ s'executa com a **`prebuild`** (a `package.json`), o sigui
+  que **cada `npm run build` (i per tant cada deploy a Cloudflare) regenera les dades reals**.
+  És **no‑fatal**: si FGC és inabastable (p. ex. l'allowlist de dev), avisa i **manté el
+  fitxer existent** sense trencar el build. Els fitxers committats són un **seed curat**
+  (línies BCN amb coords reals) que serveix de fallback; en prod es reemplacen pel GTFS complet.
+- Derivacions pures (línies, detall+geometria stop‑to‑stop, parades‑all, `fgcLineColor`,
+  filtre "connexió Barcelona") a **`src/utils/fgc.ts`** (testat a `fgc.test.ts`).
 
-**Backend** (`functions/`): `_fgc.ts` (estàtic via `src/utils/fgc` + RT) +
-`api/fgc/{linies,parades,parades-all,temps-real,vehicles}.ts`. El **temps real** usa
-l'**API de records JSON d'Opendatasoft** de `dadesobertes.fgc.cat` (vehicle-positions /
-trip-updates), **sense Protobuf**. ⚠️ Els noms de camp i si cal API key **s'han de validar
-en prod** (parsers defensius; degraden a `disponible:false`).
+##### Temps real — **GTFS‑Realtime protobuf** (no JSON!)
+- Els datasets d'Opendatasoft (`dadesobertes.fgc.cat`) **NO** retornen camps JSON: el record
+  conté un **fitxer `.pb`** (GTFS‑RT protobuf: `vehicleposition.pb` / `tripupdates.pb`).
+- `functions/_fgc.ts` → `fetchPbFeed(slug)`: 1) `…/records?limit=1` per treure la URL del
+  `.pb`, 2) baixa el `.pb`, 3) el descodifica amb **`src/utils/gtfsRt.ts`** — un
+  **descodificador GTFS‑RT minimal i sense dependències** (camina el wire‑format protobuf;
+  testat a `gtfsRt.test.ts` encodant un FeedMessage). 2 subrequests per crida.
+- ⚠️ **El feed RT NO porta `route_id` ni `headsign`** per entitat — només un `trip_id` opac
+  (amb sufix `|…` que cal escapçar). La **línia i el destí** es resolen amb `FGC_TRIPS`
+  (`trip_id → {línia, headsign}`). Els **`stop_id` del RT SÍ casen** amb els del GTFS estàtic,
+  així que les arribades es filtren per `stop_id`. Vehicles i trip‑updates s'etiqueten via
+  `trip_id`.
+- Degradació elegant: si el feed falla, `disponible:false` i es mostra l'estàtic sense error.
+- **Diagnòstic:** `GET /api/fgc/debug` retorna una mostra descodificada (vehicles/tripUpdates +
+  `FGC_ROUTE_IDS`/stops) per inspeccionar els camps reals. (Es pot esborrar quan ja no calgui.)
 
-**Frontend:** `types/fgc.ts`, `services/fgc.ts`, hooks `useFgc{Stations,Linies,LiniaDetall,
-Vehicles,Arribades}`, `FgcView` (mode: llista + cerca + ordre + mapa amb recorregut +
-parades + vehicles), `FgcLayer` + `utils/fgcMarkerIcon` (marcador = **tren en quadrat
-blanc**, color de línia, distingible de TMB/Bicing/Cooltra), `FgcStationPopup`,
-`FgcStationRow`. Icona del mode: `FgcLogo` (isotip de les baules, monocrom `currentColor`).
+**Backend** (`functions/`): `_fgc.ts` + `api/fgc/{linies,parades,parades-all,temps-real,vehicles,debug}.ts`.
+Endpoints estàtics amb `cache-control` llarg (86400 s); `temps-real`/`vehicles` a 30 s.
 
-**Favorits:** bucket propi `tmb-fav-fgc` (patró Bicing), **barrejat** a la llista i al
-`FavMap` amb parades TMB + Bicing (★ a parades FGC; **no** a línies FGC en v1).
+##### Frontend — UI **idèntica a TMB Línies**
+- `FgcView` reutilitza l'estructura `.panel`/`.map-area` de Línies: a mòbil **bottom‑sheet**
+  (mapa a dalt, llista a baix) amb `panel-backdrop` que enfosqueix; en seleccionar una línia
+  el panell es tanca → **mapa a pantalla completa**. Pila de FABs com TMB: recentrar (dins el
+  mapa), **mapa/llista**, **⇄ canvi de sentit** (només en llista), **lupa** (reobrir la llista),
+  i **Cooltra** (+ filtres moto/bici, només en vista mapa); refresc + visibilitat de vehicles
+  a dalt‑dreta. La capçalera reusa **`LineHeaderBanner`** de TMB (badge pastilla arrodonida +
+  `origen → destí`); la línia FGC s'hi passa com a `Linia` amb `tipus:'metro'`.
+- **Llista de parades** = `FgcLineListView` que **replica `LineListView`/`StopRow`** (mateixes
+  classes): cercle numerat de seqüència, nom, **badges de connexió acolorits** per línia,
+  chevron i **acordió amb arribades RT** agrupades per destí. Té **dos sentits** (la llista i
+  la seva inversa, com el metro de TMB) commutables amb el ⇄.
+- Marcador de parada: `FgcLayer` + `utils/fgcMarkerIcon` (**tren en quadrat blanc**, vora del
+  color de la línia; distingible de TMB/Bicing/Cooltra). Vehicles = `CircleMarker` del color
+  de la línia, tooltip `Lx → destí`. **Per defecte el mapa d'FGC surt net**; els trens només
+  es pinten en seleccionar una línia.
+- Hooks: `useFgc{Linies,LiniaDetall,Stations,Vehicles,Arribades}`. `useFgcVehicles(codi,enabled)`
+  amb `codi=null` pot tornar tots els trens (no s'usa ara per tenir el mapa net per defecte).
+- Tipus a `types/fgc.ts`; client `services/fgc.ts`; icona del mode `FgcLogo` (isotip de les
+  baules entrellaçades, vectoritzat del PNG oficial, monocrom `currentColor`).
 
-**Aprop meu:** parades FGC a la llista unificada + mapa, amb **toggle FGC** propi
-(`tmb-aprop-fgc-filter-v1`) i comptador "FGC: n".
+**Favorits:** bucket propi `tmb-fav-fgc` (patró Bicing), **barrejat** a la llista i al `FavMap`
+amb parades TMB + Bicing. ★ de parada FGC des del **popup del mapa** (com TMB; les files de
+llista no porten ★). Línies FGC **no** es poden marcar favorites (v1).
+
+**Aprop meu:** parades FGC a la llista unificada + mapa, amb **toggle FGC** propi i comptador
+"FGC: n". (La capçalera diu "Metro/Bus: n - Bicing: n - FGC: n".)
 
 **Persistència:** `tmb-fgc-parades-all-v1` (cache), `tmb-aprop-fgc-filter-v1`, `tmb-fav-fgc`.
+
+#### Refrescos en temps real, caches i la "regla d'or del mapa"
+- **Tots els feeds en temps real es refresquen cada 30 s** (polling frontend): TMB arribades
+  (`useTempsReal`), TMB posicions de vehicles (`useVehicles` — ara **auto‑refresca**; abans
+  només manual), Bicing (`useBicingStations`), Cooltra (`useCooltraVehicles`) i FGC vehicles
+  (`useFgcVehicles`). Les arribades FGC es carreguen **en obrir** el popup/acordió. GPS: 10 s.
+- **Botó ↻ `RefreshControl`** (Línies i Aprop meu): refresc manual amb **cooldown de 30 s**
+  (`COOLDOWN_MS`); el compte enrere del botó ho indica.
+- **Cache CDN** (`cache-control`): feeds RT a `max-age=30` (TMB temps‑real i vehicles via
+  `_tmb.jsonResponse`, Cooltra, FGC temps‑real/vehicles via `_fgc.jsonResponse`), Bicing 15 s;
+  estàtics llargs (línies 3600 s, parades 300 s, **FGC estàtic 86400 s**). Mantingues el cache
+  ≤ l'interval de poll perquè el refresc sigui efectiu.
+- ⚠️ **REGLA D'OR DEL MAPA:** un refresc de dades **mai** ha de moure el centre ni el zoom —
+  només actualitzar pois/temps/posicions. Tots els enquadraments són **d'un sol cop o amb
+  guarda**: `AutoFit` (MapView) fita un cop per línia (`lastFitId`); `FitToFavs` (FavMap) i
+  `CenterOnUser` (Bicing/MapView) un sol cop (ref); `FitToLine` (FgcView) i `FitToRoute`
+  (RoutePlanMap) per **signatura de la geometria**; a Aprop meu el fit depèn només del radi.
+  Si afegeixes una capa amb `fitBounds`/`setView`, **posa‑hi una guarda equivalent**.
 
 #### Route Planner (`mode === 'route'`)
 PRD i task list a `tasks/prd-route-planner.md` i `tasks/tasks-route-planner.md`.
@@ -335,6 +397,23 @@ posta (és un disc ple; a 44 es veia més gros que els altres). Tots centrats a
 - **GBFS Bicing**: el feed pot diferir de l'spec (v2 vs v3); normalitza defensiu i
   **verifica amb crida real**. A Bicing qualsevol ancoratge lliure accepta
   qualsevol bici → no té sentit separar el retorn per tipus.
+- **Bicing porta els noms en MAJÚSCULES** → es normalitzen a Title Case amb
+  `src/utils/titleCase.ts` (connectors `de/la/i…` en minúscula, articles elidits `l'/d'`)
+  al normalitzador (`_bicing.ts → localisedName`).
+- **FGC GTFS‑RT no és JSON**: els datasets d'Opendatasoft contenen un **fitxer `.pb`**
+  (protobuf), no camps. Cal baixar el `.pb` i descodificar‑lo (`src/utils/gtfsRt.ts`). I el
+  feed **omet `route_id`/`headsign`** → la línia/destí venen del mapa `trip_id`→línia
+  (`fgcTrips.ts`, generat de `trips.txt`); els `stop_id` sí casen amb l'estàtic.
+- **El `prebuild` (build:fgc) ha de ser NO‑FATAL** i amb timeout: a Cloudflare regenera les
+  dades reals; en entorns sense xarxa (dev/sandbox) ha de fer skip i mantenir el seed perquè
+  `npm run build` no peti.
+- **PWA: el service worker feia navigation‑fallback a `index.html` també per a `/api/*`** →
+  obrir un endpoint a la barra d'adreces mostrava l'app. Solució: `workbox.navigateFallbackDenylist:
+  [/^\/api\//]` a `vite.config.ts`. (Cal recarregar un parell de cops perquè s'activi el SW nou.)
+- **Reús de components TMB per a FGC**: estan acoblats als tipus i favorits de TMB. FGC
+  replica el **disseny/classes** (StopRow, LineHeaderBanner, `.panel`, FAB stack) amb dades i
+  bucket de favorits propis, en lloc de reusar‑los directament. La paritat literal demanaria
+  el refactor multi‑operador (camp `operator` a tota la cadena) — pendent i gros.
 
 ### El que NO fer (decisions fermades)
 - **NO un PNG de color fix com a icona de mode** (es fon amb la barra) — monocrom.
@@ -380,13 +459,17 @@ posta (és un disc ple; a 44 es veia més gros que els altres). Tots centrats a
 2. **Alertes de servei / incidències TMB**. Cost zero, valor diari alt.
 3. **Mode fosc** + pulits visuals lleugers.
 4. **Optimitzar imatges Cooltra** a SVG (`currentColor` en comptes de `mask-image`).
-5. ✅ **FGC com a segon operador** (v1 landed aquesta sessió): mode propi + Aprop meu +
-   favorits + temps real (pendent validar el feed RT en prod). Es va evitar el refactor
-   multi‑operador gros usant tipus/bucket FGC propis (patró Bicing).
-   *(Original):* Cost zero (GTFS + GTFS-RT) però requereix refactor
-   multi-operador (~30 fitxers acoblats a TMB) + ingesta GTFS/Protobuf. No és quick win.
-6. **Push "surt ara"** o **widget B2B**: només si la retenció validada justifica
-   trencar el cost zero.
+5. ✅✅ **FGC com a segon operador** — **FET i a producció** (mode + Aprop meu + favorits +
+   temps real GTFS‑RT). Dades reals regenerades a cada deploy (`prebuild`). Es va evitar el
+   refactor multi‑operador gros usant tipus/bucket FGC propis (patró Bicing). Veure la secció
+   "FGC (Ferrocarrils)" més amunt. **Pendents menors d'FGC:** (a) confirmar que el feed RT
+   d'FGC ompla bé línia/destí en hores punta amb el GTFS regenerat; (b) **esborrar
+   `functions/api/fgc/debug.ts`** quan ja no calgui; (c) opcional: vista "tots els trens FGC".
+6. **Refactor multi‑operador** (futur, gros): unificar TMB+FGC (+Bicing) amb un camp
+   `operator` a tipus/favorits/RT (~30 fitxers) per reusar literalment els components en lloc
+   de replicar disseny. Avui FGC funciona sense això.
+7. **Push "surt ara"** o **widget B2B**: només si la retenció validada justifica trencar el
+   cost zero.
 
 > **Deute tècnic menor — NETEJAT:** s'ha esborrat `public/logo-tmb.png` (ja no
 > s'usa, substituït per SVG inline), el component orfe `ViewToggle` (+ el seu
@@ -408,4 +491,5 @@ Si l'usuari demana una feature gran, segueix el workflow del projecte:
 
 Pensa sempre en **impacte vs cost** i en **mantenir el free tier**.
 
-> Nota: hi ha **64 tests** Vitest (eren 33). Mantén-los verds.
+> Nota: hi ha **69 tests** Vitest (eren 33). Mantén-los verds. Nous des d'FGC:
+> `utils/fgc.test.ts`, `utils/gtfsRt.test.ts`, `utils/titleCase.test.ts`, `stores/favorits.test.ts`.
