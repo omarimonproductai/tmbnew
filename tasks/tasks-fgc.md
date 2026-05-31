@@ -111,14 +111,14 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
   - [x] 4.5 Tests del filtre (`FilterBar` / utilitat)
   - [x] 4.6 `lint + test + build` i push
 
-- [ ] 5.0 Temps real FGC
-  - [ ] 5.1 Decidir la via RT (records JSON d'Opendatasoft vs GTFS-RT protobuf) després de validar en una Pages Function de prova
-  - [ ] 5.2 `api/fgc/temps-real.ts` (arribades per parada) i `api/fgc/vehicles.ts` (posicions per línia); afegir decoder protobuf lleuger si cal
-  - [ ] 5.3 Arribades RT al `FgcStationPopup` i a la llista d'Aprop meu (format minuts com TMB)
-  - [ ] 5.4 `useFgcVehicles` + pintar posicions al mapa del mode FGC (refresc periòdic)
-  - [ ] 5.5 `RefreshControl` + `VehicleVisibilityToggle` al mode FGC (reusar)
-  - [ ] 5.6 Cache + Toast no bloquejant si el RT falla (no bloqueja la part estàtica)
-  - [ ] 5.7 `lint + test + build` i push
+- [x] 5.0 Temps real FGC
+  - [x] 5.1 Decidir la via RT (records JSON d'Opendatasoft vs GTFS-RT protobuf) després de validar en una Pages Function de prova
+  - [x] 5.2 `api/fgc/temps-real.ts` (arribades per parada) i `api/fgc/vehicles.ts` (posicions per línia); afegir decoder protobuf lleuger si cal
+  - [x] 5.3 Arribades RT al `FgcStationPopup` i a la llista d'Aprop meu (format minuts com TMB)
+  - [x] 5.4 `useFgcVehicles` + pintar posicions al mapa del mode FGC (refresc periòdic)
+  - [x] 5.5 `RefreshControl` + `VehicleVisibilityToggle` al mode FGC (reusar)
+  - [x] 5.6 Cache + Toast no bloquejant si el RT falla (no bloqueja la part estàtica)
+  - [x] 5.7 `lint + test + build` i push
 
 - [ ] 6.0 Mockups, tests, verificació del feed en producció i desplegament
   - [ ] 6.1 Validar el feed real en producció (URLs, API key si cal, `route_color`/`shapes`/noms) i ajustar `_fgc.ts`
