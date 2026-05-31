@@ -60,13 +60,15 @@ export function FgcStationPopup({ parada, enabled, distanceM }: Props) {
           <ul>
             {data!.arribades.slice(0, 4).map((a, idx) => (
               <li key={`${a.liniaCodi}-${idx}`}>
-                <span
-                  className="aprop-popup-inline-badge"
-                  style={{ background: fgcLineColor(a.liniaCodi) }}
-                >
-                  {a.liniaCodi || '—'}
-                </span>
-                <span className="aprop-popup-dest"> → {a.destinacio || '—'}</span>
+                {a.liniaCodi && (
+                  <span
+                    className="aprop-popup-inline-badge"
+                    style={{ background: fgcLineColor(a.liniaCodi) }}
+                  >
+                    {a.liniaCodi}
+                  </span>
+                )}
+                {a.destinacio && <span className="aprop-popup-dest"> → {a.destinacio}</span>}
                 <span className="aprop-popup-time">{a.text}</span>
               </li>
             ))}
