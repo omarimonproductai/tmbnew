@@ -26,14 +26,15 @@ const OPTIONS: Option[] = [
   {
     value: 'linies',
     label: 'Línies',
+    // Monochrome "TMB" mark (currentColor) so it adapts like the other icons:
+    // white on the red header, red on the active white pill.
     icon: (
-      <img
-        src="/logo-tmb.png"
-        alt=""
-        className="mode-btn__img"
-        draggable={false}
-        aria-hidden="true"
-      />
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" fill="none" stroke="currentColor" strokeWidth={2} />
+        <text x="12" y="15.4" textAnchor="middle" fontSize="7.5" fontWeight="800" fill="currentColor" fontFamily="inherit" letterSpacing="-0.3">
+          TMB
+        </text>
+      </svg>
     ),
   },
   {
