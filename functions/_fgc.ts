@@ -87,34 +87,6 @@ export async function fetchFgcArrivals(stopCodi: string): Promise<FgcArribada[]>
   return arribades;
 }
 
-// Diagnostic: returns a small sample of the decoded live feeds + how our
-// static keys look, so we can see which fields the FGC GTFS-RT actually carries
-// (route_id present? trip_id format? stop_id format?) and finish the mapping.
-export async function fgcRtDebug() {
-  const safe = async <T>(p: Promise<T>) => {
-    try {
-      return await p;
-    } catch (err) {
-      return { error: err instanceof Error ? err.message : String(err) } as const;
-    }
-  };
-  const vp = await safe(fetchPbFeed('vehicle-positions-gtfs_realtime'));
-  const tu = await safe(fetchPbFeed('trip-updates-gtfs_realtime'));
-  return {
-    vehicles: 'error' in vp ? vp : vp.vehicles.slice(0, 5),
-    tripUpdates:
-      'error' in tu
-        ? tu
-        : tu.tripUpdates.slice(0, 5).map((t) => ({
-            routeId: t.routeId,
-            tripId: t.tripId,
-            stops: t.stops.slice(0, 3),
-          })),
-    routeIdsSample: Object.entries(FGC_ROUTE_IDS).slice(0, 12),
-    stopCodesSample: getFgcParadesAll().slice(0, 6).map((p) => p.codi),
-  };
-}
-
 export function jsonResponse(
   status: number,
   body: unknown,

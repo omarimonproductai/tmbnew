@@ -218,10 +218,8 @@ R60/…) + el Funicular de Vallvidrera. Es mostra la **línia sencera** (parades
   així que les arribades es filtren per `stop_id`. Vehicles i trip‑updates s'etiqueten via
   `trip_id`.
 - Degradació elegant: si el feed falla, `disponible:false` i es mostra l'estàtic sense error.
-- **Diagnòstic:** `GET /api/fgc/debug` retorna una mostra descodificada (vehicles/tripUpdates +
-  `FGC_ROUTE_IDS`/stops) per inspeccionar els camps reals. (Es pot esborrar quan ja no calgui.)
 
-**Backend** (`functions/`): `_fgc.ts` + `api/fgc/{linies,parades,parades-all,temps-real,vehicles,debug}.ts`.
+**Backend** (`functions/`): `_fgc.ts` + `api/fgc/{linies,parades,parades-all,temps-real,vehicles}.ts`.
 Endpoints estàtics amb `cache-control` llarg (86400 s); `temps-real`/`vehicles` a 30 s.
 
 ##### Frontend — UI **idèntica a TMB Línies**
@@ -463,8 +461,8 @@ posta (és un disc ple; a 44 es veia més gros que els altres). Tots centrats a
    temps real GTFS‑RT). Dades reals regenerades a cada deploy (`prebuild`). Es va evitar el
    refactor multi‑operador gros usant tipus/bucket FGC propis (patró Bicing). Veure la secció
    "FGC (Ferrocarrils)" més amunt. **Pendents menors d'FGC:** (a) confirmar que el feed RT
-   d'FGC ompla bé línia/destí en hores punta amb el GTFS regenerat; (b) **esborrar
-   `functions/api/fgc/debug.ts`** quan ja no calgui; (c) opcional: vista "tots els trens FGC".
+   d'FGC ompla bé línia/destí en hores punta amb el GTFS regenerat; (b) opcional: vista
+   "tots els trens FGC". *(L'endpoint diagnòstic `functions/api/fgc/debug.ts` ja s'ha esborrat.)*
 6. **Refactor multi‑operador** (futur, gros): unificar TMB+FGC (+Bicing) amb un camp
    `operator` a tipus/favorits/RT (~30 fitxers) per reusar literalment els components en lloc
    de replicar disseny. Avui FGC funciona sense això.
