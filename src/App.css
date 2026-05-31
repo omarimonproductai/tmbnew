@@ -1628,11 +1628,13 @@ body {
     min-height: 0;
   }
 
-  .app-header { padding: 6px 12px; gap: 8px; }
-  .app-header h1 { font-size: 14px; }
+  .app-header { padding: 6px 8px; gap: 6px; }
+  /* Keep the title on a single line; shave a few px elsewhere so it fits. */
+  .app-header h1 { font-size: 13px; white-space: nowrap; }
   .app-title span { display: none; }
-  .tmb-logo { width: 30px; height: 30px; font-size: 10px; border-radius: 6px; }
-  .mode-toggle .mode-btn { padding: 4px 8px; font-size: 11px; }
+  .tmb-logo { width: 26px; height: 26px; font-size: 10px; border-radius: 6px; }
+  .mode-toggle { padding: 2px; gap: 1px; }
+  .mode-toggle .mode-btn { padding: 4px 6px; font-size: 11px; }
 
   .map-controls-stack {
     top: 10px;
