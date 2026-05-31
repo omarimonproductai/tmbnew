@@ -198,5 +198,4 @@ mobilitat de Barcelona.
    limita a parades (com deia la petició original)?
 6. **Bucket de favorits:** afegim camp `operator` als buckets existents o creem
    `tmb-fav-fgc`? (Decisió d'arquitectura del refactor multi‑operador.)
-</content>
 </invoke>

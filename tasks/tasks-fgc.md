@@ -70,20 +70,20 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
 
 ## Tasks
 
-- [ ] 0.0 Crear la branca de feature
-  - [ ] 0.1 `git checkout main && git pull`, després crear i fer checkout de `claude/fgc-integration`
-  - [ ] 0.2 Push inicial de la branca al remot
+- [x] 0.0 Crear la branca de feature
+  - [x] 0.1 `git checkout main && git pull`, després crear i fer checkout de `claude/fgc-integration`
+  - [x] 0.2 Push inicial de la branca al remot
 
-- [ ] 1.0 Backend i dades estàtiques FGC
-  - [ ] 1.1 `scripts/build-fgc-data.mjs`: descarregar i descomprimir `google_transit.zip`; parsejar `routes`, `stops`, `trips`, `stop_times`, `shapes`, colors
-  - [ ] 1.2 Definir el criteri "connexió directa a Barcelona" (polígon/bbox del terme municipal); marcar línies amb ≥1 parada dins i conservar la línia sencera
-  - [ ] 1.3 Generar `src/data/fgc-static.json` (línies + parades ordenades per sentit + shape + `route_color`), mida controlada; enganxar el script al `npm run build`
-  - [ ] 1.4 `functions/_fgc.ts`: llegir el pre-bake i normalitzar a `FgcLinia`/`FgcParada` (defensiu)
-  - [ ] 1.5 Endpoints estàtics: `api/fgc/linies.ts`, `api/fgc/parades.ts?linia=`, `api/fgc/parades-all.ts`
-  - [ ] 1.6 `src/types/fgc.ts` + `src/services/fgc.ts` (client dels endpoints)
-  - [ ] 1.7 Cache + fallback a localStorage (`tmb-fgc-*-v1`) + Toast no bloquejant (patró TMB/Bicing)
-  - [ ] 1.8 Tests: filtre "connexió Barcelona" i normalitzador
-  - [ ] 1.9 `lint + test + build` i push
+- [x] 1.0 Backend i dades estàtiques FGC
+  - [x] 1.1 `scripts/build-fgc-data.mjs`: descarregar i descomprimir `google_transit.zip`; parsejar `routes`, `stops`, `trips`, `stop_times`, `shapes`, colors
+  - [x] 1.2 Definir el criteri "connexió directa a Barcelona" (polígon/bbox del terme municipal); marcar línies amb ≥1 parada dins i conservar la línia sencera
+  - [x] 1.3 Generar `src/data/fgc-static.json` (línies + parades ordenades per sentit + shape + `route_color`), mida controlada; enganxar el script al `npm run build`
+  - [x] 1.4 `functions/_fgc.ts`: llegir el pre-bake i normalitzar a `FgcLinia`/`FgcParada` (defensiu)
+  - [x] 1.5 Endpoints estàtics: `api/fgc/linies.ts`, `api/fgc/parades.ts?linia=`, `api/fgc/parades-all.ts`
+  - [x] 1.6 `src/types/fgc.ts` + `src/services/fgc.ts` (client dels endpoints)
+  - [x] 1.7 Cache + fallback a localStorage (`tmb-fgc-*-v1`) + Toast no bloquejant (patró TMB/Bicing)
+  - [x] 1.8 Tests: filtre "connexió Barcelona" i normalitzador
+  - [x] 1.9 `lint + test + build` i push
 
 - [ ] 2.0 Model multi-operador i favorits
   - [ ] 2.1 Afegir `operator?: 'tmb' | 'fgc'` a `FavParada` i `FavLinia` (`src/types/tmb.ts`), default 'tmb' per compatibilitat
@@ -126,4 +126,3 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
   - [ ] 6.3 Suite Vitest verda + tests nous; cobrir casos límit del normalitzador
   - [ ] 6.4 `lint + build` nets; comprovar no-regressió de TMB/Bicing/Cooltra/Ruta
   - [ ] 6.5 Merge a `main` + desplegament; actualitzar `HANDOVER.md` amb la integració FGC
-</content>
