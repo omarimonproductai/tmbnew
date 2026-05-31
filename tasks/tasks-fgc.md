@@ -123,6 +123,6 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
 - [ ] 6.0 Mockups, tests, verificació del feed en producció i desplegament
   - [ ] 6.1 Validar el feed real en producció (URLs, API key si cal, `route_color`/`shapes`/noms) i ajustar `_fgc.ts`
   - [ ] 6.2 Afegir credencials a Cloudflare Pages (Variables and Secrets, Production) si calen + re-deploy
-  - [ ] 6.3 Suite Vitest verda + tests nous; cobrir casos límit del normalitzador
-  - [ ] 6.4 `lint + build` nets; comprovar no-regressió de TMB/Bicing/Cooltra/Ruta
-  - [ ] 6.5 Merge a `main` + desplegament; actualitzar `HANDOVER.md` amb la integració FGC
+  - [x] 6.3 Suite Vitest verda + tests nous; cobrir casos límit del normalitzador
+  - [x] 6.4 `lint + build` nets; comprovar no-regressió de TMB/Bicing/Cooltra/Ruta
+  - [x] 6.5 Merge a `main` + desplegament; actualitzar `HANDOVER.md` amb la integració FGC

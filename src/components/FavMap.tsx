@@ -11,10 +11,12 @@ import {
 import { AproperMeuStopPopup } from './AproperMeuStopPopup';
 import { BicingLayer } from './BicingLayer';
 import { CooltraLayer } from './CooltraLayer';
+import { FgcLayer } from './FgcLayer';
 import { getLineColor, pickRepresentativeLine } from '../utils/lineColor';
 import { rotateOptions } from '../utils/leafletRotate';
 import type { BicingStation } from '../types/bicing';
 import type { CooltraVehicle } from '../types/cooltra';
+import type { FgcParada } from '../types/fgc';
 import type { Coordinate, FavParada } from '../types/tmb';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
@@ -24,6 +26,7 @@ interface Props {
   userPosition?: Coordinate | null;
   cooltraVehicles?: CooltraVehicle[];
   bicingStations?: BicingStation[];
+  fgcStations?: FgcParada[];
 }
 
 export function FavMap({
@@ -31,6 +34,7 @@ export function FavMap({
   userPosition,
   cooltraVehicles = [],
   bicingStations = [],
+  fgcStations = [],
 }: Props) {
   return (
     <MapContainer
@@ -66,10 +70,18 @@ export function FavMap({
           showFavStar={false}
         />
       )}
+      {fgcStations.length > 0 && (
+        <FgcLayer parades={fgcStations} origin={userPosition} showFavStar={false} />
+      )}
       {parades.map((p) => (
         <FavMarker key={p.id} parada={p} />
       ))}
-      <FitToFavs parades={parades} bicingStations={bicingStations} userPosition={userPosition} />
+      <FitToFavs
+        parades={parades}
+        bicingStations={bicingStations}
+        fgcStations={fgcStations}
+        userPosition={userPosition}
+      />
       {userPosition && <FavRecenterButton userPosition={userPosition} />}
       <InvalidateOnResize />
     </MapContainer>
@@ -124,10 +136,12 @@ function FavRecenterButton({ userPosition }: { userPosition: Coordinate }) {
 function FitToFavs({
   parades,
   bicingStations,
+  fgcStations = [],
   userPosition,
 }: {
   parades: FavParada[];
   bicingStations: BicingStation[];
+  fgcStations?: FgcParada[];
   userPosition?: Coordinate | null;
 }) {
   const map = useMap();
@@ -141,12 +155,13 @@ function FitToFavs({
     const bounds = L.latLngBounds([]);
     for (const p of parades) bounds.extend([p.lat, p.lng]);
     for (const s of bicingStations) bounds.extend([s.lat, s.lng]);
+    for (const f of fgcStations) bounds.extend([f.lat, f.lng]);
     if (userPosition) bounds.extend([userPosition.lat, userPosition.lng]);
     if (bounds.isValid()) {
       fitted.current = true;
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
-  }, [parades, bicingStations, userPosition, map]);
+  }, [parades, bicingStations, fgcStations, userPosition, map]);
   return null;
 }
 

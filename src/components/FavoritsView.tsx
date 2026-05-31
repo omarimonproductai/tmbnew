@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BicingStationRow } from './BicingStationRow';
+import { FgcStationRow } from './FgcStationRow';
 import { CooltraKindFilters } from './CooltraKindFilters';
 import { CooltraMapButton } from './CooltraMapButton';
 import { DirectionsButton } from './DirectionsButton';
@@ -16,12 +17,14 @@ import { haversine, formatDistance } from '../utils/distance';
 import { getLineColor } from '../utils/lineColor';
 import { groupArrivalsByDestination } from '../utils/groupArrivals';
 import type { BicingStation, FavBicing } from '../types/bicing';
+import type { FavFgc, FgcParada } from '../types/fgc';
 import type { Coordinate, FavLinia, FavParada } from '../types/tmb';
 
-// Saved stops and Bicing stations share one list (mixed, no separate section).
+// Saved stops, Bicing and FGC stations share one list (mixed, no sections).
 type FavListItem =
   | { kind: 'parada'; parada: FavParada; lat: number; lng: number }
-  | { kind: 'bicing'; station: BicingStation; lat: number; lng: number };
+  | { kind: 'bicing'; station: BicingStation; lat: number; lng: number }
+  | { kind: 'fgc'; fgc: FavFgc; lat: number; lng: number };
 
 function stationFromFav(fav: FavBicing, live?: BicingStation): BicingStation {
   return (
@@ -72,7 +75,8 @@ interface Props {
 }
 
 export function FavoritsView({ onOpenLine }: Props) {
-  const { favLinies, favParades, favBicing, toggleLinia, toggleParada } = useFavorits();
+  const { favLinies, favParades, favBicing, favFgc, toggleLinia, toggleParada } =
+    useFavorits();
   const { position } = useGeolocation(true);
   const { stations: bicingStations } = useBicingStations(favBicing.length > 0);
   const liveBicingById = useMemo(() => {
@@ -128,6 +132,9 @@ export function FavoritsView({ onOpenLine }: Props) {
           lng: b.lng,
         }),
       ),
+      ...favFgc.map(
+        (f): FavListItem => ({ kind: 'fgc', fgc: f, lat: f.lat, lng: f.lng }),
+      ),
     ];
     if (effectiveSort === 'proximity' && position) {
       return items.sort(
@@ -138,7 +145,7 @@ export function FavoritsView({ onOpenLine }: Props) {
     }
     // 'recent' — store keeps add order (oldest first); show newest first.
     return items.reverse();
-  }, [favParades, favBicing, liveBicingById, position, effectiveSort]);
+  }, [favParades, favBicing, favFgc, liveBicingById, position, effectiveSort]);
 
   // Live Bicing stations for the favourites map (fall back to stored position).
   const favBicingStations = useMemo<BicingStation[]>(
@@ -146,8 +153,18 @@ export function FavoritsView({ onOpenLine }: Props) {
     [favBicing, liveBicingById],
   );
 
-  const hasMappable = favParades.length > 0 || favBicing.length > 0;
-  const isEmpty = favLinies.length === 0 && favParades.length === 0 && favBicing.length === 0;
+  const favFgcStations = useMemo<FgcParada[]>(
+    () => favFgc.map((f) => ({ ...f })),
+    [favFgc],
+  );
+
+  const hasMappable =
+    favParades.length > 0 || favBicing.length > 0 || favFgc.length > 0;
+  const isEmpty =
+    favLinies.length === 0 &&
+    favParades.length === 0 &&
+    favBicing.length === 0 &&
+    favFgc.length === 0;
 
   if (isEmpty) {
     return (
@@ -214,6 +231,7 @@ export function FavoritsView({ onOpenLine }: Props) {
           <FavMap
             parades={favParades}
             bicingStations={favBicingStations}
+            fgcStations={favFgcStations}
             userPosition={position}
             cooltraVehicles={visibleCooltra}
           />
@@ -261,6 +279,15 @@ export function FavoritsView({ onOpenLine }: Props) {
                       distanceM={distanceM}
                       onRemove={() => toggleParada(item.parada)}
                       onOpenLine={onOpenLine}
+                    />
+                  );
+                }
+                if (item.kind === 'fgc') {
+                  return (
+                    <FgcStationRow
+                      key={`f-${item.fgc.id}`}
+                      parada={item.fgc}
+                      distanceM={distanceM}
                     />
                   );
                 }

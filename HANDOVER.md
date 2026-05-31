@@ -34,8 +34,8 @@ Copia-ho al primer missatge de la sessió nova per posar-la al dia ràpid.
 > MCP de GitHub torna a funcionar, pots tornar als PRs; si no, el push directe a
 > `main` és vàlid i desplega igual.
 >
-> **Cinc modes al header** (esquerra→dreta): Ruta · Línies (icona "TMB"
-> monocroma) · **Bicing** (nou aquesta sessió) · Aprop meu · ★ Favorits.
+> **Sis modes al header** (esquerra→dreta): Ruta · Línies (icona "TMB"
+> monocroma) · **FGC** (nou) · Bicing · Aprop meu · ★ Favorits.
 >
 > **Tres regles d'or:**
 > 1. **No confiïs en docs que prometen un format.** L'API de TMB i la de Cooltra van
@@ -69,17 +69,19 @@ pagar. Volem convertir-la en eina de rutina diària, no només consulta puntual.
 
 ### Estat de producció actual
 
-#### Cinc modes al header
+#### Sis modes al header
 Icones SVG monocromes (`currentColor`, s'adapten a blanc sobre la barra / vermell
 sobre la píndola activa). A mòbil només icones, a tablet+ icona + label.
 - 🧭 **Ruta** — planificador A→B (TMB Planner + geocoder Photon)
 - **TMB Línies** — explorador de línies amb mapa o llista. Icona = wordmark
   "TMB" monocrom dins d'un quadrat arrodonit (`ModeToggle.tsx`, inline SVG; NO
   el PNG `public/logo-tmb.png`, que es fonia amb la barra vermella).
-- 🅱️ **Bicing** — estacions Bicing (mode nou; veure secció pròpia). Icona =
+- **FGC** — explorador de línies FGC (mode nou; veure secció pròpia). Icona =
+  `FgcLogo` (isotip de les baules entrellaçades inline, `currentColor`).
+- 🅱️ **Bicing** — estacions Bicing (veure secció pròpia). Icona =
   `BicingLogo` (`public/bicing-logo.svg` inline, `currentColor`).
-- 🎯 **Aprop meu** — parades + estacions Bicing a la rodona amb GPS i radi.
-- ⭐ **Favorits** — parades/línies/estacions desades amb llista o mapa.
+- 🎯 **Aprop meu** — parades TMB + FGC + estacions Bicing a la rodona amb GPS i radi.
+- ⭐ **Favorits** — parades/línies/estacions (TMB + FGC + Bicing) amb llista o mapa.
 
 Component: `src/components/ModeToggle.tsx`. Routing simple via `useState` a `App.tsx`.
 
@@ -174,6 +176,39 @@ exposa `favBicing`/`isBicingFav`/`toggleBicing`. Al mode ★ les estacions surte
 nom, estat, distància, elèctriques/mecàniques, ancoratges, capacitat + accions
 **"Ruta fins aquí" + caminant (Apple/Google Maps a peu) + Compartir** (comparteix
 un enllaç de mapa, no `?parada=`).
+
+#### FGC (Ferrocarrils) — mode nou + capa a Aprop meu + favorits
+PRD/tasks a `tasks/prd-fgc.md` i `tasks/tasks-fgc.md`. FGC com a **segon operador**.
+
+**Inclusió:** línies amb **connexió directa a Barcelona** (≥1 parada dins el terme
+municipal): Barcelona‑Vallès (L6/L7/L12/S1/S2/S5/S6/S7) i Llobregat‑Anoia
+(L8/S3/S4/S8/S9/R5/R6…). Es mostra la **línia sencera** (parades fora de BCN incloses).
+
+**Dades:** `src/data/fgcStatic.ts` és un **seed curat** (línies + parades ordenades +
+colors). En prod es **regenera** amb `npm run build:fgc` (`scripts/build-fgc-data.mjs`)
+des del GTFS oficial (`https://www.fgc.cat/google/google_transit.zip`). ⚠️ El script
+NO està dins de `npm run build` (els hosts FGC són fora de l'allowlist de dev; es regenera
+manualment/CI). Derivacions pures a `src/utils/fgc.ts` (testat).
+
+**Backend** (`functions/`): `_fgc.ts` (estàtic via `src/utils/fgc` + RT) +
+`api/fgc/{linies,parades,parades-all,temps-real,vehicles}.ts`. El **temps real** usa
+l'**API de records JSON d'Opendatasoft** de `dadesobertes.fgc.cat` (vehicle-positions /
+trip-updates), **sense Protobuf**. ⚠️ Els noms de camp i si cal API key **s'han de validar
+en prod** (parsers defensius; degraden a `disponible:false`).
+
+**Frontend:** `types/fgc.ts`, `services/fgc.ts`, hooks `useFgc{Stations,Linies,LiniaDetall,
+Vehicles,Arribades}`, `FgcView` (mode: llista + cerca + ordre + mapa amb recorregut +
+parades + vehicles), `FgcLayer` + `utils/fgcMarkerIcon` (marcador = **tren en quadrat
+blanc**, color de línia, distingible de TMB/Bicing/Cooltra), `FgcStationPopup`,
+`FgcStationRow`. Icona del mode: `FgcLogo` (isotip de les baules, monocrom `currentColor`).
+
+**Favorits:** bucket propi `tmb-fav-fgc` (patró Bicing), **barrejat** a la llista i al
+`FavMap` amb parades TMB + Bicing (★ a parades FGC; **no** a línies FGC en v1).
+
+**Aprop meu:** parades FGC a la llista unificada + mapa, amb **toggle FGC** propi
+(`tmb-aprop-fgc-filter-v1`) i comptador "FGC: n".
+
+**Persistència:** `tmb-fgc-parades-all-v1` (cache), `tmb-aprop-fgc-filter-v1`, `tmb-fav-fgc`.
 
 #### Route Planner (`mode === 'route'`)
 PRD i task list a `tasks/prd-route-planner.md` i `tasks/tasks-route-planner.md`.
@@ -345,7 +380,10 @@ posta (és un disc ple; a 44 es veia més gros que els altres). Tots centrats a
 2. **Alertes de servei / incidències TMB**. Cost zero, valor diari alt.
 3. **Mode fosc** + pulits visuals lleugers.
 4. **Optimitzar imatges Cooltra** a SVG (`currentColor` en comptes de `mask-image`).
-5. **FGC com a segon operador**. Cost zero (GTFS + GTFS-RT) però requereix refactor
+5. ✅ **FGC com a segon operador** (v1 landed aquesta sessió): mode propi + Aprop meu +
+   favorits + temps real (pendent validar el feed RT en prod). Es va evitar el refactor
+   multi‑operador gros usant tipus/bucket FGC propis (patró Bicing).
+   *(Original):* Cost zero (GTFS + GTFS-RT) però requereix refactor
    multi-operador (~30 fitxers acoblats a TMB) + ingesta GTFS/Protobuf. No és quick win.
 6. **Push "surt ara"** o **widget B2B**: només si la retenció validada justifica
    trencar el cost zero.
@@ -370,4 +408,4 @@ Si l'usuari demana una feature gran, segueix el workflow del projecte:
 
 Pensa sempre en **impacte vs cost** i en **mantenir el free tier**.
 
-> Nota: hi ha **59 tests** Vitest (eren 33). Mantén-los verds.
+> Nota: hi ha **64 tests** Vitest (eren 33). Mantén-los verds.
