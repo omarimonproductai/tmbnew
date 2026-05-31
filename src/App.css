@@ -1567,15 +1567,13 @@ body {
   .list-sentit-selector { display: flex; }
   .list-columns.multi .list-column:not(.active) { display: none; }
 
-  /* Línies: the line-search list opens as a panel over the lower half. Keep the
-     close-X floating just above that list (not at the very top of the screen)
-     and hide the map's recenter so the X is the only control on screen.
-     Scoped with :not(.panel--bottom-sheet) so Aprop meu (which also uses
-     .panel--open) keeps its recenter. */
+  /* Línies: when a line is selected AND the search list is reopened over it,
+     float the close-X just above that list (not at the top of the screen) and
+     hide the map's recenter so the X is the only control. Gated on
+     .map-area--search-overlay (set only when seleccio && panelOpen) so the
+     default no-selection state — where the list is also open — keeps recenter. */
   .linies-fab--close { top: auto; bottom: 14px; }
-  .panel.panel--open:not(.panel--bottom-sheet) ~ .map-area .recenter-control {
-    display: none;
-  }
+  .map-area--search-overlay .recenter-control { display: none; }
 
   /* Move Leaflet's zoom buttons to the bottom-left on mobile. When the
      'Aprop meu' bottom sheet is around, lift them above its peek so the

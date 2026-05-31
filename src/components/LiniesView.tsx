@@ -283,7 +283,10 @@ export function LiniesView({
           onSelect={handleSelect}
         />
       </aside>
-      <section className="map-area" aria-label="Vista de la línia">
+      <section
+        className={`map-area${seleccio && panelOpen ? ' map-area--search-overlay' : ''}`}
+        aria-label="Vista de la línia"
+      >
         {seleccio && (
           <div className="line-header-wrapper">
             <LineHeaderBanner linia={seleccio} />
