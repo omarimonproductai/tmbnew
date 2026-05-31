@@ -44,7 +44,14 @@ function loadStoredCooltra(): boolean {
   }
 }
 
-export function FgcView() {
+interface FgcViewProps {
+  // A line requested from elsewhere (e.g. an FGC badge in Favorits): select it
+  // and show its map, mirroring TMB's LiniesView requestedLine flow.
+  requestedLine?: { codi: string } | null;
+  onRequestedLineConsumed?: () => void;
+}
+
+export function FgcView({ requestedLine, onRequestedLineConsumed }: FgcViewProps = {}) {
   const { linies, loading, error, cerca, setCerca } = useFgcLinies();
   const [sort, setSort] = useState<SortMode>('proximity');
   const [selected, setSelected] = useState<string | null>(null);
@@ -120,6 +127,16 @@ export function FgcView() {
     setViewMode('map');
     setSentit('forward');
   };
+
+  // Consume a line requested from outside (e.g. an FGC badge in Favorits) once
+  // the lines are loaded, so we can validate the codi exists.
+  useEffect(() => {
+    if (!requestedLine || linies.length === 0) return;
+    if (linies.some((l) => l.codi === requestedLine.codi)) {
+      handleSelect(requestedLine.codi);
+    }
+    onRequestedLineConsumed?.();
+  }, [requestedLine, linies, onRequestedLineConsumed]);
 
   return (
     <main className="app-main">

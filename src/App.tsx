@@ -40,6 +40,7 @@ function initialMode(): AppMode {
 export default function App() {
   const [appMode, setAppMode] = useState<AppMode>(initialMode);
   const [requestedLine, setRequestedLine] = useState<RequestedLine | null>(null);
+  const [requestedFgcLine, setRequestedFgcLine] = useState<{ codi: string } | null>(null);
   const [requestedParada, setRequestedParada] = useState<string | null>(readParadaParam);
   const [sharedStop, setSharedStop] = useState<ParadaAmbLinies | null>(null);
 
@@ -59,6 +60,11 @@ export default function App() {
   const openLine = (id: string, focus?: Coordinate) => {
     setRequestedLine({ id, focus });
     setAppMode('linies');
+  };
+
+  const openFgcLine = (codi: string) => {
+    setRequestedFgcLine({ codi });
+    setAppMode('fgc');
   };
 
   // Resolve a shared ?parada= link: find the stop and open its card (all
@@ -91,10 +97,17 @@ export default function App() {
           onRequestedLineConsumed={() => setRequestedLine(null)}
         />
       )}
-      {appMode === 'fgc' && <FgcView />}
+      {appMode === 'fgc' && (
+        <FgcView
+          requestedLine={requestedFgcLine}
+          onRequestedLineConsumed={() => setRequestedFgcLine(null)}
+        />
+      )}
       {appMode === 'bicing' && <BicingView />}
       {appMode === 'aprop-meu' && <AproperMeuView focusStop={sharedStop} />}
-      {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}
+      {appMode === 'favorits' && (
+        <FavoritsView onOpenLine={openLine} onOpenFgcLine={openFgcLine} />
+      )}
       <InstallBanner />
       {offlineToast && (
         <Toast

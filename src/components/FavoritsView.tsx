@@ -72,9 +72,10 @@ function loadStoredCooltra(): boolean {
 
 interface Props {
   onOpenLine: OpenLine;
+  onOpenFgcLine: (codi: string) => void;
 }
 
-export function FavoritsView({ onOpenLine }: Props) {
+export function FavoritsView({ onOpenLine, onOpenFgcLine }: Props) {
   const { favLinies, favParades, favBicing, favFgc, toggleLinia, toggleParada } =
     useFavorits();
   const { position } = useGeolocation(true);
@@ -288,6 +289,7 @@ export function FavoritsView({ onOpenLine }: Props) {
                       key={`f-${item.fgc.id}`}
                       parada={item.fgc}
                       distanceM={distanceM}
+                      onOpenLine={onOpenFgcLine}
                     />
                   );
                 }

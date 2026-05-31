@@ -8,12 +8,15 @@ interface Props {
   parada: FgcParada;
   distanceM?: number | null;
   onSelect?: (id: string) => void;
+  // When provided, the line badges become buttons that open that line's map
+  // (used in Favorits, mirroring metro/bus badges). Omitted in Aprop meu.
+  onOpenLine?: (codi: string) => void;
   rank?: number;
   topN?: number;
 }
 
 // Row used in the Aprop meu merged list (and reused in Favorits) for FGC stops.
-export function FgcStationRow({ parada, distanceM, onSelect, rank, topN }: Props) {
+export function FgcStationRow({ parada, distanceM, onSelect, onOpenLine, rank, topN }: Props) {
   const { isFgcFav, toggleFgc } = useFavorits();
   const isTop = rank != null && topN != null ? rank <= topN : true;
   return (
@@ -52,15 +55,31 @@ export function FgcStationRow({ parada, distanceM, onSelect, rank, topN }: Props
           <span className="fgc-row-tag">FGC</span>
         </div>
         <div className="bicing-row-pills">
-          {parada.liniesQueParen.map((codi) => (
-            <span
-              key={codi}
-              className="fgc-line-badge fgc-line-badge--sm"
-              style={{ background: fgcLineColor(codi) }}
-            >
-              {codi}
-            </span>
-          ))}
+          {parada.liniesQueParen.map((codi) =>
+            onOpenLine ? (
+              <button
+                key={codi}
+                type="button"
+                className="fgc-line-badge fgc-line-badge--sm fgc-line-badge--btn"
+                style={{ background: fgcLineColor(codi) }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenLine(codi);
+                }}
+                title={`Veure la línia ${codi} al mapa`}
+              >
+                {codi}
+              </button>
+            ) : (
+              <span
+                key={codi}
+                className="fgc-line-badge fgc-line-badge--sm"
+                style={{ background: fgcLineColor(codi) }}
+              >
+                {codi}
+              </span>
+            ),
+          )}
         </div>
       </div>
     </div>
