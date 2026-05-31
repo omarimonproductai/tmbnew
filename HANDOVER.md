@@ -26,7 +26,16 @@ Copia-ho al primer missatge de la sessió nova per posar-la al dia ràpid.
 >
 > **Treball:** sempre a la branca que la sessió t'hagi assignat; commits petits i
 > descriptius; `npm run lint && npm run build && npm test` abans de cada push;
-> PR + squash-merge a `main` quan el canvi sigui llest.
+> PR + squash-merge a `main` quan el canvi sigui llest. **⚠️ Workflow git real
+> (última sessió):** el servidor OAuth del **MCP de GitHub estava caigut**, així
+> que els merges es van fer **directament amb `git`** (`main` NO té protecció de
+> branca): la branca de feature era exactament `main` + commits nous → `git
+> checkout main && git merge --ff-only <branca> && git push origin main`. Si el
+> MCP de GitHub torna a funcionar, pots tornar als PRs; si no, el push directe a
+> `main` és vàlid i desplega igual.
+>
+> **Cinc modes al header** (esquerra→dreta): Ruta · Línies (icona "TMB"
+> monocroma) · **Bicing** (nou aquesta sessió) · Aprop meu · ★ Favorits.
 >
 > **Tres regles d'or:**
 > 1. **No confiïs en docs que prometen un format.** L'API de TMB i la de Cooltra van
@@ -43,9 +52,11 @@ Copia-ho al primer missatge de la sessió nova per posar-la al dia ràpid.
 > Quan tinguis preguntes ambigües, **pregunta primer** (regla 1 de `CLAUDE.md`).
 > Si la solució més òbvia trenca un patró establert, dilo i proposa alternatives.
 >
-> Mira el bloc "**Estat de producció actual**" més avall — la sessió anterior va
-> aterrar dues features grans i molt UI/UX polish; no reinventis components que
-> ja existeixen.
+> Mira el bloc "**Estat de producció actual**" més avall — l'última sessió va
+> aterrar la integració **Bicing** (mode nou + capa a Aprop meu + favorits) i una
+> ronda molt llarga de polish de controls de mapa (totes les icones rodones de
+> mapa a 44 px, piles a baix-dreta, etc.). No reinventis components que ja
+> existeixen.
 
 ---
 
@@ -58,23 +69,31 @@ pagar. Volem convertir-la en eina de rutina diària, no només consulta puntual.
 
 ### Estat de producció actual
 
-#### Quatre modes al header
-Icones SVG. A mòbil només icones, a tablet+ icona + label.
+#### Cinc modes al header
+Icones SVG monocromes (`currentColor`, s'adapten a blanc sobre la barra / vermell
+sobre la píndola activa). A mòbil només icones, a tablet+ icona + label.
 - 🧭 **Ruta** — planificador A→B (TMB Planner + geocoder Photon)
-- 🚌 **Línies** — explorador de línies amb mapa o llista
-- 🎯 **Aprop meu** — parades a la rodona amb GPS i radi configurable
-- ⭐ **Favorits** — parades/línies desades amb llista o mapa
+- **TMB Línies** — explorador de línies amb mapa o llista. Icona = wordmark
+  "TMB" monocrom dins d'un quadrat arrodonit (`ModeToggle.tsx`, inline SVG; NO
+  el PNG `public/logo-tmb.png`, que es fonia amb la barra vermella).
+- 🅱️ **Bicing** — estacions Bicing (mode nou; veure secció pròpia). Icona =
+  `BicingLogo` (`public/bicing-logo.svg` inline, `currentColor`).
+- 🎯 **Aprop meu** — parades + estacions Bicing a la rodona amb GPS i radi.
+- ⭐ **Favorits** — parades/línies/estacions desades amb llista o mapa.
 
 Component: `src/components/ModeToggle.tsx`. Routing simple via `useState` a `App.tsx`.
 
 #### Filtres Metro / Bus (Aprop meu i Línies)
-Dos toggles independents — ja no existeix "Tots". Per defecte tots dos ON; mai
-poden estar tots dos OFF (l'últim queda sticky). Persistència separada:
+Dos toggles independents — ja no existeix "Tots". Per defecte tots dos ON. **Ara
+SÍ es poden desmarcar tots dos** (estat `'cap'` → no mostra res); això es va
+demanar explícitament. Quan un xip està desmarcat el marge queda gris (el
+`:hover` vermell es protegeix amb `@media (hover: hover)` per evitar el sticky
+hover a mòbil). Persistència separada:
 - `tmb-aprop-meu-filter-v1`
 - `tmb-linies-filter-v1`
 
-Internament `FilterType = 'tots' | 'metro' | 'bus'` (el FilterBar tradueix els
-dos toggles a aquest valor unificat per no haver de refactoritzar la resta).
+Internament `FilterType = 'tots' | 'cap' | 'metro' | 'bus'` (el FilterBar tradueix
+els dos toggles a aquest valor unificat).
 
 #### Capa Cooltra (motos + bicis)
 Botó rodó al cantó superior dret de cada mapa amb el logo Cooltra
@@ -102,6 +121,59 @@ NO `ZEUS_API_*` — el manual de Cooltra mentia).
 - `model_id`: número (6 = moto, 13 = bici) — NO string
 - Alguns vehicles arriben amb `position` undefined → cal filtrar abans de fer
   `L.marker([lat, lng])` o petarà tota l'app
+
+#### Bicing (estacions GBFS) — mode nou + capa a Aprop meu + favorits
+PRD/tasks a `tasks/prd-bicing.md` i `tasks/tasks-bicing.md`. Mockups:
+`mockup-bicing.html` i `mockup-bicing-markers.svg`.
+
+**Backend** (`functions/`): `_bicing.ts` (normalitzador defensiu del feed GBFS
+v3.0) + `api/bicing/stations.ts` (proxy públic, SENSE credencials). Feed:
+`https://barcelona.publicbikesystem.net/customer/gbfs/v3.0/gbfs.json`.
+- ⚠️ **NO s'ha pogut verificar el feed en viu** (l'entorn d'aquesta sessió tenia
+  el host fora de l'allowlist de xarxa; en producció les Pages Functions hi
+  accedeixen sense problema). El normalitzador gestiona variants v2/v3 (noms
+  localitzats `[{text,language}]` vs string, `last_reported` epoch vs RFC3339,
+  `vehicle_types_available`) però **cal validar-lo contra el feed real** abans de
+  refiar-se'n (regla d'or). `BicingStation` exposa: id, name, lat, lng, capacity,
+  bikesElectric, bikesMechanical, docksAvailable, status, lastReported.
+
+**Frontend**: `types/bicing.ts`, `services/bicing.ts`, `hooks/useBicingStations.ts`
+(refresc 60 s + cache `tmb-bicing-stations-v1` + fallback/Toast), `hooks/useBicingFilter.ts`,
+`utils/bicingFilter.ts` (+tests), `components/Bicing{Layer,StationPopup,StationRow,Filters}.tsx`,
+`components/BicingView.tsx` (mode), `components/BicingLogo.tsx`.
+
+**Model de filtre (intenció, NO tipus):** `BicingFilterState = { action:
+'agafar' | 'retornar' | 'cap' }`. Decisió de producte clau:
+- **Agafar** → mostra TOTES les estacions (les buides es pinten en GRIS, no
+  s'amaguen, perquè no semblin error de dades). Marcador = quadrat partit verd
+  (elèctriques) | groc (mecàniques); col·lapsa a un sol color si un tipus és 0;
+  gris amb "0" si està buida.
+- **Retornar** → estacions amb ancoratges lliures (`docksAvailable > 0`).
+  Marcador = quadrat VERMELL amb contorn NEGRE i número blanc. **No hi ha
+  distinció elèctric/mecànic al retorn** (qualsevol ancoratge accepta qualsevol
+  bici — es va eliminar el selector de tipus per al retorn).
+- **Mode Bicing**: agafar/retornar són **radio** (sempre un, mai `'cap'` →
+  mai mapa en blanc). A **Aprop meu** sí es poden desmarcar tots dos.
+- Persistència: `tmb-aprop-bicing-filter-v1` (Aprop meu) i `tmb-bicing-filter-v1`
+  (mode Bicing).
+- Els xips a Aprop meu són pills amb logo "b" + fletxa (agafar=fletxa surt,
+  retornar=fletxa entra, estil log-out/log-in). Al **mode Bicing** són rodons
+  i només la fletxa (sense logo, ja ets en context Bicing).
+
+**Marcador**: quadrat (DivIcon, NO custom pane) — forma diferent dels punts
+rodons de TMB/Cooltra per identificar Bicing ràpid. Estrella daurada de favorit a
+sobre (reusa `utils/favStarIcon.ts`); al **mapa de Favorits** s'amaga l'estrella
+(`showFavStar={false}`, ja ets en context favorits). Clic a la fila → "guinyo"
+del quadrat (pulse CSS + tooltip).
+
+**Favorits d'estacions**: 3r bucket al store (`tmb-fav-bicing`); `useFavorits`
+exposa `favBicing`/`isBicingFav`/`toggleBicing`. Al mode ★ les estacions surten
+**barrejades amb les parades** (sense secció pròpia) i al `FavMap`.
+
+**Popup d'estació** (`BicingStationPopup`, compartit Aprop meu/mode/Favorits):
+nom, estat, distància, elèctriques/mecàniques, ancoratges, capacitat + accions
+**"Ruta fins aquí" + caminant (Apple/Google Maps a peu) + Compartir** (comparteix
+un enllaç de mapa, no `?parada=`).
 
 #### Route Planner (`mode === 'route'`)
 PRD i task list a `tasks/prd-route-planner.md` i `tasks/tasks-route-planner.md`.
@@ -133,37 +205,63 @@ Mockup HTML inicial: `mockup-route-planner.html`.
   "00:17" l'usuari)
 - **Cooltra last-mile**: vehicles dins de 300 m del destí es pinten automàticament
   al mapa del planner. No té toggle propi (és part de l'experiència del planner).
-- **Botó "Ruta fins aquí"** als popups de parada (`AproperMeuStopPopup`,
-  `StopPopup`) reemplaça l'antic "Com arribar-hi" (que delegava a Apple/Google
-  Maps i ja no té sentit perquè el planner intern el subsumeix). Escriu un seed
-  a `sessionStorage` i dispara l'event `tmb:open-planner`; `App.tsx` l'escolta i
-  canvia de mode.
+- **Accions dels popups (parada TMB i estació Bicing), unificades:** una fila amb
+  **"Ruta fins aquí"** (blau, compacte, mida de contingut — `RouteHereButton`,
+  obre el planner intern via seed a `sessionStorage` + event `tmb:open-planner`) +
+  **icona de persona caminant** (`DirectionsButton`, obre Apple/Google Maps a peu)
+  + **Compartir**. ⚠️ Això **reverteix** la decisió antiga d'eliminar Apple/Google
+  Maps: ara conviuen (ruta en transport públic vs a peu — a una bici hi vas a peu).
+- **Planner map**: recentrar SEMPRE a la cantonada inferior dreta; el toggle
+  Mapa↔Llista just a sobre (icona de llista sempre grisa).
 
-#### Sistema de controls al mapa
-Cada mapa té una pila vertical al cantó superior dret:
-- Botó Cooltra (amb logo) → quan està actiu, sota: botó motos + botó bicis (filtres)
-- Sota d'això (només Línies): RefreshControl + VehicleVisibilityToggle (bus icon)
-- Els filtres de tipus usen format de bombolla amb doble anell + silueta blanca
+#### Sistema de controls al mapa (reorganitzat aquesta sessió)
+**Regla:** TOTA icona rodona de mapa fa **44 px** (referència: el botó recentrar)
+i les distàncies verticals entre icones són **12 px** (offsets des de baix: 16,
+72, 128, 184…). `box-sizing: border-box` global, així que vora de 2px no canvia
+la mida. Les piles van a **baix-dreta** (no a dalt). El cooltra-map-btn fa 40 px a
+posta (és un disc ple; a 44 es veia més gros que els altres). Tots centrats a
+`right: 16px`.
 
-Cantó inferior dret: botó de recentrar + view-toggle (un sol botó rodó que mostra
-la icona de l'altre mode — no segmented).
-
-Cantó superior esquerre (a mòbil pot moure's a baix-esquerra via CSS): brúixola
-de rotació + +/- de zoom, sempre apilats verticalment a la mateixa cantonada.
+- **Aprop meu** (`.cooltra-map-control--aprop`, baix-dreta de baix a dalt):
+  recentrar (dins del mapa) · RefreshControl (↻ amb cooldown, com Línies) ·
+  Cooltra (+ moto/bici que surten **cap amunt**, `column-reverse`).
+- **Favorits (mapa)**: barra superior amagada en mode mapa; baix-dreta:
+  recentrar · mapa/llista · Cooltra (filtres amunt). En mode **llista**: filtres
+  d'ordenació a la dreta + FAB rodó de "mapa" a baix-dreta (icona de llista
+  sempre grisa).
+- **Línies** (`.linies-fab-stack`, baix-dreta, `column-reverse`):
+  - Mapa: recentrar (dins MapView) · llista · lupa · Cooltra (filtres amunt).
+    Refresc + visibilitat de vehicles es queden a **dalt-dreta** (`.map-controls-stack`).
+  - Llista: mapa · **⇄ (canvi de sentit, icona nova)** · lupa. El sentit s'ha
+    aixecat de `LineListView` a `LiniesView` (controlat: `activeSentit` +
+    `onColumnsChange`); el ⇄ recorre els sentits.
+  - Quan s'obre la llista de cerca (línia ja triada): s'amaga tota la pila i
+    només surt una **X** (a dalt-dreta) per tancar.
+  - La lupa = obrir/tancar el cercador de línies (abans era un FAB vermell gran;
+    ara icona rodona estàndard de 44 px).
+- Cantó superior esquerre: brúixola de rotació + +/- de zoom (Leaflet).
 
 #### Sistema de mides de marcadors
-- **Mini Ø10–14** → vehicles Cooltra (`CircleMarker radius 5`) i parades TMB
-  no-top a Aprop meu
-- **Gran Ø20** → top stops a Aprop meu i parades de Favorits (`radius 10`)
-- Wink a Aprop meu en tap des de la llista: només +1 radi (subtil, no jump)
-- Cooltra sempre per sota dels TMB (`bringToBack()` a l'overlayPane). Custom
-  panes amb DivIcon **van donar problemes diversos** — el patró estable és
-  `L.circleMarker` + `bringToBack()`.
+- **Mini Ø10** → vehicles Cooltra (`CircleMarker radius 5`).
+- Parades TMB a Aprop meu: no-top radius 5, top-N (5 més propers) radius 10.
+- **Quadrats Bicing** (DivIcon): agafar = partit verd|groc o solo, gris si buida;
+  retornar = vermell/contorn negre/número blanc.
+- **Guinyo en tap des de la llista (Aprop meu):** ara és MOLT més pronunciat
+  (pulsa gran +9 radi unes quantes voltes, anell blau, `bringToFront`, i obre el
+  tooltip amb el nom ~1 s). Funciona per a parades TMB I estacions Bicing (canals
+  de wink separats per evitar col·lisió d'ids).
+- **Llista d'Aprop meu** ara és UNA llista barrejada (parades + estacions Bicing)
+  ordenada per proximitat, tota numerada (cercle taronja idèntic; la "b" de Bicing
+  va inline a la fila de pastilles, davant de l'⚡). Capçalera en una línia:
+  "Parades: n - Estacions bicing: m" (s'omet cada part si el seu xip està a `cap`).
+  S'ha tret la fila "La meva ubicació" (el mapa ja diu "Tu") i el botó
+  "Actualitzar" (el GPS s'auto-actualitza). El slider de Radi té un hit-area
+  vertical més gran (44 px) sense canviar el dibuix.
+- Cooltra sempre per sota dels TMB (`bringToBack()`). Custom panes amb DivIcon
+  **van donar problemes** — patró estable: `L.circleMarker`/`Marker` simple.
 
 #### Mockups HTML guardats
-- `mockup-route-planner.html` — UI del planner (3 estats)
-- `mockup-cooltra-icons.html` — primera ronda d'icones moto/bici
-- `mockup-cooltra-bike-icons.html` — segona ronda de bicis
+- `mockup-route-planner.html` · `mockup-bicing.html` · `mockup-bicing-markers.svg`
 - Convenció: mockups grans al root abans d'UI gran.
 
 ### Pegats / lessons learned (els que han costat sang)
@@ -190,15 +288,29 @@ de rotació + +/- de zoom, sempre apilats verticalment a la mateixa cantonada.
   els endpoints nous no responen, demana hard refresh i comprova SW.
 - **iOS PNG upload via GitHub web** afegeix `.png.png` al final del nom — cal
   renomenar després.
+- **Icones de la barra de modes han de ser monocromes `currentColor`**. Un PNG/SVG
+  de color fix (logo TMB vermell) es fon amb la barra vermella en estat inactiu.
+  Inline + `currentColor` → s'adapta sol (blanc/vermell). Igual la `BicingLogo`.
+- **Emojis (⚡🚲) no es centren sols** dins d'un botó: cal embolicar-los en un span
+  amb `line-height: 1` (descens de l'emoji). Per icones crítiques, millor SVG.
+- **Inline SVG dins d'un badge cau ~1px** (baseline gap) → `svg { display: block }`.
+- **`box-sizing: border-box` és global** → per igualar mides d'icones rodones,
+  mira la mida total (vora inclosa). Un disc ple sense vora sembla més gros que un
+  amb vora blanca a la mateixa mida (per això Cooltra fa 40, no 44).
+- **GBFS Bicing**: el feed pot diferir de l'spec (v2 vs v3); normalitza defensiu i
+  **verifica amb crida real**. A Bicing qualsevol ancoratge lliure accepta
+  qualsevol bici → no té sentit separar el retorn per tipus.
 
 ### El que NO fer (decisions fermades)
-- **Apple/Google Maps shortcut "Com arribar-hi"** a popups de parada — eliminat
-  perquè el planner intern el subsumeix.
-- **Toggle segmented Map↔List** a Línies — substituït per un sol botó rodó que
-  mostra la icona de l'altre mode.
-- **Clustering Cooltra** — abandonat; ara són punts simples sense agrupació.
+- **NO un PNG de color fix com a icona de mode** (es fon amb la barra) — monocrom.
+- **NO separar elèctric/mecànic en el RETORN de Bicing** (docks compartits).
+- **NO amagar les estacions Bicing buides** en mode agafar — pintar-les en gris.
+- **NO el FAB vermell gran** per la lupa de Línies — icona rodona estàndard 44 px.
+- **Clustering Cooltra** — abandonat; punts simples.
 - **Cache offline dels tiles del mapa**.
 - **`lang=ca` a Photon** — no suportat.
+- (Revertit) L'antiga regla d'eliminar Apple/Google Maps dels popups: ara hi ha
+  "Ruta fins aquí" (planner) **+** icona caminant (Apple/Google a peu) + Compartir.
 
 ### Els 4 objectius i les seves apostes
 
@@ -220,25 +332,28 @@ de rotació + +/- de zoom, sempre apilats verticalment a la mateixa cantonada.
   hotels/comerços ("com arribar fins aquí"). **NO** ads.
 
 #### 4. PORTFOLI / demo
-- ✅ Integració mobilitat secundària: **Cooltra** (motos + bicis com a
-  last-mile, també last-mile dins del planner).
+- ✅ Integració mobilitat secundària: **Cooltra** (motos + bicis last-mile).
+- ✅ **Bicing** (estacions GBFS): mode propi + capa a Aprop meu + favorits.
 - Quick win pendent: **mode fosc**, transicions polides.
 - Aposta gran: integració **FGC** com a segon operador TMB-equivalent.
 
 ### Roadmap proposat (què toca ara, en ordre)
 
-1. **Alertes de servei / incidències TMB**. Cost zero, valor diari alt,
-   encaixa amb la tesi d'hàbit.
-2. **Mode fosc** + pulits visuals lleugers.
-3. **Optimitzar les imatges Cooltra**: `cooltra-moto.png` i `cooltra-bike.png`
-   ja són ~10 KB però convertir-les a SVG real seria més net (no caldria
-   `mask-image`, podríem colorar amb `currentColor`).
-4. **FGC com a segon operador**. Viable a cost zero (FGC publica GTFS +
-   GTFS-RT), però requereix refactor multi-operador (~30 fitxers acoblats a
-   TMB) + segona via d'ingesta (parsejar GTFS + descodificar Protobuf de
-   GTFS-RT). **No és quick win** — feina dedicada.
-5. **Notificacions push "surt ara"** o **widget B2B**: només si la retenció
-   ja validada justifica trencar el cost zero, o si hi ha primer client B2B.
+1. **Verificar el feed Bicing real en producció** (l'allowlist de dev no hi
+   arribava): comprovar `/api/bicing/stations` i que el desglossament elèctric/
+   mecànic i els ancoratges quadren; ajustar `functions/_bicing.ts` si cal.
+2. **Alertes de servei / incidències TMB**. Cost zero, valor diari alt.
+3. **Mode fosc** + pulits visuals lleugers.
+4. **Optimitzar imatges Cooltra** a SVG (`currentColor` en comptes de `mask-image`).
+5. **FGC com a segon operador**. Cost zero (GTFS + GTFS-RT) però requereix refactor
+   multi-operador (~30 fitxers acoblats a TMB) + ingesta GTFS/Protobuf. No és quick win.
+6. **Push "surt ara"** o **widget B2B**: només si la retenció validada justifica
+   trencar el cost zero.
+
+> **Deute tècnic menor d'aquesta sessió:** `public/logo-tmb.png` ja no s'usa
+> (substituït per SVG inline) — es pot esborrar. El component `ViewToggle` i el seu
+> CSS (`.view-toggle-*`, `.panel-toggle-mobile`) han quedat orfes en treure el
+> segmented de Línies; conservats per no trencar res, però es poden netejar.
 
 ### Com encarar la propera feature
 
@@ -249,6 +364,9 @@ Si l'usuari demana una feature gran, segueix el workflow del projecte:
 4. Task list amb la skill `/GENERATE-TASKS` (a `tasks/tasks-*.md`).
 5. Branca per parent task. Sub-tasques comparteixen branca.
 6. Verifica `lint + build + test` abans de cada push.
-7. PR cap a `main`, squash merge. Cloudflare desplega sol.
+7. PR cap a `main` + squash merge (o, si el MCP de GitHub no va, `git merge
+   --ff-only` + `git push origin main`). Cloudflare desplega sol.
 
 Pensa sempre en **impacte vs cost** i en **mantenir el free tier**.
+
+> Nota: hi ha **59 tests** Vitest (eren 33). Mantén-los verds.
