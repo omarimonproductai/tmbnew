@@ -79,25 +79,10 @@ body {
   min-height: 0;
 }
 
-/* --- FGC mode --- */
-.fgc-panel {
-  width: 320px;
-  min-width: 280px;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #e0e0e0;
-  overflow: hidden;
-}
-.fgc-panel-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #eee;
-}
-.fgc-panel-head .search-box { flex: 1; }
+/* --- FGC mode (reuses the TMB Línies .panel / .map-area layout) --- */
 .fgc-line-list { flex: 1; overflow-y: auto; }
+/* Search + sort share one row in the FGC panel head. */
+.filters-row .search-box { flex: 1; min-width: 0; padding: 8px 0 8px 12px; }
 .fgc-line-row {
   display: flex;
   align-items: center;
@@ -1598,15 +1583,6 @@ body {
 
 @media (max-width: 640px) {
   .app-main { flex-direction: column-reverse; }
-  /* FGC mode: list on top, map below (override the column-reverse default). */
-  main.fgc-main { flex-direction: column; }
-  .fgc-panel {
-    width: 100%;
-    min-width: 0;
-    max-height: 42vh;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-  }
   .panel {
     display: none;
     width: 100%;

@@ -8,35 +8,75 @@ import {
   Tooltip,
   useMap,
 } from 'react-leaflet';
+import { CooltraKindFilters } from './CooltraKindFilters';
+import { CooltraLayer } from './CooltraLayer';
+import { CooltraMapButton } from './CooltraMapButton';
+import { FavStar } from './FavStar';
 import { FgcLayer } from './FgcLayer';
 import { RefreshControl } from './RefreshControl';
 import { SearchInput } from './SearchInput';
 import { SortControls, type SortMode } from './SortControls';
-import { FavStar } from './FavStar';
+import { VehicleVisibilityToggle } from './VehicleVisibilityToggle';
+import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
+import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useFavorits } from '../hooks/useFavorits';
 import { useFgcLinies } from '../hooks/useFgcLinies';
 import { useFgcLiniaDetall } from '../hooks/useFgcLiniaDetall';
 import { useFgcStations } from '../hooks/useFgcStations';
 import { useFgcVehicles } from '../hooks/useFgcVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { inferKind } from '../types/cooltra';
 import { haversine } from '../utils/distance';
 import { rotateOptions } from '../utils/leafletRotate';
 
 const FALLBACK_CENTER: [number, number] = [41.3874, 2.1686];
+const COOLTRA_STORAGE_KEY = 'tmb-cooltra-visible-v1';
 type ViewMode = 'map' | 'list';
+
+function loadStoredCooltra(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(COOLTRA_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 export function FgcView() {
   const { linies, loading, error, cerca, setCerca } = useFgcLinies();
-  const [sort, setSort] = useState<SortMode>('az');
+  const [sort, setSort] = useState<SortMode>('proximity');
   const [selected, setSelected] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('map');
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [showVehicles, setShowVehicles] = useState(true);
+  const [cooltraOn, setCooltraOn] = useState<boolean>(loadStoredCooltra);
   const [wink, setWink] = useState<{ id: string; nonce: number } | null>(null);
+
   const { detall } = useFgcLiniaDetall(selected);
-  const { vehicles, refresh } = useFgcVehicles(selected, !!selected);
+  const { vehicles, refresh } = useFgcVehicles(selected, !!selected && showVehicles);
   const { stations } = useFgcStations(true);
   const { position } = useGeolocation(true);
+  const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
+  const cooltraKinds = useCooltraKindFilters();
 
-  // Min distance from the user to each line (closest stop) for proximity sort.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(COOLTRA_STORAGE_KEY, cooltraOn ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, [cooltraOn]);
+
+  const visibleCooltra = useMemo(() => {
+    if (!cooltraOn) return [];
+    return cooltraVehicles.filter((v) => {
+      const kind = inferKind(v.model_id);
+      return kind === 'scooter' ? cooltraKinds.motos : cooltraKinds.bikes;
+    });
+  }, [cooltraOn, cooltraVehicles, cooltraKinds.motos, cooltraKinds.bikes]);
+
+  // Proximity sort: min distance from the user to each line's closest stop.
   const lineDist = useMemo(() => {
     const m = new Map<string, number>();
     if (!position) return m;
@@ -59,9 +99,7 @@ export function FgcView() {
       a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
     return [...arr].sort((a, b) => {
       if (sort === 'proximity' && position) {
-        return (
-          (lineDist.get(a.codi) ?? Infinity) - (lineDist.get(b.codi) ?? Infinity)
-        );
+        return (lineDist.get(a.codi) ?? Infinity) - (lineDist.get(b.codi) ?? Infinity);
       }
       return sort === 'za' ? cmp(b.codi, a.codi) : cmp(a.codi, b.codi);
     });
@@ -73,10 +111,19 @@ export function FgcView() {
     [detall],
   );
 
+  const handleSelect = (codi: string) => {
+    setSelected(codi);
+    setPanelOpen(false);
+    setViewMode('map');
+  };
+
   return (
-    <main className="app-main fgc-main">
-      <aside className="fgc-panel">
-        <div className="fgc-panel-head">
+    <main className="app-main">
+      {panelOpen && (
+        <div className="panel-backdrop" onClick={() => setPanelOpen(false)} aria-hidden="true" />
+      )}
+      <aside className={`panel${panelOpen ? ' panel--open' : ''}`}>
+        <div className="filters-row">
           <SearchInput value={cerca} onChange={setCerca} />
           <SortControls value={sort} onChange={setSort} proximityAvailable={!!position} />
         </div>
@@ -88,7 +135,7 @@ export function FgcView() {
               key={l.id}
               type="button"
               className={`fgc-line-row${selected === l.codi ? ' active' : ''}`}
-              onClick={() => setSelected(selected === l.codi ? null : l.codi)}
+              onClick={() => handleSelect(l.codi)}
             >
               <span className="fgc-line-badge" style={{ background: l.color }}>
                 {l.codi}
@@ -101,6 +148,17 @@ export function FgcView() {
       </aside>
 
       <section className="map-area" aria-label="Mapa FGC">
+        {detall && (
+          <div className="line-header-wrapper">
+            <span className="line-header-banner">
+              <span className="line-badge" style={{ background: detall.linia.color }}>
+                {detall.linia.codi}
+              </span>
+              <span className="line-header-name">{detall.linia.nom}</span>
+            </span>
+          </div>
+        )}
+
         {viewMode === 'map' || !detall ? (
           <MapContainer
             center={position ? [position.lat, position.lng] : FALLBACK_CENTER}
@@ -133,18 +191,22 @@ export function FgcView() {
             {detall && (
               <FgcLayer parades={detall.parades} color={color} origin={position} winkTarget={wink} />
             )}
-            {vehicles.map((v) => (
-              <CircleMarker
-                key={v.id}
-                center={[v.lat, v.lng]}
-                radius={6}
-                pathOptions={{ color: '#ffffff', weight: 2, fillColor: color, fillOpacity: 1 }}
-              >
-                <Tooltip direction="top" className="stop-tooltip">
-                  <span className="tooltip-name">{v.liniaCodi} {v.destinacio ?? ''}</span>
-                </Tooltip>
-              </CircleMarker>
-            ))}
+            {showVehicles &&
+              vehicles.map((v) => (
+                <CircleMarker
+                  key={v.id}
+                  center={[v.lat, v.lng]}
+                  radius={6}
+                  pathOptions={{ color: '#ffffff', weight: 2, fillColor: color, fillOpacity: 1 }}
+                >
+                  <Tooltip direction="top" className="stop-tooltip">
+                    <span className="tooltip-name">
+                      {v.liniaCodi} {v.destinacio ?? ''}
+                    </span>
+                  </Tooltip>
+                </CircleMarker>
+              ))}
+            {visibleCooltra.length > 0 && <CooltraLayer vehicles={visibleCooltra} />}
             <FitToLine points={polyline} />
             {position && <RecenterButton userPosition={position} />}
             <InvalidateOnResize />
@@ -160,13 +222,37 @@ export function FgcView() {
           />
         )}
 
-        {!selected && (
+        {!selected && !panelOpen && (
           <div className="map-hint">Selecciona una línia FGC per veure les parades</div>
         )}
 
-        {detall && (
-          <>
-            <div className="linies-fab-stack linies-fab-stack--mapview">
+        {/* Top-right: refresh + vehicle visibility (map view, line selected). */}
+        {detall && viewMode === 'map' && !panelOpen && (
+          <div className="map-controls-stack">
+            <RefreshControl onRefresh={refresh} />
+            <VehicleVisibilityToggle value={showVehicles} onChange={setShowVehicles} tipus="metro" />
+          </div>
+        )}
+
+        {/* While the line list is open over the map, the only control is a close X. */}
+        {selected && panelOpen && (
+          <button
+            type="button"
+            className="linies-fab linies-fab--close"
+            onClick={() => setPanelOpen(false)}
+            aria-label="Tancar la llista de línies"
+            title="Tancar"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden="true">
+              <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+        )}
+
+        {/* Bottom-right FAB stack (map/list · lupa · Cooltra) when the panel is closed. */}
+        {!(selected && panelOpen) && (
+          <div className="linies-fab-stack linies-fab-stack--mapview">
+            {detall && (
               <button
                 type="button"
                 className="linies-fab"
@@ -185,13 +271,28 @@ export function FgcView() {
                   </svg>
                 )}
               </button>
-            </div>
-            {viewMode === 'map' && (
-              <div className="map-controls-stack">
-                <RefreshControl onRefresh={refresh} />
-              </div>
             )}
-          </>
+            <button
+              type="button"
+              className="linies-fab"
+              onClick={() => setPanelOpen(true)}
+              aria-label="Cercar / triar línia"
+              title="Línies"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+            <CooltraMapButton value={cooltraOn} onChange={setCooltraOn} />
+            {cooltraOn && (
+              <CooltraKindFilters
+                motos={cooltraKinds.motos}
+                bikes={cooltraKinds.bikes}
+                onMotosChange={cooltraKinds.setMotos}
+                onBikesChange={cooltraKinds.setBikes}
+              />
+            )}
+          </div>
         )}
       </section>
     </main>
@@ -238,11 +339,7 @@ function FgcLineStops({
                   <span key={codi} className="fgc-stoplist-linebadge">{codi}</span>
                 ))}
               </span>
-              <FavStar
-                active={isFgcFav(p.id)}
-                onToggle={() => toggleFgc({ ...p })}
-                size={18}
-              />
+              <FavStar active={isFgcFav(p.id)} onToggle={() => toggleFgc({ ...p })} size={18} />
             </li>
           );
         })}
