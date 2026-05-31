@@ -26,6 +26,7 @@ import { useFgcStations } from '../hooks/useFgcStations';
 import { useFgcVehicles } from '../hooks/useFgcVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { inferKind } from '../types/cooltra';
+import { fgcLineColor } from '../utils/fgc';
 import { haversine } from '../utils/distance';
 import { rotateOptions } from '../utils/leafletRotate';
 
@@ -53,7 +54,8 @@ export function FgcView() {
   const [wink, setWink] = useState<{ id: string; nonce: number } | null>(null);
 
   const { detall } = useFgcLiniaDetall(selected);
-  const { vehicles, refresh } = useFgcVehicles(selected, !!selected && showVehicles);
+  // No line selected → all FGC trains (each coloured by its own line).
+  const { vehicles, refresh } = useFgcVehicles(selected, showVehicles);
   const { stations } = useFgcStations(true);
   const { position } = useGeolocation(true);
   const { vehicles: cooltraVehicles } = useCooltraVehicles(cooltraOn);
@@ -197,11 +199,17 @@ export function FgcView() {
                   key={v.id}
                   center={[v.lat, v.lng]}
                   radius={6}
-                  pathOptions={{ color: '#ffffff', weight: 2, fillColor: color, fillOpacity: 1 }}
+                  pathOptions={{
+                    color: '#ffffff',
+                    weight: 2,
+                    fillColor: fgcLineColor(v.liniaCodi),
+                    fillOpacity: 1,
+                  }}
                 >
                   <Tooltip direction="top" className="stop-tooltip">
                     <span className="tooltip-name">
-                      {v.liniaCodi} {v.destinacio ?? ''}
+                      {v.liniaCodi}
+                      {v.destinacio ? ` → ${v.destinacio}` : ''}
                     </span>
                   </Tooltip>
                 </CircleMarker>
@@ -226,8 +234,8 @@ export function FgcView() {
           <div className="map-hint">Selecciona una línia FGC per veure les parades</div>
         )}
 
-        {/* Top-right: refresh + vehicle visibility (map view, line selected). */}
-        {detall && viewMode === 'map' && !panelOpen && (
+        {/* Top-right: refresh + vehicle visibility (map view, panel closed). */}
+        {viewMode === 'map' && !panelOpen && (
           <div className="map-controls-stack">
             <RefreshControl onRefresh={refresh} />
             <VehicleVisibilityToggle value={showVehicles} onChange={setShowVehicles} tipus="metro" />
