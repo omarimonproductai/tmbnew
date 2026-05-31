@@ -313,7 +313,7 @@ export function LiniesView({
           />
         )}
         {/* Top-right: vehicle data controls (both views). */}
-        {seleccio && (
+        {seleccio && !panelOpen && (
           <div className="map-controls-stack">
             <RefreshControl onRefresh={refreshVehicles} />
             <VehicleVisibilityToggle
@@ -323,7 +323,22 @@ export function LiniesView({
             />
           </div>
         )}
+        {/* While the line-search list is open, the only control is a close X. */}
+        {seleccio && panelOpen && (
+          <button
+            type="button"
+            className="linies-fab linies-fab--close"
+            onClick={() => setPanelOpen(false)}
+            aria-label="Tancar la llista de línies"
+            title="Tancar"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden="true">
+              <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+        )}
         {/* Bottom-right FAB stack (column-reverse → first child sits lowest). */}
+        {!(seleccio && panelOpen) && (
         <div
           className={`linies-fab-stack${
             viewMode === 'map' || !seleccio ? ' linies-fab-stack--mapview' : ''
@@ -405,6 +420,7 @@ export function LiniesView({
             </>
           )}
         </div>
+        )}
         {seleccio && paradesLoading && (
           <div className="map-overlay">Carregant parades…</div>
         )}

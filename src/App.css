@@ -1051,6 +1051,14 @@ body {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
 }
 .linies-fab:hover { color: #1c1c1e; }
+/* Close-X shown (top-right) while the line-search list is open. */
+.linies-fab--close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  bottom: auto;
+  z-index: 1500;
+}
 
 .vehicle-visibility-toggle {
   position: relative;
@@ -1601,8 +1609,8 @@ body {
   .view-toggle-wrapper { top: 10px; left: 10px; }
 
   .line-header-wrapper {
-    top: 60px;
-    max-width: calc(100% - 24px);
+    top: 12px;
+    max-width: calc(100% - 130px);
   }
   .line-header-banner { padding: 4px 12px 4px 4px; }
 
