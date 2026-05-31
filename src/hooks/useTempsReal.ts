@@ -8,7 +8,7 @@ interface UseTempsRealResult {
   error: string | null;
 }
 
-const REFRESH_MS = 60_000;
+const REFRESH_MS = 30_000;
 
 export function useTempsReal(
   tipus: TransportType | null,

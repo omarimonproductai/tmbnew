@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getBicingStations } from '../services/bicing';
 import type { BicingStation } from '../types/bicing';
 
-const REFRESH_MS = 60_000;
+const REFRESH_MS = 30_000;
 const STORAGE_KEY = 'tmb-bicing-stations-v1';
 
 function loadCache(): BicingStation[] {

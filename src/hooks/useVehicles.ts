@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { getVehicles } from '../services/tmb';
 import type { VehiclesResposta } from '../types/tmb';
 
+const REFRESH_MS = 30_000;
+
 interface UseVehiclesArgs {
   liniaId: string | null;
   liniaCodi: string | null;
@@ -49,6 +51,8 @@ export function useVehicles({
       return;
     }
     fetchNow();
+    const id = window.setInterval(fetchNow, REFRESH_MS);
+    return () => window.clearInterval(id);
   }, [enabled, liniaId, liniaCodi, fetchNow]);
 
   return { data, loading, error, lastFetchedAt, refresh: fetchNow };

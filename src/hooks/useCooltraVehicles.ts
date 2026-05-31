@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getCooltraVehicles } from '../services/cooltra';
 import type { CooltraVehicle } from '../types/cooltra';
 
-const REFRESH_MS = 60_000;
+const REFRESH_MS = 30_000;
 
 export function useCooltraVehicles(enabled: boolean, systemId = 'barcelona') {
   const [vehicles, setVehicles] = useState<CooltraVehicle[]>([]);

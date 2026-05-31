@@ -124,7 +124,7 @@ export function jsonResponse(
     status,
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': status === 200 ? 'public, max-age=60' : 'no-store',
+      'cache-control': status === 200 ? 'public, max-age=30' : 'no-store',
       ...(extraHeaders ?? {}),
     },
   });

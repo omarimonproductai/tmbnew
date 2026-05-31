@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCooldown } from '../hooks/useCooldown';
 
-const COOLDOWN_MS = 2 * 60 * 1000;
+const COOLDOWN_MS = 30 * 1000;
 
 interface Props {
   onRefresh: () => Promise<void>;
