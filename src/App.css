@@ -1569,8 +1569,6 @@ body {
     align-items: flex-end;
     gap: 8px;
   }
-  .vehicle-visibility-toggle { width: 40px; height: 40px; }
-  .refresh-control { width: 40px; height: 40px; }
 
   .view-toggle-wrapper { top: 10px; left: 10px; }
 
@@ -1765,8 +1763,8 @@ body {
 
 .cooltra-kind-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1795,8 +1793,8 @@ body {
 }
 .cooltra-map-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #fff;
   border: none;
