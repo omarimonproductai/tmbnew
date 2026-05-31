@@ -249,9 +249,12 @@ export function FgcView() {
           </button>
         )}
 
-        {/* Bottom-right FAB stack (map/list · lupa · Cooltra) when the panel is closed. */}
-        {!(selected && panelOpen) && (
-          <div className="linies-fab-stack linies-fab-stack--mapview">
+        {/* Bottom-right FAB stack (map/list · lupa · Cooltra) only when the
+            panel is closed — the lupa is redundant while the list is open. */}
+        {!panelOpen && (
+          <div
+            className={`linies-fab-stack${viewMode === 'map' ? ' linies-fab-stack--mapview' : ''}`}
+          >
             {detall && (
               <button
                 type="button"
@@ -283,8 +286,11 @@ export function FgcView() {
                 <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
-            <CooltraMapButton value={cooltraOn} onChange={setCooltraOn} />
-            {cooltraOn && (
+            {/* Cooltra only makes sense over the map, not the stop list. */}
+            {viewMode === 'map' && (
+              <CooltraMapButton value={cooltraOn} onChange={setCooltraOn} />
+            )}
+            {viewMode === 'map' && cooltraOn && (
               <CooltraKindFilters
                 motos={cooltraKinds.motos}
                 bikes={cooltraKinds.bikes}

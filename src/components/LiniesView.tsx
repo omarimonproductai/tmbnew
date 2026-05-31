@@ -259,10 +259,12 @@ export function LiniesView({
 
   return (
     <main className="app-main">
-      {panelOpen && seleccio && (
+      {panelOpen && (
         <div
           className="panel-backdrop"
-          onClick={() => setPanelOpen(false)}
+          // Darken the map above the open list. Tapping closes only when a line
+          // is selected (otherwise there'd be no way to reopen the list).
+          onClick={seleccio ? () => setPanelOpen(false) : undefined}
           aria-hidden="true"
         />
       )}
