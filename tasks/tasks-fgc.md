@@ -85,13 +85,13 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
   - [x] 1.8 Tests: filtre "connexió Barcelona" i normalitzador
   - [x] 1.9 `lint + test + build` i push
 
-- [ ] 2.0 Model multi-operador i favorits
-  - [ ] 2.1 Afegir `operator?: 'tmb' | 'fgc'` a `FavParada` i `FavLinia` (`src/types/tmb.ts`), default 'tmb' per compatibilitat
-  - [ ] 2.2 `src/stores/favorits.ts`: desar/llegir parades i línies FGC al mateix bucket amb el camp `operator` (migració silenciosa dels existents → 'tmb')
-  - [ ] 2.3 `useFavorits`: helpers `toggleParada`/`toggleLinia` que accepten l'operador; `isFav` per (operator,id)
-  - [ ] 2.4 Verificar que els ★ existents de TMB no es trenquen (referencial + persistència)
-  - [ ] 2.5 Tests del store (FGC + migració)
-  - [ ] 2.6 `lint + test + build` i push
+- [x] 2.0 Model multi-operador i favorits
+  - [x] 2.1 Afegir `operator?: 'tmb' | 'fgc'` a `FavParada` i `FavLinia` (`src/types/tmb.ts`), default 'tmb' per compatibilitat
+  - [x] 2.2 `src/stores/favorits.ts`: desar/llegir parades i línies FGC al mateix bucket amb el camp `operator` (migració silenciosa dels existents → 'tmb')
+  - [x] 2.3 `useFavorits`: helpers `toggleParada`/`toggleLinia` que accepten l'operador; `isFav` per (operator,id)
+  - [x] 2.4 Verificar que els ★ existents de TMB no es trenquen (referencial + persistència)
+  - [x] 2.5 Tests del store (FGC + migració)
+  - [x] 2.6 `lint + test + build` i push
 
 - [ ] 3.0 Mode FGC complet al header
   - [ ] 3.1 `mockup-fgc.html` (mode + marcador FGC) i validar-ne l'estil abans de la UI

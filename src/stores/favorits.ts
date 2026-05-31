@@ -1,5 +1,6 @@
 import type { FavLinia, FavParada } from '../types/tmb';
 import type { FavBicing } from '../types/bicing';
+import type { FavFgc } from '../types/fgc';
 
 // Tiny external store for favourites, shared across every star button and
 // the FavoritsView. Backed by localStorage, no backend. Components read it
@@ -8,6 +9,7 @@ import type { FavBicing } from '../types/bicing';
 const LINIES_KEY = 'tmb-fav-linies';
 const PARADES_KEY = 'tmb-fav-parades';
 const BICING_KEY = 'tmb-fav-bicing';
+const FGC_KEY = 'tmb-fav-fgc';
 
 function load<T>(key: string): T[] {
   if (typeof window === 'undefined') return [];
@@ -35,6 +37,7 @@ function save(key: string, value: unknown): void {
 let liniesSnapshot: FavLinia[] = load<FavLinia>(LINIES_KEY);
 let paradesSnapshot: FavParada[] = load<FavParada>(PARADES_KEY);
 let bicingSnapshot: FavBicing[] = load<FavBicing>(BICING_KEY);
+let fgcSnapshot: FavFgc[] = load<FavFgc>(FGC_KEY);
 
 const listeners = new Set<() => void>();
 function emit(): void {
@@ -55,6 +58,9 @@ export function getParadesSnapshot(): FavParada[] {
 export function getBicingSnapshot(): FavBicing[] {
   return bicingSnapshot;
 }
+export function getFgcSnapshot(): FavFgc[] {
+  return fgcSnapshot;
+}
 
 export function isLiniaFav(id: string): boolean {
   return liniesSnapshot.some((l) => l.id === id);
@@ -64,6 +70,9 @@ export function isParadaFav(id: string): boolean {
 }
 export function isBicingFav(id: string): boolean {
   return bicingSnapshot.some((b) => b.id === id);
+}
+export function isFgcFav(id: string): boolean {
+  return fgcSnapshot.some((f) => f.id === id);
 }
 
 export function toggleLinia(linia: FavLinia): void {
@@ -87,5 +96,13 @@ export function toggleBicing(station: FavBicing): void {
     ? bicingSnapshot.filter((b) => b.id !== station.id)
     : [...bicingSnapshot, station];
   save(BICING_KEY, bicingSnapshot);
+  emit();
+}
+
+export function toggleFgc(parada: FavFgc): void {
+  fgcSnapshot = isFgcFav(parada.id)
+    ? fgcSnapshot.filter((f) => f.id !== parada.id)
+    : [...fgcSnapshot, parada];
+  save(FGC_KEY, fgcSnapshot);
   emit();
 }
