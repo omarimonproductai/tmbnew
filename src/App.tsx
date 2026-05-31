@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AproperMeuView } from './components/AproperMeuView';
 import { BicingView } from './components/BicingView';
 import { FavoritsView } from './components/FavoritsView';
-import { FgcLogo } from './components/FgcLogo';
+import { FgcView } from './components/FgcView';
 import { InstallBanner } from './components/InstallBanner';
 import { LiniesView } from './components/LiniesView';
 import { ModeToggle, type AppMode } from './components/ModeToggle';
@@ -91,14 +91,7 @@ export default function App() {
           onRequestedLineConsumed={() => setRequestedLine(null)}
         />
       )}
-      {appMode === 'fgc' && (
-        <main className="app-main mode-placeholder">
-          <div className="mode-placeholder__card">
-            <FgcLogo size={48} />
-            <p>FGC · properament</p>
-          </div>
-        </main>
-      )}
+      {appMode === 'fgc' && <FgcView />}
       {appMode === 'bicing' && <BicingView />}
       {appMode === 'aprop-meu' && <AproperMeuView focusStop={sharedStop} />}
       {appMode === 'favorits' && <FavoritsView onOpenLine={openLine} />}

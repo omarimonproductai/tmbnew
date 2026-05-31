@@ -9,6 +9,10 @@ import type {
 // Pure derivations over the static FGC catalogue. Shared by the Pages Function
 // (`functions/_fgc.ts`) and unit-testable on its own.
 
+export function fgcLineColor(codi: string): string {
+  return FGC_LINES.find((l) => l.codi === codi)?.color ?? '#1f7a3d';
+}
+
 export function liniesForStop(code: string): string[] {
   const out: string[] = [];
   for (const [lineCodi, stops] of Object.entries(FGC_LINE_STOPS)) {

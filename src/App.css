@@ -79,16 +79,100 @@ body {
   min-height: 0;
 }
 
-/* Placeholder shown for modes whose full view isn't built yet (e.g. FGC). */
-.mode-placeholder { align-items: center; justify-content: center; background: #f7f5ef; }
-.mode-placeholder__card {
+/* --- FGC mode --- */
+.fgc-panel {
+  width: 320px;
+  min-width: 280px;
+  background: white;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  color: #c8001e;
+  border-right: 1px solid #e0e0e0;
+  overflow: hidden;
 }
-.mode-placeholder__card p { margin: 0; font-weight: 700; font-size: 15px; color: #555; }
+.fgc-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+.fgc-panel-head .search-box { flex: 1; }
+.fgc-sort-btn {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1.5px solid #ddd;
+  background: white;
+  font-weight: 700;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+}
+.fgc-line-list { flex: 1; overflow-y: auto; }
+.fgc-line-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  background: white;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.fgc-line-row:hover { background: #fafafa; }
+.fgc-line-row.active { background: #eef6ef; }
+.fgc-line-badge {
+  width: 36px;
+  height: 22px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.fgc-line-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fgc-line-count { font-size: 11px; color: #bbb; flex-shrink: 0; }
+.fgc-popup-dist { color: #888; font-size: 12px; }
+
+/* FGC stop marker: train glyph in a white rounded square (currentColor border
+   = line colour) so it reads apart from TMB dots / Bicing squares / Cooltra. */
+.fgc-stop-icon { background: none; border: none; }
+.fgc-stop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #fff;
+  border: 2px solid currentColor;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.fgc-stop svg { display: block; }
+@keyframes fgc-wink-pulse {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.5); }
+  60% { transform: scale(1.15); }
+}
+.fgc-stop-icon.fgc-wink .fgc-stop {
+  animation: fgc-wink-pulse 1s ease;
+  box-shadow: 0 0 0 3px #1d7df2, 0 1px 3px rgba(0, 0, 0, 0.35);
+}
 
 .panel {
   width: 320px;
@@ -1465,6 +1549,15 @@ body {
 
 @media (max-width: 640px) {
   .app-main { flex-direction: column-reverse; }
+  /* FGC mode: list on top, map below (override the column-reverse default). */
+  main.fgc-main { flex-direction: column; }
+  .fgc-panel {
+    width: 100%;
+    min-width: 0;
+    max-height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
   .panel {
     display: none;
     width: 100%;

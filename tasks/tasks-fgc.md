@@ -93,15 +93,15 @@ fitxer. Actualitza el fitxer després de cada sub-tasca, no només en acabar la 
   - [x] 2.5 Tests del store (FGC + migració)
   - [x] 2.6 `lint + test + build` i push
 
-- [ ] 3.0 Mode FGC complet al header
-  - [ ] 3.1 `mockup-fgc.html` (mode + marcador FGC) i validar-ne l'estil abans de la UI
-  - [ ] 3.2 `src/utils/fgcMarkerIcon.ts` + `FgcLayer.tsx`: marcador FGC distingible (≠ cercles TMB, quadrats Bicing, mini Cooltra) amb estrella de favorit (reusar `favStarIcon`)
-  - [ ] 3.3 `useFgcLinies` (filtre/ordre/cerca) i `useFgcParades` (parades + shape de la línia seleccionada)
-  - [ ] 3.4 `FgcView.tsx`: reaprofitar `LineList`, `SearchInput`, `SortControls`, toggle mapa/llista i `MapView` (recorregut amb el color de línia via shape)
-  - [ ] 3.5 `FgcStationPopup.tsx`: dades de la parada + accions (Ruta fins aquí + caminant + Compartir)
-  - [ ] 3.6 ★ a línies i parades FGC (via `useFavorits` del 2.0)
-  - [ ] 3.7 Substituir el placeholder de `App.tsx` per `<FgcView />`
-  - [ ] 3.8 `lint + test + build` i push
+- [x] 3.0 Mode FGC complet al header
+  - [x] 3.1 `mockup-fgc.html` (mode + marcador FGC) i validar-ne l'estil abans de la UI
+  - [x] 3.2 `src/utils/fgcMarkerIcon.ts` + `FgcLayer.tsx`: marcador FGC distingible (≠ cercles TMB, quadrats Bicing, mini Cooltra) amb estrella de favorit (reusar `favStarIcon`)
+  - [x] 3.3 `useFgcLinies` (filtre/ordre/cerca) i `useFgcParades` (parades + shape de la línia seleccionada)
+  - [x] 3.4 `FgcView.tsx`: reaprofitar `LineList`, `SearchInput`, `SortControls`, toggle mapa/llista i `MapView` (recorregut amb el color de línia via shape)
+  - [x] 3.5 `FgcStationPopup.tsx`: dades de la parada + accions (Ruta fins aquí + caminant + Compartir)
+  - [x] 3.6 ★ a línies i parades FGC (via `useFavorits` del 2.0)
+  - [x] 3.7 Substituir el placeholder de `App.tsx` per `<FgcView />`
+  - [x] 3.8 `lint + test + build` i push
 
 - [ ] 4.0 Integració d'FGC a "Aprop meu"
   - [ ] 4.1 `useFgcStations` (totes les parades FGC) i barrejar-les a la llista unificada per proximitat (numerades)
