@@ -1,3 +1,5 @@
+import { FGC_ROUTE_IDS } from '../src/data/fgcStatic';
+import { decodeFeedMessage } from '../src/utils/gtfsRt';
 import type { FgcArribada, FgcVehicle } from '../src/types/fgc';
 
 // Static derivations live in src/utils/fgc.ts (shared + unit-tested).
@@ -12,82 +14,67 @@ const FGC_ODS_BASE =
 
 // --- REAL TIME (best-effort; validate fields in production) ----------
 
-interface OdsRecord {
-  [k: string]: unknown;
-}
-interface OdsResponse {
-  results?: OdsRecord[];
+interface OdsFileResponse {
+  results?: Array<{ file?: { url?: string } }>;
 }
 
-async function odsRecords(slug: string, params: string): Promise<OdsRecord[]> {
-  const url = `${FGC_ODS_BASE}/${slug}/records?${params}`;
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!res.ok) throw new Error(`FGC ODS ${slug} ${res.status}`);
-  const data = (await res.json()) as OdsResponse;
-  return Array.isArray(data.results) ? data.results : [];
+// The Opendatasoft GTFS-RT datasets expose a single record holding the raw
+// GTFS-RT protobuf as a file attachment (vehicleposition.pb / tripupdates.pb).
+// Step 1: read the records endpoint to get the current file URL. Step 2: fetch
+// the .pb. Step 3: decode it (see decodeFeedMessage). 2 subrequests per call.
+async function fetchPbFeed(slug: string) {
+  const recUrl = `${FGC_ODS_BASE}/${slug}/records?limit=1`;
+  const recRes = await fetch(recUrl, { headers: { Accept: 'application/json' } });
+  if (!recRes.ok) throw new Error(`FGC ODS ${slug} ${recRes.status}`);
+  const rec = (await recRes.json()) as OdsFileResponse;
+  const fileUrl = rec.results?.[0]?.file?.url;
+  if (!fileUrl) throw new Error(`FGC ODS ${slug}: cap fitxer .pb`);
+  const pbRes = await fetch(fileUrl);
+  if (!pbRes.ok) throw new Error(`FGC pb ${slug} ${pbRes.status}`);
+  return decodeFeedMessage(new Uint8Array(await pbRes.arrayBuffer()));
 }
 
-function num(v: unknown): number | null {
-  const x = Number(v);
-  return Number.isFinite(x) ? x : null;
-}
-function str(v: unknown): string {
-  return v === null || v === undefined ? '' : String(v);
-}
-
-// Vehicle positions: tolerate several plausible field names from the GTFS-RT
-// → ODS mapping (latitude/longitude/route_id/trip_id…).
-export async function fetchFgcVehicles(
-  liniaCodi?: string,
-): Promise<FgcVehicle[]> {
-  const recs = await odsRecords('vehicle-positions-gtfs_realtime', 'limit=100');
-  const vehicles: FgcVehicle[] = [];
-  for (const r of recs) {
-    const lat = num(r.latitude ?? r.lat ?? r.position_latitude);
-    const lng = num(r.longitude ?? r.lon ?? r.lng ?? r.position_longitude);
-    if (lat === null || lng === null) continue;
-    const route = str(r.route_id ?? r.route_short_name ?? r.line ?? r.linia);
-    if (liniaCodi && route && route.toUpperCase() !== liniaCodi.toUpperCase()) {
-      continue;
-    }
-    vehicles.push({
-      id: str(r.vehicle_id ?? r.id ?? r.trip_id ?? `${lat},${lng}`),
-      liniaCodi: route || (liniaCodi ?? ''),
-      lat,
-      lng,
-      destinacio: str(r.trip_headsign ?? r.headsign ?? '') || undefined,
-    });
-  }
-  return vehicles;
+// Map a feed route_id (GTFS route_id) to our line code (route_short_name). The
+// build pre-bake fills FGC_ROUTE_IDS; with the curated seed it's empty, so we
+// fall back to comparing the raw value.
+function routeCodi(routeId: string): string {
+  return FGC_ROUTE_IDS[routeId] ?? routeId;
 }
 
-// Trip updates → next arrivals for a stop.
-export async function fetchFgcArrivals(
-  stopCodi: string,
-): Promise<FgcArribada[]> {
-  const recs = await odsRecords(
-    'trip-updates-gtfs_realtime',
-    `limit=50&where=${encodeURIComponent(`stop_id="${stopCodi}"`)}`,
-  );
+export async function fetchFgcVehicles(liniaCodi?: string): Promise<FgcVehicle[]> {
+  const { vehicles } = await fetchPbFeed('vehicle-positions-gtfs_realtime');
+  const target = liniaCodi?.toUpperCase();
+  return vehicles
+    .filter((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng))
+    .map((v) => ({ codi: routeCodi(v.routeId), v }))
+    .filter(({ codi }) => !target || codi.toUpperCase() === target)
+    .map(({ codi, v }) => ({
+      id: v.id || `${v.lat},${v.lng}`,
+      liniaCodi: codi,
+      lat: v.lat,
+      lng: v.lng,
+    }));
+}
+
+export async function fetchFgcArrivals(stopCodi: string): Promise<FgcArribada[]> {
+  const { tripUpdates } = await fetchPbFeed('trip-updates-gtfs_realtime');
   const now = Date.now();
   const arribades: FgcArribada[] = [];
-  for (const r of recs) {
-    const epoch = num(r.arrival_time ?? r.arrival ?? r.departure_time);
-    let minuts: number | null = null;
-    if (epoch !== null) {
-      const ms = epoch > 1e12 ? epoch : epoch * 1000;
-      minuts = Math.max(0, Math.round((ms - now) / 60000));
+  for (const tu of tripUpdates) {
+    for (const s of tu.stops) {
+      if (s.stopId !== stopCodi) continue;
+      const minuts =
+        s.time !== null ? Math.max(0, Math.round((s.time * 1000 - now) / 60000)) : null;
+      arribades.push({
+        liniaCodi: routeCodi(tu.routeId),
+        destinacio: '',
+        minutsRestants: minuts,
+        text: minuts !== null ? `${minuts} min` : '—',
+      });
     }
-    arribades.push({
-      liniaCodi: str(r.route_id ?? r.route_short_name ?? r.line),
-      destinacio: str(r.trip_headsign ?? r.headsign ?? ''),
-      minutsRestants: minuts,
-      text: minuts !== null ? `${minuts} min` : '—',
-    });
   }
   arribades.sort(
-    (a, b) =>
-      (a.minutsRestants ?? Infinity) - (b.minutsRestants ?? Infinity),
+    (a, b) => (a.minutsRestants ?? Infinity) - (b.minutsRestants ?? Infinity),
   );
   return arribades;
 }

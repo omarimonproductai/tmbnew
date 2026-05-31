@@ -91,3 +91,7 @@ export const FGC_LINE_STOPS: Record<string, string[]> = {
   R5: ['ES', 'MG', 'IC', 'EU', 'CR', 'CO', 'SBL', 'ML', 'MR'],
   R6: ['ES', 'MG', 'IC', 'EU', 'CR', 'CO', 'SBL', 'ML', 'IG'],
 };
+
+// Maps the GTFS-RT route_id (numeric GTFS id) to our line code. Empty in the
+// seed; the build pre-bake fills it so live vehicles match the selected line.
+export const FGC_ROUTE_IDS: Record<string, string> = {};

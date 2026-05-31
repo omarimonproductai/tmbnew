@@ -65,7 +65,7 @@ function color(raw) {
 
 async function main() {
   console.log('Descarregant', GTFS_URL);
-  const res = await fetch(GTFS_URL);
+  const res = await fetch(GTFS_URL, { signal: AbortSignal.timeout(20000) });
   if (!res.ok) throw new Error(`GTFS ${res.status}`);
   const zip = unzipSync(new Uint8Array(await res.arrayBuffer()));
   const read = (name) => parseCsv(strFromU8(zip[name]));
@@ -110,6 +110,7 @@ async function main() {
 
   const FGC_LINES = [];
   const FGC_LINE_STOPS = {};
+  const FGC_ROUTE_IDS = {};
   const usedStops = new Set();
 
   for (const r of routes) {
@@ -128,6 +129,7 @@ async function main() {
       nomComplet: `FGC ${codi}`,
     });
     FGC_LINE_STOPS[codi] = ordered;
+    FGC_ROUTE_IDS[r.route_id] = codi;
     ordered.forEach((id) => usedStops.add(id));
   }
 
@@ -157,7 +159,8 @@ export interface FgcStaticStop {
     banner +
     `\nexport const FGC_LINES: FgcLinia[] = ${JSON.stringify(FGC_LINES, null, 2)};\n` +
     `\nexport const FGC_STOPS: Record<string, FgcStaticStop> = ${JSON.stringify(FGC_STOPS, null, 2)};\n` +
-    `\nexport const FGC_LINE_STOPS: Record<string, string[]> = ${JSON.stringify(FGC_LINE_STOPS, null, 2)};\n`;
+    `\nexport const FGC_LINE_STOPS: Record<string, string[]> = ${JSON.stringify(FGC_LINE_STOPS, null, 2)};\n` +
+    `\nexport const FGC_ROUTE_IDS: Record<string, string> = ${JSON.stringify(FGC_ROUTE_IDS, null, 2)};\n`;
 
   writeFileSync(OUT, body);
   console.log(
@@ -165,7 +168,13 @@ export interface FgcStaticStop {
   );
 }
 
+// Non-fatal: if FGC is unreachable (restricted network / allowlist), keep the
+// committed data and let the build proceed. On Cloudflare Pages (open network)
+// this regenerates the real dataset on every deploy.
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
+  console.warn(
+    "[build-fgc-data] no s'ha pogut regenerar; es manté el fitxer existent:",
+    err?.message ?? err,
+  );
+  process.exit(0);
 });

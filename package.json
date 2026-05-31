@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:functions": "concurrently -k -n vite,cf \"vite\" \"wrangler pages dev --proxy 5173\"",
+    "prebuild": "node scripts/build-fgc-data.mjs",
     "build": "tsc -b && vite build",
     "build:fgc": "node scripts/build-fgc-data.mjs",
     "preview": "vite preview",
