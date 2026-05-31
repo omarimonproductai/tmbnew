@@ -16,13 +16,14 @@ interface Option {
 
 const OPTIONS: Option[] = [
   {
-    value: 'route',
-    label: 'Ruta',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M3 11l18-8-8 18-2-8z" />
-      </svg>
-    ),
+    value: 'fgc',
+    label: 'FGC',
+    icon: <FgcLogo size={18} />,
+  },
+  {
+    value: 'bicing',
+    label: 'Bicing',
+    icon: <BicingLogo size={20} />,
   },
   {
     value: 'linies',
@@ -39,14 +40,13 @@ const OPTIONS: Option[] = [
     ),
   },
   {
-    value: 'fgc',
-    label: 'FGC',
-    icon: <FgcLogo size={18} />,
-  },
-  {
-    value: 'bicing',
-    label: 'Bicing',
-    icon: <BicingLogo size={20} />,
+    value: 'route',
+    label: 'Ruta',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M3 11l18-8-8 18-2-8z" />
+      </svg>
+    ),
   },
   {
     value: 'aprop-meu',
