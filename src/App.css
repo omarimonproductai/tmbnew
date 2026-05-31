@@ -2840,3 +2840,108 @@ body {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
   border-width: 2px;
 }
+
+/* --- Weather summary (top of Aprop meu) ------------------------------- */
+.weather-card {
+  margin: 8px 12px 4px;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+.weather-card--rain {
+  border-color: #b8d4f0;
+  background: #f3f8fe;
+}
+.weather-card--skeleton {
+  height: 56px;
+  background: linear-gradient(90deg, #f4f4f4 25%, #ececec 37%, #f4f4f4 63%);
+  background-size: 400% 100%;
+  animation: weather-shimmer 1.4s ease infinite;
+}
+@keyframes weather-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+.weather-card--error {
+  padding: 14px;
+  color: #888;
+  font-size: 13px;
+  text-align: center;
+}
+.weather-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  color: #222;
+}
+.weather-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.weather-temp {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+}
+.weather-verdict {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.weather-verdict-main {
+  font-size: 15px;
+  font-weight: 800;
+}
+.weather-card--rain .weather-verdict-main { color: #1a6fc4; }
+.weather-verdict-detail {
+  font-size: 12px;
+  color: #777;
+}
+.weather-loc-note {
+  font-size: 11px;
+  color: #999;
+}
+.weather-chevron {
+  color: #aaa;
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+.weather-chevron.open { transform: rotate(180deg); }
+
+.weather-hourly {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 4px 8px 10px;
+  -webkit-overflow-scrolling: touch;
+}
+.weather-hour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 46px;
+  padding: 6px 4px;
+  border-radius: 9px;
+}
+.weather-hour.rainy { background: #e3f0fc; }
+.weather-hour-time { font-size: 11px; color: #888; font-weight: 600; }
+.weather-hour-icon { font-size: 18px; line-height: 1; }
+.weather-hour-temp { font-size: 13px; font-weight: 700; color: #222; }
+.weather-hour-pop { font-size: 11px; color: #1a6fc4; font-weight: 600; }
+.weather-hour:not(.rainy) .weather-hour-pop { color: #bbb; }
+
+.weather-attribution {
+  padding: 0 12px 8px;
+  font-size: 10px;
+  color: #b0b0b0;
+  text-align: right;
+}

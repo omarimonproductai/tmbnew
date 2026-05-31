@@ -10,12 +10,14 @@ import { LocationBlock } from './LocationBlock';
 import { StopItem } from './ParadesAprop';
 import { RefreshControl } from './RefreshControl';
 import { Toast } from './Toast';
+import { WeatherSummary } from './WeatherSummary';
 import { useBicingFilter } from '../hooks/useBicingFilter';
 import { useBicingStations } from '../hooks/useBicingStations';
 import { useFgcStations } from '../hooks/useFgcStations';
 import { useCooltraKindFilters } from '../hooks/useCooltraKindFilters';
 import { useCooltraVehicles } from '../hooks/useCooltraVehicles';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { useWeather } from '../hooks/useWeather';
 import { inferKind } from '../types/cooltra';
 import type { FilterType } from '../hooks/useLinies';
 import { useParadesAprop } from '../hooks/useParadesAprop';
@@ -201,6 +203,7 @@ export function AproperMeuView({
   }, []);
 
   const { position, status, refresh } = useGeolocation(true);
+  const weather = useWeather(position);
   const { parades, loading: loadingParades, lastFailureAt } = useTotesParades(true);
   const { paradesDins } = useParadesAprop(position, radius, parades);
   const paradesFiltrades = useMemo(
@@ -401,6 +404,12 @@ export function AproperMeuView({
           </span>
         </button>
         <div className="sheet-body">
+          <WeatherSummary
+            forecast={weather.forecast}
+            source={weather.source}
+            loading={weather.loading}
+            error={weather.error}
+          />
           <LocationBlock radius={radius} onRadiusChange={setRadius} />
           {loadingParades && parades.length === 0 && (
             <div className="state-msg">Carregant parades de tota la xarxa…</div>

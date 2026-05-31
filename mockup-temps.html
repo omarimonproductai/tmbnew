@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mockup — Temps (Cal paraigua?)</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; background: #ddd; margin: 0; padding: 24px; }
+  .sheet { max-width: 380px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 8px 0; box-shadow: 0 8px 30px rgba(0,0,0,.2); }
+
+  .weather-card { margin: 8px 12px; border: 1px solid #e6e6e6; border-radius: 12px; overflow: hidden; }
+  .weather-card--rain { border-color: #b8d4f0; background: #f3f8fe; }
+  .weather-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: none; border: 0; cursor: pointer; text-align: left; }
+  .weather-icon { font-size: 24px; }
+  .weather-temp { font-size: 22px; font-weight: 800; color: #111; }
+  .weather-verdict { display: flex; flex-direction: column; flex: 1; }
+  .weather-verdict-main { font-size: 15px; font-weight: 800; }
+  .weather-card--rain .weather-verdict-main { color: #1a6fc4; }
+  .weather-verdict-detail { font-size: 12px; color: #777; }
+  .weather-loc-note { font-size: 11px; color: #999; }
+  .weather-chevron { color: #aaa; }
+
+  .weather-hourly { display: flex; gap: 4px; overflow-x: auto; padding: 4px 8px 10px; }
+  .weather-hour { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 46px; padding: 6px 4px; border-radius: 9px; }
+  .weather-hour.rainy { background: #e3f0fc; }
+  .weather-hour-time { font-size: 11px; color: #888; font-weight: 600; }
+  .weather-hour-icon { font-size: 18px; }
+  .weather-hour-temp { font-size: 13px; font-weight: 700; color: #222; }
+  .weather-hour-pop { font-size: 11px; color: #1a6fc4; font-weight: 600; }
+  .weather-hour:not(.rainy) .weather-hour-pop { color: #bbb; }
+  .weather-attribution { padding: 0 12px 8px; font-size: 10px; color: #b0b0b0; text-align: right; }
+
+  h3 { text-align: center; font-size: 13px; color: #666; }
+</style>
+</head>
+<body>
+  <h3>Estat sec (col·lapsat)</h3>
+  <div class="sheet">
+    <div class="weather-card">
+      <button class="weather-head">
+        <span class="weather-icon">⛅</span>
+        <span class="weather-temp">21°</span>
+        <span class="weather-verdict">
+          <span class="weather-verdict-main">No et cal paraigua</span>
+        </span>
+        <span class="weather-chevron">▾</span>
+      </button>
+    </div>
+  </div>
+
+  <h3 style="margin-top:28px">Estat pluja (desplegat)</h3>
+  <div class="sheet">
+    <div class="weather-card weather-card--rain">
+      <button class="weather-head">
+        <span class="weather-icon">🌧️</span>
+        <span class="weather-temp">17°</span>
+        <span class="weather-verdict">
+          <span class="weather-verdict-main">Agafa paraigua</span>
+          <span class="weather-verdict-detail">de les 17 a les 19 h</span>
+          <span class="weather-loc-note">Barcelona</span>
+        </span>
+        <span class="weather-chevron">▴</span>
+      </button>
+      <div class="weather-hourly">
+        <div class="weather-hour"><span class="weather-hour-time">14h</span><span class="weather-hour-icon">⛅</span><span class="weather-hour-temp">20°</span><span class="weather-hour-pop">10%</span></div>
+        <div class="weather-hour"><span class="weather-hour-time">15h</span><span class="weather-hour-icon">☁️</span><span class="weather-hour-temp">19°</span><span class="weather-hour-pop">30%</span></div>
+        <div class="weather-hour rainy"><span class="weather-hour-time">17h</span><span class="weather-hour-icon">🌧️</span><span class="weather-hour-temp">17°</span><span class="weather-hour-pop">70%</span></div>
+        <div class="weather-hour rainy"><span class="weather-hour-time">18h</span><span class="weather-hour-icon">🌧️</span><span class="weather-hour-temp">16°</span><span class="weather-hour-pop">80%</span></div>
+        <div class="weather-hour rainy"><span class="weather-hour-time">19h</span><span class="weather-hour-icon">🌦️</span><span class="weather-hour-temp">16°</span><span class="weather-hour-pop">55%</span></div>
+        <div class="weather-hour"><span class="weather-hour-time">20h</span><span class="weather-hour-icon">⛅</span><span class="weather-hour-temp">17°</span><span class="weather-hour-pop">20%</span></div>
+      </div>
+      <div class="weather-attribution">Dades meteorològiques: Open‑Meteo</div>
+    </div>
+  </div>
+</body>
+</html>
