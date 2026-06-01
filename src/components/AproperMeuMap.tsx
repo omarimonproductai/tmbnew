@@ -146,9 +146,30 @@ export function AproperMeuMap({
       {fgcStations.length > 0 && (
         <FgcLayer parades={fgcStations} origin={centre} winkTarget={fgcWinkTarget} />
       )}
+      <HideControlsOnPopup />
       <InvalidateOnResize />
     </MapContainer>
   );
+}
+
+// Leaflet's controls (zoom/rotation) live outside the transformed map-pane, so
+// no z-index on the popup pane can rise above them — they'd slice through an
+// open stop popup. While a popup is open, flag the container so CSS hides the
+// top-left control stack; it returns on close.
+function HideControlsOnPopup() {
+  const map = useMap();
+  useEffect(() => {
+    const el = map.getContainer();
+    const open = () => el.classList.add('has-open-popup');
+    const close = () => el.classList.remove('has-open-popup');
+    map.on('popupopen', open);
+    map.on('popupclose', close);
+    return () => {
+      map.off('popupopen', open);
+      map.off('popupclose', close);
+    };
+  }, [map]);
+  return null;
 }
 
 // When the user or radius change, refit the bounds inside the visible area

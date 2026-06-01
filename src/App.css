@@ -1073,11 +1073,11 @@ body {
 }
 .vehicle-tooltip-dest { color: #222; font-weight: 600; }
 
-/* Leaflet's controls (zoom/rotation) sit at z-index 1000, above the default
-   popup pane (700) — they'd slice through an open stop popup and its action
-   buttons. Lift the popup pane above the controls (but below the weather
-   chip/panel at 1200). */
-.leaflet-popup-pane { z-index: 1100; }
+/* Leaflet's controls (zoom/rotation) sit at z-index 1000, outside the
+   transformed .leaflet-map-pane — no z-index on the popup pane can lift a stop
+   popup above them. So while a popup is open we hide the top-left control stack
+   (AproperMeuMap flags the container); it returns when the popup closes. */
+.map-container.has-open-popup .leaflet-top.leaflet-left { display: none; }
 
 .vehicle-popup .leaflet-popup-content {
   margin: 10px 12px;
